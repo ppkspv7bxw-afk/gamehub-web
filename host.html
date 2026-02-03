@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Host • Gamehub4u</title>
+  <link rel="stylesheet" href="/common.css"/>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <div class="brand">
+          <div class="title">
+            <div>Host Panel</div>
+            <small id="roomLabel">Room: ...</small>
+          </div>
+        </div>
+
+        <div class="status">
+          <span id="light" class="statusLight"></span>
+          <span id="statusText">...</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="grid">
+          <div class="panel">
+            <div class="kv">
+              <div class="k">Room Code</div>
+              <div class="v"><span id="roomCode">...</span></div>
+            </div>
+            <div class="hint" style="margin-top:6px">
+              رابط الدعوة: <a id="inviteLink" href="#" target="_blank" rel="noopener">...</a>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="label">اسم الـ Host (اختياري تدخل كلاعب)</div>
+            <input id="hostName" class="input" placeholder="اسمك" maxlength="20" autocomplete="off"/>
+
+            <div class="row" style="margin-top:12px;">
+              <button id="joinAsPlayerBtn" class="btn secondary" type="button">Join as Player</button>
+              <button id="goLobbyBtn" class="btn ghost" type="button">Open Lobby</button>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="row">
+              <button id="toggleDevBtn" class="btn" type="button">Dev Mode: OFF</button>
+              <button id="startMafiaBtn" class="btn danger" type="button">Start Mafia</button>
+              <button id="nextBtn" class="btn secondary" type="button">Next Phase</button>
+            </div>
+
+            <div class="hint">
+              Dev Mode يخلّي المافيا تبدأ من لاعبين للتجربة.
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="label">Players</div>
+            <ul id="players" class="list"></ul>
+
+            <div class="hr"></div>
+
+            <div class="label">Mafia State</div>
+            <div class="kv"><div class="k">Phase</div><div class="v" id="phase">-</div></div>
+            <div class="kv"><div class="k">Round</div><div class="v" id="round">-</div></div>
+            <div class="kv"><div class="k">Winner</div><div class="v" id="winner">-</div></div>
+            <div class="hint" id="lastResult" style="margin-top:10px"></div>
+
+            <div class="hr"></div>
+
+            <div id="devBox" style="display:none">
+              <div class="label">Dev Tools</div>
+              <div class="row">
+                <button id="revealBtn" class="btn secondary" type="button">Reveal All Roles</button>
+              </div>
+              <div class="hint" id="revealOut" style="white-space:pre-wrap"></div>
+
+              <div class="hr"></div>
+
+              <div class="label">Set Role</div>
+              <select id="targetSel" class="select"></select>
+              <select id="roleSel" class="select" style="margin-top:8px">
+                <option value="mafia">mafia</option>
+                <option value="detective">detective</option>
+                <option value="doctor">doctor</option>
+                <option value="villager">villager</option>
+              </select>
+              <div class="row" style="margin-top:10px">
+                <button id="setRoleBtn" class="btn" type="button">Apply Role</button>
+                <button id="toggleAliveBtn" class="btn danger" type="button">Toggle Alive</button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="box">
+      <h3>انقطع الاتصال</h3>
+      <p>بنحاول نرجع الاتصال تلقائيًا…</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">OK</div>
+
+  <script src="https://gamehub-server-okv5.onrender.com/socket.io/socket.io.js"></script>
+  <script src="/common.js"></script>
+  <script>
+    const socket = createSocket();
+    bindStatusLight(socket, document.getElementById("light"));
+    setupReconnectOverlay(socket);
+
+    const roomEl = document.getElementById("roomCode");
+    const roomLabel = document.getElementById("roomLabel");
+    const inviteLink = document.getElementById("inviteLink");
+    const playersEl = document.getElementById("players");
+
+    const hostName = document.getElementById("hostName");
+    const joinAsPlayerBtn = document.getElementById("joinAsPlayerBtn");
+    const goLobbyBtn = document.getElementById("goLobbyBtn");
+
+    const toggleDevBtn = document.getElementById("toggleDevBtn");
+    const startMafiaBtn = document.getElementById("startMafiaBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    const phaseEl = document.getElementById("phase");
+    const roundEl = document.getElementById("round");
+    const winnerEl = document.getElementById("winner");
+    const lastResultEl = document.getElementById("lastResult");
+
+    const devBox = document.getElementById("devBox");
+    const revealBtn = document.getElementById("revealBtn");
+    const revealOut = document.getElementById("revealOut");
+    const targetSel = document.getElementById("targetSel");
+    const roleSel = document.getElementById("roleSel");
+    const setRoleBtn = document.getElementById("setRoleBtn");
+    const toggleAliveBtn = document.getElementById("toggleAliveBtn");
+
+    const profile = loadProfile();
+    if(profile.name) hostName.value = profile.name;
+
+    let roomCode = (getParam("room") || "").trim().toUpperCase();
+    let devMode = false;
+
+    function setRoomUI(code){
+      roomCode = code;
+      roomEl.textContent = code;
+      roomLabel.textContent = "Room: " + code;
+      const link = WEB_ORIGIN + "/?room=" + encodeURIComponent(code);
+      inviteLink.textContent = link;
+      inviteLink.href = link;
+      setParam("room", code);
+    }
+
+    function renderPlayers(state){
+      playersEl.innerHTML = "";
+      targetSel.innerHTML = "";
+
+      const players = (state.players || []);
+      if(players.length === 0){
+        playersEl.innerHTML = `<li class="item"><div class="left"><span class="pill warn">Empty</span><div>لا يوجد لاعبين</div></div></li>`;
+        return;
+      }
+
+      for(const p of players){
+        const li = document.createElement("li");
+        li.className = "item";
+        li.innerHTML = `
+          <div class="left">
+            <span class="pill ${p.ready ? "ok":"warn"}">${p.ready ? "Ready":"Not Ready"}</span>
+            <div style="font-weight:900; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${p.name}</div>
+          </div>
+          <div class="pill">${p.clientId === state.hostClientId ? "HOST" : "PLAYER"}</div>
+        `;
+        playersEl.appendChild(li);
+
+        const opt = document.createElement("option");
+        opt.value = p.clientId;
+        opt.textContent = p.name + " (" + p.clientId.slice(0,6) + ")";
+        targetSel.appendChild(opt);
+      }
+    }
+
+    function renderMafia(ms){
+      phaseEl.textContent = ms.started ? ms.phase : "not started";
+      roundEl.textContent = ms.started ? String(ms.round) : "-";
+      winnerEl.textContent = ms.winnerTeam || "-";
+
+      if(ms.lastResult){
+        lastResultEl.textContent = "Last: " + JSON.stringify(ms.lastResult);
+      }else{
+        lastResultEl.textContent = "";
+      }
+
+      devMode = !!ms.devMode;
+      toggleDevBtn.textContent = "Dev Mode: " + (devMode ? "ON" : "OFF");
+      devBox.style.display = devMode ? "block" : "none";
+    }
+
+    // Create room if no room param
+    socket.on("connect", () => {
+      if(!roomCode){
+        socket.emit("host:createRoom");
+      }else{
+        socket.emit("host:attach", { roomCode });
+      }
+    });
+
+    socket.on("room:created", ({ roomCode: rc } = {}) => {
+      const code = String(rc||"").trim().toUpperCase();
+      if(!code) return;
+      setRoomUI(code);
+      showToast("Room created ✅");
+    });
+
+    socket.on("host:attached", ({ roomCode: rc } = {}) => {
+      if(rc) setRoomUI(String(rc).trim().toUpperCase());
+    });
+
+    socket.on("host:attach:error", ({ message }={}) => showToast(message || "HOST_ATTACH_ERROR"));
+
+    socket.on("room:state", (state) => {
+      if(!state) return;
+      if(state.roomCode && !roomCode) setRoomUI(state.roomCode);
+      renderPlayers(state);
+    });
+
+    socket.on("mafia:state", (ms) => renderMafia(ms));
+    socket.on("start:error", ({ message, minPlayers } = {}) => {
+      if(message === "NEED_MIN_PLAYERS") return showToast("Need players: " + minPlayers);
+      showToast(message || "Start error");
+    });
+
+    joinAsPlayerBtn.onclick = () => {
+      if(!roomCode) return showToast("No room");
+      const nm = validateName(hostName.value);
+      if(!nm.ok) return showToast(nm.msg);
+      saveProfile(nm.value);
+      socket.emit("host:joinAsPlayer", { roomCode, name: nm.value });
+      showToast("Joined as player ✅");
+    };
+
+    goLobbyBtn.onclick = () => {
+      if(!roomCode) return showToast("No room");
+      location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(roomCode);
+    };
+
+    toggleDevBtn.onclick = () => {
+      if(!roomCode) return;
+      const next = !devMode;
+      socket.emit("host:setDevMode", { roomCode, enabled: next });
+    };
+
+    startMafiaBtn.onclick = () => {
+      if(!roomCode) return;
+      socket.emit("mafia:start", { roomCode });
+    };
+
+    nextBtn.onclick = () => {
+      if(!roomCode) return;
+      socket.emit("mafia:next", { roomCode });
+    };
+
+    revealBtn.onclick = () => {
+      if(!roomCode) return;
+      socket.emit("mafia:revealAll", { roomCode });
+    };
+
+    socket.on("mafia:reveal", ({ list } = {}) => {
+      if(!Array.isArray(list)) return;
+      revealOut.textContent = list.map(x => `${x.name} • ${x.role} • ${x.alive ? "alive":"dead"}`).join("\n");
+    });
+
+    setRoleBtn.onclick = () => {
+      if(!roomCode) return;
+      const targetId = targetSel.value;
+      const role = roleSel.value;
+      socket.emit("mafia:setRole", { roomCode, targetId, role });
+      showToast("Role updated ✅");
+    };
+
+    toggleAliveBtn.onclick = () => {
+      if(!roomCode) return;
+      const targetId = targetSel.value;
+      socket.emit("mafia:toggleAlive", { roomCode, targetId });
+      showToast("Toggled ✅");
+    };
+  </script>
+</body>
+</html>
