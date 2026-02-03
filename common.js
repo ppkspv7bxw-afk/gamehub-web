@@ -1,7 +1,5 @@
-// ====== CONFIG ======
-const SERVER_URL = "https://api.gamehub4u.com"; // ✅ هذا هو الجديد
+const SERVER_URL = "https://api.gamehub4u.com";
 
-// ====== Helpers ======
 const WEB_ORIGIN = location.origin;
 
 function getParam(key) {
@@ -58,7 +56,6 @@ function loadProfile() {
   return { name: localStorage.getItem("gh_name") || "" };
 }
 
-// ====== Socket.io Loader (تحميل تلقائي من api) ======
 function ensureSocketIoLoaded() {
   if (window.io) return Promise.resolve();
 
@@ -67,8 +64,7 @@ function ensureSocketIoLoaded() {
     s.src = `${SERVER_URL}/socket.io/socket.io.js`;
     s.async = true;
     s.onload = () => resolve();
-    s.onerror = () =>
-      reject(new Error("socket.io script failed to load: " + s.src));
+    s.onerror = () => reject(new Error("socket.io load failed"));
     document.head.appendChild(s);
   });
 }
@@ -92,7 +88,6 @@ function bindStatusLight(socket, el) {
   };
 
   set("bad", "Disconnected");
-
   socket.on("connect", () => set("ok", "Connected"));
   socket.on("disconnect", () => set("bad", "Disconnected"));
   socket.on("connect_error", () => set("warn", "Connecting..."));
