@@ -16,7 +16,9 @@
 
         <div class="status">
           <span id="light" class="statusLight bad"></span>
-          <!-- ✅ شلينا أي كتابة للحالة -->
+
+          <!-- ✅ موجود عشان JS ما ينكسر، لكنه مخفي -->
+          <span id="statusText" style="display:none;">Loading...</span>
         </div>
       </div>
 
@@ -56,11 +58,14 @@
     const SERVER_URL = "https://api.gamehub4u.com";
     const WEB_ORIGIN = location.origin;
 
-    function setLight(cls) {
+    function setStatus(text, cls) {
+      const label = document.getElementById("statusText");
       const light = document.getElementById("light");
-      if (!light) return;
-      light.classList.remove("ok","warn","bad");
-      light.classList.add(cls);
+      if (label) label.textContent = text;
+      if (light) {
+        light.classList.remove("ok","warn","bad");
+        light.classList.add(cls);
+      }
     }
 
     function showToast(msg) {
@@ -119,17 +124,16 @@
     }
 
     async function start() {
-      setLight("warn");
+      setStatus("Connecting...", "warn");
 
-      // 1) حمل socket.io client من السيرفر
       try {
         await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
       } catch (e) {
-        setLight("bad");
+        setStatus("Offline", "bad");
+        showToast("ما قدرنا نحمل socket.io من api");
         return;
       }
 
-      // 2) اتصل
       let socket;
       try {
         socket = io(SERVER_URL, {
@@ -137,7 +141,8 @@
           auth: { clientId }
         });
       } catch (e) {
-        setLight("bad");
+        setStatus("Offline", "bad");
+        showToast("تعذر تشغيل socket");
         return;
       }
 
@@ -145,11 +150,10 @@
       const showOv = () => ov && ov.classList.add("show");
       const hideOv = () => ov && ov.classList.remove("show");
 
-      socket.on("connect", () => { setLight("ok"); hideOv(); });
-      socket.on("disconnect", () => { setLight("bad"); showOv(); });
-      socket.on("connect_error", () => { setLight("warn"); });
+      socket.on("connect", () => { setStatus("Connected", "ok"); hideOv(); });
+      socket.on("disconnect", () => { setStatus("Disconnected", "bad"); showOv(); });
+      socket.on("connect_error", () => { setStatus("Connecting...", "warn"); });
 
-      // UI
       const roomInput = document.getElementById("room");
       const nameInput = document.getElementById("name");
       const joinBtn   = document.getElementById("joinBtn");
