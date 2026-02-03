@@ -16,7 +16,7 @@
 
         <div class="status">
           <span id="light" class="statusLight"></span>
-          <span id="statusText">...</span>
+          <span id="statusText">Loading...</span>
         </div>
       </div>
 
@@ -55,13 +55,12 @@
   <script src="/common.js"></script>
   <script>
     (async () => {
-      const roomFromUrl = (getParam("room") || "").trim().toUpperCase();
-
       const roomInput = document.getElementById("room");
       const nameInput = document.getElementById("name");
       const joinBtn   = document.getElementById("joinBtn");
       const hostBtn   = document.getElementById("hostBtn");
 
+      const roomFromUrl = (getParam("room") || "").trim().toUpperCase();
       const profile = loadProfile();
       if (profile.name) nameInput.value = profile.name;
       if (roomFromUrl) roomInput.value = roomFromUrl;
@@ -70,11 +69,13 @@
         roomInput.value = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
       });
 
+      // محاولة اتصال واضحة (لو فشلت يصير Offline بدل 3 نقاط)
       let socket;
       try {
         socket = await createSocket();
       } catch (e) {
-        // common.js بيحوّل الحالة إلى Offline تلقائيًا
+        // common.js بيغيّرها Offline تلقائياً
+        showToast("Server offline");
         return;
       }
 
