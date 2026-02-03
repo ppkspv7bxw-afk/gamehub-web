@@ -5,334 +5,120 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Gamehub4u</title>
 
-  <!-- إذا عندك common.css وتبيه، خله -->
-  <link rel="stylesheet" href="/common.css"/>
-
-  <!-- UI إضافي خفيف فوق الـ common.css -->
   <style>
-    :root{
-      --bg1:#070A12;
-      --bg2:#0B1224;
-      --card:rgba(255,255,255,.06);
-      --stroke:rgba(255,255,255,.10);
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.62);
-      --danger:#ff5a6a;
-      --ok:#34d399;
-      --warn:#fbbf24;
-      --shadow: 0 24px 70px rgba(0,0,0,.55);
-      --radius: 18px;
-    }
-
     body{
-      margin:0;
+      margin:0; min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(900px 600px at 20% 10%, rgba(99,102,241,.18), transparent 60%),
-        radial-gradient(900px 600px at 80% 20%, rgba(34,211,238,.12), transparent 55%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px 14px;
+      background:#0b1020; color:#fff;
+      padding:16px;
     }
-
-    .shell{
-      width:min(980px, 100%);
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:18px;
-      align-items:stretch;
+    .card{
+      width:min(520px, 100%);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      padding:18px;
     }
-
-    @media (max-width: 860px){
-      .shell{ grid-template-columns: 1fr; }
-    }
-
-    .hero{
-      border:1px solid var(--stroke);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
-      padding:22px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .hero:before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      background:
-        radial-gradient(400px 250px at 15% 15%, rgba(99,102,241,.18), transparent 55%),
-        radial-gradient(400px 250px at 85% 25%, rgba(34,211,238,.12), transparent 55%);
-      pointer-events:none;
-    }
-
-    .hero > *{ position:relative; }
-
-    .toprow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+    .top{
+      display:flex; align-items:center; justify-content:space-between;
       gap:12px;
       margin-bottom:14px;
     }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
+    h1{ margin:0; font-size:20px; }
+    .status{ display:flex; align-items:center; gap:8px; }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background:#ff4d4d;
+      box-shadow:0 0 0 4px rgba(255,77,77,.15);
     }
+    .dot.ok{ background:#22c55e; box-shadow:0 0 0 4px rgba(34,197,94,.15); }
+    .dot.warn{ background:#fbbf24; box-shadow:0 0 0 4px rgba(251,191,36,.15); }
+    .dot.bad{ background:#ff4d4d; box-shadow:0 0 0 4px rgba(255,77,77,.15); }
+    .st{ font-size:13px; opacity:.8; }
 
-    .logoDot{
-      width:12px;height:12px;border-radius:999px;
-      background: rgba(99,102,241,.9);
-      box-shadow: 0 0 18px rgba(99,102,241,.45);
-    }
-
-    h1{
-      margin:0;
-      font-size:22px;
-      letter-spacing:.2px;
-      line-height:1.2;
-    }
-
-    .sub{
-      margin:8px 0 0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.6;
-    }
-
-    .statusPill{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      border:1px solid var(--stroke);
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(0,0,0,.18);
-      backdrop-filter: blur(8px);
-      user-select:none;
-      white-space:nowrap;
-    }
-
-    .statusLight{
-      width:10px;height:10px;border-radius:50%;
-      background: var(--danger);
-      box-shadow: 0 0 0 4px rgba(255,90,106,.12);
-    }
-    .statusLight.ok{ background: var(--ok); box-shadow: 0 0 0 4px rgba(52,211,153,.12); }
-    .statusLight.warn{ background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.12); }
-    .statusLight.bad{ background: var(--danger); box-shadow: 0 0 0 4px rgba(255,90,106,.12); }
-
-    .statusText{
-      font-size:13px;
-      color: var(--muted);
-    }
-
-    .formCard{
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.06);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
-      padding:18px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:7px;
-    }
-
-    label{
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .input{
+    .field{ margin-top:10px; }
+    label{ display:block; font-size:13px; opacity:.75; margin-bottom:6px; }
+    input{
       width:100%;
-      padding:14px 14px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
-      color:var(--text);
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.25);
+      color:#fff;
       outline:none;
       font-size:15px;
     }
-    .input:focus{
-      border-color: rgba(99,102,241,.55);
-      box-shadow: 0 0 0 4px rgba(99,102,241,.16);
-    }
-    .input.invalid{
-      border-color: rgba(255,90,106,.55);
-      box-shadow: 0 0 0 4px rgba(255,90,106,.14);
-    }
-
-    .row{
-      display:flex;
-      gap:10px;
-      margin-top:6px;
-    }
-
-    .btn{
+    input:focus{ border-color: rgba(99,102,241,.7); box-shadow:0 0 0 4px rgba(99,102,241,.18); }
+    .row{ display:flex; gap:10px; margin-top:14px; }
+    button{
       flex:1;
+      padding:12px 12px;
+      border-radius:12px;
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(99,102,241,.90);
-      color:white;
-      padding:12px 14px;
-      border-radius: 14px;
-      font-weight:700;
       cursor:pointer;
-      transition: transform .06s ease, opacity .2s ease, filter .2s ease;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
+      font-weight:700;
     }
-    .btn:hover{ filter:brightness(1.06); }
-    .btn:active{ transform: translateY(1px); }
-    .btn.secondary{
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-    }
-    .btn[disabled]{ opacity:.55; cursor:not-allowed; }
-
-    .tiny{
-      margin-top:2px;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.5;
-    }
-
-    .errorLine{
-      display:none;
-      color: rgba(255,90,106,.95);
-      font-size:13px;
-      line-height:1.5;
-      padding:10px 12px;
-      border:1px solid rgba(255,90,106,.26);
-      background: rgba(255,90,106,.10);
-      border-radius: 14px;
-    }
-
-    .errorLine.show{ display:block; }
+    .primary{ background:#6366f1; color:#fff; }
+    .secondary{ background:rgba(255,255,255,.06); color:#fff; }
 
     .toast{
-      position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,.78);
-      color: white;
-      padding: 10px 14px;
-      border-radius: 999px;
+      position:fixed; left:50%; bottom:16px;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,.75);
       border:1px solid rgba(255,255,255,.14);
+      padding:10px 14px;
+      border-radius:999px;
       opacity:0;
+      transition:.2s;
       pointer-events:none;
-      transition: opacity .2s ease, transform .2s ease;
       font-size:13px;
-      backdrop-filter: blur(10px);
     }
-    .toast.show{
-      opacity:1;
-      transform: translateX(-50%) translateY(-4px);
-    }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px); }
 
     .overlay{
-      position: fixed;
-      inset:0;
-      background: rgba(0,0,0,.45);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.45);
+      display:none; align-items:center; justify-content:center;
+      padding:16px;
     }
     .overlay.show{ display:flex; }
     .overlay .box{
       width:min(420px, 100%);
-      border-radius: 18px;
+      background:rgba(10,12,18,.86);
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(10,12,18,.86);
-      padding: 16px;
-      box-shadow: var(--shadow);
+      border-radius:16px;
+      padding:14px;
     }
     .overlay h3{ margin:0 0 8px; font-size:16px; }
-    .overlay p{ margin:0; color:var(--muted); font-size:13px; line-height:1.6; }
-
-    .spinner{
-      width:16px;height:16px;border-radius:50%;
-      border:2px solid rgba(255,255,255,.35);
-      border-top-color: rgba(255,255,255,.95);
-      animation: spin 1s linear infinite;
-      display:none;
-    }
-    .btn.loading .spinner{ display:inline-block; }
-    .btn.loading .btnText{ opacity:.9; }
-
-    @keyframes spin { to{ transform: rotate(360deg);} }
+    .overlay p{ margin:0; opacity:.75; font-size:13px; line-height:1.6; }
   </style>
 </head>
 <body>
-  <div class="shell">
 
-    <section class="hero">
-      <div class="toprow">
-        <div class="brand">
-          <span class="logoDot"></span>
-          <div style="min-width:0">
-            <h1>Gamehub4u</h1>
-          </div>
-        </div>
-
-        <div class="statusPill">
-          <span id="light" class="statusLight bad"></span>
-          <span id="statusText" class="statusText">Loading...</span>
-        </div>
+  <div class="card">
+    <div class="top">
+      <h1>Gamehub4u</h1>
+      <div class="status">
+        <span id="light" class="dot bad"></span>
+        <span id="statusText" class="st">Loading...</span>
       </div>
+    </div>
 
-      <p class="sub">
-        ادخل الكود واسمك. إذا أنت المضيف افتح Host وأنشئ غرفة.
-      </p>
+    <div class="field">
+      <label for="room">Room Code</label>
+      <input id="room" placeholder="مثال: 6F3J" maxlength="6" autocomplete="off"/>
+    </div>
 
-      <div class="tiny">
-        اختصار: اضغط Enter للتنفيذ بسرعة.
-      </div>
-    </section>
+    <div class="field">
+      <label for="name">اسمك</label>
+      <input id="name" placeholder="مثال: محمد" maxlength="20" autocomplete="off"/>
+    </div>
 
-    <section class="formCard" aria-label="Join form">
-      <div id="err" class="errorLine"></div>
-
-      <div class="field">
-        <label for="room">Room Code</label>
-        <input id="room" class="input" placeholder="مثال: 6F3J" maxlength="6" autocomplete="off"/>
-      </div>
-
-      <div class="field">
-        <label for="name">اسمك</label>
-        <input id="name" class="input" placeholder="مثال: محمد" maxlength="20" autocomplete="off"/>
-      </div>
-
-      <div class="row">
-        <button id="joinBtn" class="btn" type="button">
-          <span class="spinner" aria-hidden="true"></span>
-          <span class="btnText">Join</span>
-        </button>
-        <button id="hostBtn" class="btn secondary" type="button">Host</button>
-      </div>
-
-      <div class="tiny" style="text-align:center;">
-        إذا ما اتصل السيرفر بتشوف Offline بدل ما يعلق.
-      </div>
-    </section>
-
+    <div class="row">
+      <button id="joinBtn" class="primary" type="button">Join</button>
+      <button id="hostBtn" class="secondary" type="button">Host</button>
+    </div>
   </div>
 
   <div id="overlay" class="overlay">
@@ -345,11 +131,9 @@
   <div id="toast" class="toast">OK</div>
 
   <script>
-    // ===== Connection Config =====
     const SERVER_URL = "https://api.gamehub4u.com";
     const WEB_ORIGIN = location.origin;
 
-    // ===== UI Helpers =====
     function setStatus(text, cls) {
       const label = document.getElementById("statusText");
       const light = document.getElementById("light");
@@ -369,30 +153,19 @@
       showToast._tm = setTimeout(() => t.classList.remove("show"), 1600);
     }
 
-    function showError(msg){
-      const err = document.getElementById("err");
-      if (!err) return;
-      if (!msg) { err.classList.remove("show"); err.textContent=""; return; }
-      err.textContent = String(msg);
-      err.classList.add("show");
-    }
-
     function normalizeRoom(s) {
       return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0,6);
     }
-
     function validateRoomCode(s) {
       const v = normalizeRoom(s);
       if (v.length < 3) return { ok:false, msg:"اكتب Room Code صحيح" };
       return { ok:true, value:v };
     }
-
     function validateName(s) {
       const v = String(s || "").trim().replace(/\s+/g," ").slice(0,20);
       if (v.length < 2) return { ok:false, msg:"اكتب اسم (حرفين على الأقل)" };
       return { ok:true, value:v };
     }
-
     function getOrCreateClientId() {
       let id = localStorage.getItem("gh_clientId");
       if (!id) {
@@ -418,38 +191,22 @@
       });
     }
 
-    function setLoading(isLoading){
-      const btn = document.getElementById("joinBtn");
-      if (!btn) return;
-      btn.classList.toggle("loading", !!isLoading);
-      btn.disabled = !!isLoading;
-    }
-
     async function start() {
       setStatus("Connecting...", "warn");
-      showError("");
 
-      // 1) Load socket.io client
+      // تحميل socket.io client
       try {
         await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
       } catch (e) {
         setStatus("Offline", "bad");
-        showError("ما قدرنا نحمل socket.io من api");
+        showToast("socket.io ما انحمّل من api");
         return;
       }
 
-      // 2) Connect
-      let socket;
-      try {
-        socket = io(SERVER_URL, {
-          transports: ["websocket","polling"],
-          auth: { clientId }
-        });
-      } catch (e) {
-        setStatus("Offline", "bad");
-        showError("تعذر تشغيل socket");
-        return;
-      }
+      const socket = io(SERVER_URL, {
+        transports: ["websocket","polling"],
+        auth: { clientId }
+      });
 
       const ov = document.getElementById("overlay");
       const showOv = () => ov && ov.classList.add("show");
@@ -459,7 +216,6 @@
       socket.on("disconnect", () => { setStatus("Disconnected", "bad"); showOv(); });
       socket.on("connect_error", () => { setStatus("Connecting...", "warn"); });
 
-      // Form
       const roomInput = document.getElementById("room");
       const nameInput = document.getElementById("name");
       const joinBtn   = document.getElementById("joinBtn");
@@ -472,50 +228,28 @@
 
       roomInput.addEventListener("input", () => {
         roomInput.value = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-        roomInput.classList.remove("invalid");
-        showError("");
-      });
-
-      nameInput.addEventListener("input", () => {
-        nameInput.classList.remove("invalid");
-        showError("");
       });
 
       hostBtn.onclick = () => location.href = WEB_ORIGIN + "/host.html";
 
       function doJoin(){
         const rc = validateRoomCode(roomInput.value);
-        if (!rc.ok) {
-          roomInput.classList.add("invalid");
-          showError(rc.msg);
-          return;
-        }
+        if (!rc.ok) return showToast(rc.msg);
 
         const nm = validateName(nameInput.value);
-        if (!nm.ok) {
-          nameInput.classList.add("invalid");
-          showError(nm.msg);
-          return;
-        }
+        if (!nm.ok) return showToast(nm.msg);
 
         saveProfile(nm.value);
-        setLoading(true);
         socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
       }
 
       joinBtn.onclick = doJoin;
-
-      // Enter shortcuts
       roomInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doJoin(); });
       nameInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doJoin(); });
 
-      socket.on("join:error", ({ message } = {}) => {
-        setLoading(false);
-        showError(message || "Join error");
-      });
+      socket.on("join:error", ({ message } = {}) => showToast(message || "Join error"));
 
       socket.on("player:joined", ({ roomCode: rc } = {}) => {
-        setLoading(false);
         const code = String(rc || "").trim().toUpperCase();
         showToast("Joined ✅");
         setTimeout(() => {
