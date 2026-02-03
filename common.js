@@ -1,4 +1,7 @@
-const SERVER_URL = "https://api.gamehub4u.com";
+const PRIMARY_SERVER_URL = "https://api.gamehub4u.com";
+const FALLBACK_SERVER_URL = "https://gamehub-server-okv5.onrender.com";
+
+let SERVER_URL = PRIMARY_SERVER_URL;
 
 const WEB_ORIGIN = location.origin;
 
@@ -7,9 +10,20 @@ function getParam(key) {
   return url.searchParams.get(key);
 }
 
+function setStatus(text, cls) {
+  const label = document.getElementById("statusText");
+  const light = document.getElementById("light");
+  if (label) label.textContent = text;
+
+  if (light) {
+    light.classList.remove("ok", "warn", "bad");
+    light.classList.add(cls);
+  }
+}
+
 function showToast(msg) {
   const t = document.getElementById("toast");
-  if (!t) return alert(msg);
+  if (!t) return;
   t.textContent = String(msg || "OK");
   t.classList.add("show");
   clearTimeout(showToast._tm);
@@ -46,7 +60,6 @@ function getOrCreateClientId() {
   }
   return id;
 }
-
 const clientId = getOrCreateClientId();
 
 function saveProfile(name) {
@@ -56,50 +69,60 @@ function loadProfile() {
   return { name: localStorage.getItem("gh_name") || "" };
 }
 
-function ensureSocketIoLoaded() {
-  if (window.io) return Promise.resolve();
-
+function loadScript(src) {
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = `${SERVER_URL}/socket.io/socket.io.js`;
+    s.src = src;
     s.async = true;
     s.onload = () => resolve();
-    s.onerror = () => reject(new Error("socket.io load failed"));
+    s.onerror = () => reject(new Error("Failed to load: " + src));
     document.head.appendChild(s);
   });
 }
 
+async function ensureSocketIoLoaded() {
+  if (window.io) return true;
+
+  setStatus("Connecting...", "warn");
+  try {
+    SERVER_URL = PRIMARY_SERVER_URL;
+    await loadScript(`${SERVER_URL}/socket.io/socket.io.js`);
+    return true;
+  } catch (e) {
+    // fallback (يمنع التعليق)
+    try {
+      SERVER_URL = FALLBACK_SERVER_URL;
+      await loadScript(`${SERVER_URL}/socket.io/socket.io.js`);
+      showToast("Fallback server ✅");
+      return true;
+    } catch (e2) {
+      setStatus("Offline", "bad");
+      throw e2;
+    }
+  }
+}
+
 async function createSocket() {
   await ensureSocketIoLoaded();
-  return io(SERVER_URL, {
+  const socket = io(SERVER_URL, {
     transports: ["websocket", "polling"],
     auth: { clientId },
   });
+  return socket;
 }
 
-function bindStatusLight(socket, el) {
-  if (!el) return;
-
-  const set = (cls, text) => {
-    el.classList.remove("ok", "warn", "bad");
-    el.classList.add(cls);
-    const label = document.getElementById("statusText");
-    if (label) label.textContent = text;
-  };
-
-  set("bad", "Disconnected");
-  socket.on("connect", () => set("ok", "Connected"));
-  socket.on("disconnect", () => set("bad", "Disconnected"));
-  socket.on("connect_error", () => set("warn", "Connecting..."));
+function bindStatusLight(socket) {
+  setStatus("Disconnected", "bad");
+  socket.on("connect", () => setStatus("Connected", "ok"));
+  socket.on("disconnect", () => setStatus("Disconnected", "bad"));
+  socket.on("connect_error", () => setStatus("Connecting...", "warn"));
 }
 
 function setupReconnectOverlay(socket) {
   const ov = document.getElementById("overlay");
   if (!ov) return;
-
   const show = () => ov.classList.add("show");
   const hide = () => ov.classList.remove("show");
-
   socket.on("disconnect", show);
   socket.on("connect", hide);
 }
