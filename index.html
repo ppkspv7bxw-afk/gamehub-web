@@ -13,7 +13,6 @@
         <div class="brand">
           <div class="title">
             <div>Gamehub4u</div>
-            <small>Lobby • Mafia</small>
           </div>
         </div>
 
@@ -36,36 +35,13 @@
               <button id="joinBtn" class="btn" type="button" style="flex:1;min-width:160px;">Join</button>
               <button id="hostBtn" class="btn secondary" type="button" style="flex:1;min-width:160px;">Host</button>
             </div>
-
-            <div class="hint" id="hint"></div>
           </div>
 
           <div class="panel">
-            <div class="kv">
-              <div class="k">تنبيه</div>
-              <div class="v">إذا اللمبة حمراء: السيرفر ما اتصل</div>
+            <div class="hint" style="margin:0;">
+              اكتب الكود واسمك ثم Join — أو Host لإنشاء غرفة.
             </div>
-            <div class="hr"></div>
-            <ul class="list">
-              <li class="item">
-                <div class="left">
-                  <span class="pill warn">معلومة</span>
-                  <div style="min-width:0">
-                    Host يسوي روم → اللاعبين يدخلون بالكود
-                  </div>
-                </div>
-              </li>
-              <li class="item">
-                <div class="left">
-                  <span class="pill ok">Tip</span>
-                  <div style="min-width:0">
-                    افتح الـ Host في نافذة ثانية لو تبي
-                  </div>
-                </div>
-              </li>
-            </ul>
           </div>
-
         </div>
       </div>
     </div>
@@ -89,7 +65,6 @@
       const nameInput = document.getElementById("name");
       const joinBtn   = document.getElementById("joinBtn");
       const hostBtn   = document.getElementById("hostBtn");
-      const hintEl    = document.getElementById("hint");
 
       const profile = loadProfile();
       if (profile.name) nameInput.value = profile.name;
@@ -99,12 +74,10 @@
         roomInput.value = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
       });
 
-      // اتصال socket.io (يتحمّل تلقائيًا من السيرفر)
       let socket;
       try {
         socket = await createSocket();
       } catch (e) {
-        hintEl.textContent = "تعذر تحميل socket.io من السيرفر.";
         showToast("Socket load failed");
         return;
       }
@@ -130,8 +103,6 @@
         }
 
         saveProfile(nm.value);
-
-        // نفس الحدث اللي كان عندك
         socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
       };
 
