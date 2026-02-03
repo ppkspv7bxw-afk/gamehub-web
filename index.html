@@ -16,7 +16,7 @@
 
         <div class="status">
           <span id="light" class="statusLight bad"></span>
-          <span id="statusText">Loading...</span>
+          <!-- ✅ شلينا أي كتابة للحالة -->
         </div>
       </div>
 
@@ -56,14 +56,11 @@
     const SERVER_URL = "https://api.gamehub4u.com";
     const WEB_ORIGIN = location.origin;
 
-    function setStatus(text, cls) {
-      const label = document.getElementById("statusText");
+    function setLight(cls) {
       const light = document.getElementById("light");
-      if (label) label.textContent = text;
-      if (light) {
-        light.classList.remove("ok","warn","bad");
-        light.classList.add(cls);
-      }
+      if (!light) return;
+      light.classList.remove("ok","warn","bad");
+      light.classList.add(cls);
     }
 
     function showToast(msg) {
@@ -122,14 +119,13 @@
     }
 
     async function start() {
-      setStatus("Connecting...", "warn");
+      setLight("warn");
 
       // 1) حمل socket.io client من السيرفر
       try {
         await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
       } catch (e) {
-        setStatus("Offline", "bad");
-        showToast("ما قدرنا نحمل socket.io من api");
+        setLight("bad");
         return;
       }
 
@@ -141,8 +137,7 @@
           auth: { clientId }
         });
       } catch (e) {
-        setStatus("Offline", "bad");
-        showToast("تعذر تشغيل socket");
+        setLight("bad");
         return;
       }
 
@@ -150,9 +145,9 @@
       const showOv = () => ov && ov.classList.add("show");
       const hideOv = () => ov && ov.classList.remove("show");
 
-      socket.on("connect", () => { setStatus("Connected", "ok"); hideOv(); });
-      socket.on("disconnect", () => { setStatus("Disconnected", "bad"); showOv(); });
-      socket.on("connect_error", () => { setStatus("Connecting...", "warn"); });
+      socket.on("connect", () => { setLight("ok"); hideOv(); });
+      socket.on("disconnect", () => { setLight("bad"); showOv(); });
+      socket.on("connect_error", () => { setLight("warn"); });
 
       // UI
       const roomInput = document.getElementById("room");
@@ -189,7 +184,7 @@
         setTimeout(() => {
           location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
         }, 200);
-      });
+      };
     }
 
     start();
