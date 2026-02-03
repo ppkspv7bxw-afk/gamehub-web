@@ -3,1174 +3,289 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Gamehub4u - انضم للعبة</title>
-  <meta name="description" content="انضم إلى غرفة اللعب مع أصدقائك"/>
-
+  <title>Gamehub4u - استضافة</title>
   <style>
-    :root{
-      --bg0: #0a0415;
-      --bg1: #1a0820;
-
-      --card: rgba(255,255,255,.08);
-      --stroke: rgba(255,255,255,.16);
-      --text: rgba(255,255,255,.94);
-      --muted: rgba(255,255,255,.65);
-
-      --primary: #ff1b3a;
-      --primary-hover: #ff2d4d;
-      --secondary: #ff3d6b;
-      --accent: #ff4d7a;
-
-      --ok: #22c55e;
-      --warn: #fbbf24;
-      --bad: #ff2d55;
-
-      --shadow-sm: 0 4px 12px rgba(0,0,0,.3);
-      --shadow-md: 0 12px 32px rgba(0,0,0,.45);
-      --shadow-lg: 0 20px 60px rgba(0,0,0,.6);
-      --radius: 20px;
-      --radius-sm: 14px;
-    }
-
-    *{ 
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    *{box-sizing:border-box;margin:0;padding:0}
     body{
-      min-height: 100vh;
-      color: var(--text);
-      font-family: 'Tajawal', system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", sans-serif;
-      background:
-        radial-gradient(1400px 800px at 20% 15%, rgba(255,27,58,.28), transparent 65%),
-        radial-gradient(1200px 800px at 85% 20%, rgba(255,61,107,.20), transparent 60%),
-        radial-gradient(1000px 700px at 50% 95%, rgba(255,77,122,.14), transparent 65%),
-        linear-gradient(165deg, var(--bg0), var(--bg1));
-      background-attachment: fixed;
-      overflow-x: hidden;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: clamp(20px, 5vw, 40px) 16px;
+      min-height:100vh;
+      color:#fff;
+      font-family:system-ui,sans-serif;
+      background:linear-gradient(165deg,#0a0415,#1a0820);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px
     }
-
-    /* Animated gradient blobs */
-    .blob{
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(70px);
-      opacity: 0;
-      z-index: 0;
-      pointer-events: none;
-      will-change: transform;
-      animation: blobFade 1s ease-out forwards, blobFloat 20s ease-in-out infinite;
-    }
-    .blob.a{ 
-      width: 700px; 
-      height: 700px;
-      left: -280px; 
-      top: -250px; 
-      background: radial-gradient(circle, rgba(255,27,58,.85), rgba(255,27,58,.4)); 
-      animation-delay: 0s, 0.5s;
-    }
-    .blob.b{ 
-      width: 650px; 
-      height: 650px;
-      right: -300px; 
-      top: 60px; 
-      background: radial-gradient(circle, rgba(255,61,107,.7), rgba(255,61,107,.3)); 
-      animation-delay: 0.3s, 1s;
-      animation-duration: 1s, 24s;
-    }
-    .blob.blob.c{ 
-      width: 600px; 
-      height: 600px;
-      left: 20%; 
-      bottom: -280px; 
-      background: radial-gradient(circle, rgba(255,77,122,.5), rgba(255,77,122,.2)); 
-      animation-delay: 0.6s, 1.5s;
-      animation-duration: 1s, 28s;
-    }
-
-    @keyframes blobFade{
-      to{ opacity: .24; }
-    }
-
-    @keyframes blobFloat{
-      0%, 100%{ transform: translate(0, 0) scale(1) rotate(0deg); }
-      33%{ transform: translate(40px, -30px) scale(1.08) rotate(5deg); }
-      66%{ transform: translate(-30px, 20px) scale(0.95) rotate(-5deg); }
-    }
-
     .wrap{
-      width: min(1000px, 100%);
-      display: flex;
-      flex-direction: column;
-      gap: clamp(16px, 3vw, 24px);
-      align-items: stretch;
-      position: relative;
-      z-index: 1;
+      width:min(600px,100%);
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:20px;
+      padding:30px;
+      backdrop-filter:blur(16px)
     }
-
-    .logoTop{
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0 0 8px;
-      animation: logoEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    .logo{text-align:center;margin-bottom:30px}
+    .logo img{width:min(350px,80vw);height:auto}
+    h1{font-size:24px;margin-bottom:20px;text-align:center}
+    .room-box{
+      background:rgba(255,255,255,.03);
+      border:2px solid rgba(255,255,255,.16);
+      border-radius:18px;
+      padding:25px;
+      margin-bottom:20px;
+      text-align:center;
+      transition:all .3s
     }
-    
-    @keyframes logoEnter{
-      from{ 
-        opacity: 0;
-        transform: translateY(-20px) scale(0.9);
-      }
-      to{
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+    .room-box.active{
+      border-color:rgba(255,61,107,.35);
+      background:rgba(255,27,58,.08);
+      box-shadow:0 0 0 1px rgba(255,61,107,.2),0 8px 24px rgba(255,27,58,.15)
     }
-
-    .logoImg{
-      width: min(540px, 90vw);
-      height: auto;
-      display: block;
-      filter: drop-shadow(0 8px 24px rgba(255,27,58,.3)) drop-shadow(0 16px 48px rgba(0,0,0,.5));
-      user-select: none;
-      -webkit-user-drag: none;
-      transform: translateZ(0);
-      transition: filter 0.3s ease;
+    .room-label{
+      font-size:14px;
+      color:rgba(255,255,255,.65);
+      margin-bottom:12px
     }
-
-    .logoImg:hover{
-      filter: drop-shadow(0 12px 32px rgba(255,27,58,.4)) drop-shadow(0 20px 60px rgba(0,0,0,.6));
+    .room-code{
+      font-size:42px;
+      font-weight:900;
+      letter-spacing:10px;
+      font-family:monospace;
+      background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,255,255,.7));
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+      filter:drop-shadow(0 2px 8px rgba(255,27,58,.3));
+      transition:all .3s;
+      user-select:all;
+      margin-bottom:15px
     }
-
-    .grid{
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: clamp(12px, 2.5vw, 20px);
-      align-items: stretch;
+    .room-code.placeholder{
+      opacity:.3;
+      letter-spacing:8px;
+      filter:none
     }
-    
-    @media (max-width: 900px){
-      .grid{ 
-        grid-template-columns: 1fr;
-      }
+    .quick-btns{
+      display:flex;
+      gap:8px;
+      justify-content:center
     }
-
-    .panel{
-      background: var(--card);
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      overflow: hidden;
-      position: relative;
-      min-height: 300px;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-      animation: panelEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    .icon-btn{
+      width:48px;
+      height:48px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.25);
+      color:#fff;
+      cursor:pointer;
+      transition:all .2s;
+      display:flex;
+      align-items:center;
+      justify-content:center
     }
-
-    @keyframes panelEnter{
-      from{
-        opacity: 0;
-        transform: translateY(30px);
-      }
+    .icon-btn:hover{
+      background:rgba(255,255,255,.1);
+      transform:translateY(-2px)
     }
-
-    .panel:nth-child(1){ animation-delay: 0.1s; }
-    .panel:nth-child(2){ animation-delay: 0.2s; }
-
-    .panel:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 24px 72px rgba(0,0,0,.65);
+    .icon-btn svg{width:20px;height:20px;opacity:.9}
+    .info-box{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:14px;
+      padding:14px 16px;
+      font-size:13px;
+      line-height:1.6;
+      color:rgba(255,255,255,.65);
+      margin-bottom:20px;
+      display:flex;
+      gap:12px
     }
-
-    .panel::before{
-      content: "";
-      position: absolute;
-      inset: -2px;
-      background:
-        radial-gradient(800px 400px at 18% 0%, rgba(255,27,58,.22), transparent 65%),
-        radial-gradient(800px 400px at 82% 20%, rgba(255,61,107,.15), transparent 65%);
-      pointer-events: none;
-      opacity: 0.8;
+    .info-box svg{
+      width:18px;
+      height:18px;
+      flex-shrink:0;
+      opacity:.7;
+      margin-top:2px
     }
-
-    .panel > *{ 
-      position: relative;
-      z-index: 1;
-    }
-
-    .form{
-      padding: clamp(18px, 4vw, 28px);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .side{
-      padding: clamp(18px, 4vw, 28px);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .sideTop{
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .lamp{
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--bad);
-      box-shadow: 
-        0 0 0 0 rgba(255,45,85,.6),
-        0 0 12px rgba(255,45,85,.4);
-      margin-top: 4px;
-      position: relative;
-      transition: all 0.3s ease;
-      animation: lampPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes lampPulse{
-      0%, 100%{ box-shadow: 0 0 0 0 rgba(255,45,85,.6), 0 0 12px rgba(255,45,85,.4); }
-      50%{ box-shadow: 0 0 0 6px rgba(255,45,85,.0), 0 0 20px rgba(255,45,85,.6); }
-    }
-
-    .lamp.ok{ 
-      background: var(--ok);
-      animation-name: lampPulseOk;
-    }
-
-    @keyframes lampPulseOk{
-      0%, 100%{ box-shadow: 0 0 0 0 rgba(34,197,94,.6), 0 0 12px rgba(34,197,94,.4); }
-      50%{ box-shadow: 0 0 0 6px rgba(34,197,94,.0), 0 0 20px rgba(34,197,94,.6); }
-    }
-
-    .lamp.warn{ 
-      background: var(--warn);
-      animation-name: lampPulseWarn;
-    }
-
-    @keyframes lampPulseWarn{
-      0%, 100%{ box-shadow: 0 0 0 0 rgba(251,191,36,.6), 0 0 12px rgba(251,191,36,.4); }
-      50%{ box-shadow: 0 0 0 6px rgba(251,191,36,.0), 0 0 20px rgba(251,191,36,.6); }
-    }
-
-    .chips{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .chip{
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
-      padding: 10px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      user-select: none;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .chip::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.1), transparent);
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .chip:hover{
-      transform: translateY(-2px);
-      background: rgba(255,255,255,.12);
-      border-color: rgba(255,255,255,.25);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .chip:hover::before{
-      opacity: 1;
-    }
-
-    .chip:active{ 
-      transform: translateY(0);
-      box-shadow: none;
-    }
-
-    .errorBox{
-      display: none;
-      border: 1px solid rgba(255,45,85,.3);
-      background: linear-gradient(135deg, rgba(255,45,85,.12), rgba(255,45,85,.08));
-      color: rgba(255,240,245,.96);
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      line-height: 1.5;
-      font-weight: 500;
-      backdrop-filter: blur(8px);
-    }
-
-    .errorBox.show{ 
-      display: block;
-      animation: errorSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes errorSlide{
-      from{
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-    }
-
-    .shake{ 
-      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97);
-    }
-
-    @keyframes shake{
-      0%, 100%{ transform: translateX(0); }
-      20%, 60%{ transform: translateX(-8px); }
-      40%, 80%{ transform: translateX(8px); }
-    }
-
-    label{
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 8px;
-      display: block;
-      letter-spacing: 0.3px;
-    }
-
-    .codeHeader{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .codeRight{
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .iconBtn{
-      width: 42px;
-      height: 42px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.25);
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      user-select: none;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .iconBtn::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .iconBtn:hover{
-      transform: translateY(-2px) scale(1.05);
-      background: rgba(255,255,255,.1);
-      border-color: rgba(255,255,255,.3);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .iconBtn:hover::before{
-      opacity: 1;
-    }
-
-    .iconBtn:active{ 
-      transform: translateY(0) scale(0.98);
-    }
-
-    .iconBtn svg{ 
-      width: 20px;
-      height: 20px;
-      opacity: 0.9;
-      transition: opacity 0.2s ease;
-    }
-
-    .iconBtn:hover svg{
-      opacity: 1;
-    }
-
-    .codeBoxes{
-      display: flex;
-      gap: 12px;
-      direction: ltr;
-      justify-content: center;
-    }
-
-    .box{
-      width: 56px;
-      height: 64px;
-      border-radius: var(--radius-sm);
-      border: 2px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.3);
-      color: var(--text);
-      font-size: 24px;
-      font-weight: 800;
-      text-transform: uppercase;
-      text-align: center;
-      outline: none;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-      backdrop-filter: blur(8px);
-    }
-
-    .box::before{
-      content: '';
-      position: absolute;
-      inset: -2px;
-      border-radius: var(--radius-sm);
-      padding: 2px;
-      background: linear-gradient(135deg, rgba(255,61,107,0), rgba(255,61,107,0));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-
-    .box:focus{
-      border-color: var(--secondary);
-      background: rgba(0,0,0,.4);
-      transform: translateY(-3px) scale(1.08);
-      box-shadow: 
-        0 0 0 4px rgba(255,61,107,.2),
-        0 8px 20px rgba(255,61,107,.3);
-    }
-
-    .box:focus::before{
-      background: linear-gradient(135deg, rgba(255,61,107,.6), rgba(255,27,58,.4));
-      opacity: 1;
-    }
-
-    .box.invalid{
-      border-color: var(--bad);
-      background: rgba(255,45,85,.08);
-      animation: boxShake 0.4s ease;
-    }
-
-    @keyframes boxShake{
-      0%, 100%{ transform: translateX(0); }
-      25%, 75%{ transform: translateX(-4px); }
-      50%{ transform: translateX(4px); }
-    }
-
-    .nameInput{
-      width: 100%;
-      padding: 15px 18px;
-      border-radius: var(--radius-sm);
-      border: 2px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.3);
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      backdrop-filter: blur(8px);
-      font-weight: 500;
-    }
-
-    .nameInput::placeholder{
-      color: rgba(255,255,255,.4);
-    }
-
-    .nameInput:focus{
-      border-color: var(--accent);
-      background: rgba(0,0,0,.4);
-      transform: translateY(-2px);
-      box-shadow: 
-        0 0 0 4px rgba(255,77,122,.18),
-        0 8px 20px rgba(255,77,122,.25);
-    }
-
-    .nameInput.invalid{
-      border-color: var(--bad);
-      background: rgba(255,45,85,.08);
-      animation: inputShake 0.4s ease;
-    }
-
-    @keyframes inputShake{
-      0%, 100%{ transform: translateX(0); }
-      25%, 75%{ transform: translateX(-6px); }
-      50%{ transform: translateX(6px); }
-    }
-
-    .row{
-      display: flex;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
+    .actions{display:flex;gap:12px;flex-wrap:wrap}
     .btn{
-      flex: 1;
-      border-radius: var(--radius-sm);
-      border: none;
-      padding: 15px 20px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 15px;
-      color: white;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      user-select: none;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 
-        0 4px 12px rgba(255,27,58,.3),
-        inset 0 1px 0 rgba(255,255,255,.2);
+      flex:1;
+      min-width:140px;
+      padding:14px 20px;
+      border:none;
+      border-radius:12px;
+      font-size:15px;
+      font-weight:700;
+      color:#fff;
+      background:linear-gradient(135deg,#ff1b3a,#ff3d6b);
+      cursor:pointer;
+      transition:transform .2s;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px
     }
-
-    .btn::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.2), transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .btn:hover{
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 
-        0 8px 24px rgba(255,27,58,.45),
-        inset 0 1px 0 rgba(255,255,255,.25);
-    }
-
-    .btn:hover::before{
-      opacity: 1;
-    }
-
-    .btn:active{ 
-      transform: translateY(-1px) scale(0.98);
-      box-shadow: 
-        0 4px 12px rgba(255,27,58,.35),
-        inset 0 1px 0 rgba(255,255,255,.2);
-    }
-
+    .btn:hover{transform:translateY(-2px)}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
     .btn.secondary{
-      background: rgba(255,255,255,.1);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.2);
-      box-shadow: 
-        0 4px 12px rgba(0,0,0,.2),
-        inset 0 1px 0 rgba(255,255,255,.1);
+      background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.2)
     }
-
-    .btn.secondary:hover{
-      background: rgba(255,255,255,.15);
-      border-color: rgba(255,255,255,.3);
-      box-shadow: 
-        0 8px 24px rgba(0,0,0,.3),
-        inset 0 1px 0 rgba(255,255,255,.15);
-    }
-
-    .btn[disabled]{ 
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,.2);
-    }
-
     .spinner{
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2.5px solid rgba(255,255,255,.3);
-      border-top-color: white;
-      animation: spin 0.8s linear infinite;
-      display: none;
+      width:16px;
+      height:16px;
+      border:2px solid rgba(255,255,255,.3);
+      border-top-color:#fff;
+      border-radius:50%;
+      animation:spin .8s linear infinite
     }
-
-    .btn.loading .spinner{ 
-      display: inline-block;
-    }
-
-    @keyframes spin{ 
-      to{ transform: rotate(360deg); }
-    }
-
+    @keyframes spin{to{transform:rotate(360deg)}}
     .toast{
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: rgba(10,12,18,.92);
-      color: white;
-      padding: 14px 24px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.2);
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-size: 14px;
-      font-weight: 600;
-      backdrop-filter: blur(16px) saturate(180%);
-      box-shadow: var(--shadow-md);
-      z-index: 1000;
+      position:fixed;
+      bottom:30px;
+      left:50%;
+      transform:translateX(-50%) translateY(100px);
+      background:rgba(0,0,0,.9);
+      color:#fff;
+      padding:12px 24px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:600;
+      opacity:0;
+      transition:all .3s;
+      z-index:1000;
+      backdrop-filter:blur(10px)
     }
-
-    .toast.show{
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 999;
-      animation: overlayFade 0.3s ease;
-    }
-
-    @keyframes overlayFade{
-      from{ opacity: 0; }
-    }
-
-    .overlay.show{ 
-      display: flex;
-    }
-
-    .overlay .box{
-      width: min(440px, 100%);
-      border-radius: var(--radius);
-      border: 1px solid rgba(255,255,255,.2);
-      background: rgba(15,18,25,.94);
-      padding: 24px;
-      box-shadow: var(--shadow-lg);
-      backdrop-filter: blur(20px) saturate(180%);
-      animation: overlayBoxSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes overlayBoxSlide{
-      from{
-        opacity: 0;
-        transform: scale(0.9) translateY(20px);
-      }
-    }
-
-    .overlay h3{ 
-      margin: 0 0 12px;
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .overlay p{ 
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    @media (max-width: 600px){
-      .codeBoxes{
-        gap: 10px;
-      }
-      .box{
-        width: 52px;
-        height: 60px;
-        font-size: 22px;
-      }
-      .btn{
-        font-size: 14px;
-        padding: 13px 18px;
-      }
-    }
-
-    ::-webkit-scrollbar{
-      width: 10px;
-    }
-    ::-webkit-scrollbar-track{
-      background: rgba(0,0,0,.2);
-    }
-    ::-webkit-scrollbar-thumb{
-      background: rgba(255,255,255,.2);
-      border-radius: 5px;
-    }
-    ::-webkit-scrollbar-thumb:hover{
-      background: rgba(255,255,255,.3);
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @media(max-width:600px){
+      .room-code{font-size:36px;letter-spacing:8px}
+      .actions{flex-direction:column}
+      .btn{width:100%}
     }
   </style>
 </head>
-
 <body>
-  <div class="blob a"></div>
-  <div class="blob b"></div>
-  <div class="blob c"></div>
-
   <div class="wrap">
-    <div class="logoTop">
-      <img class="logoImg" src="/logo.png" alt="Gamehub4u Logo" loading="eager">
+    <div class="logo">
+      <img src="/logo.png" alt="Gamehub4u">
     </div>
-
-    <div class="grid">
-      <section class="panel form" role="form" aria-label="نموذج الانضمام">
-        <div id="err" class="errorBox" role="alert"></div>
-
-        <div>
-          <div class="codeHeader">
-            <label style="margin:0;">كود الغرفة</label>
-            <div class="codeRight">
-              <button class="iconBtn" id="pasteBtn" type="button" aria-label="لصق الكود" title="لصق">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M16 4h-1.2a3 3 0 0 0-5.6 0H8a2 2 0 0 0-2 2v2h12V6a2 2 0 0 0-2-2Z" stroke-width="2" stroke-linecap="round"/>
-                  <path d="M8 8h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8h2Z" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="codeBoxes" id="codeBoxes">
-            <input class="box" inputmode="text" maxlength="1" id="c0" aria-label="الحرف الأول">
-            <input class="box" inputmode="text" maxlength="1" id="c1" aria-label="الحرف الثاني">
-            <input class="box" inputmode="text" maxlength="1" id="c2" aria-label="الحرف الثالث">
-            <input class="box" inputmode="text" maxlength="1" id="c3" aria-label="الحرف الرابع">
-          </div>
-        </div>
-
-        <div>
-          <label for="name">اسمك في اللعبة</label>
-          <input id="name" class="nameInput" placeholder="مثال: محمد" maxlength="20" autocomplete="off" aria-label="اسمك"/>
-        </div>
-
-        <div class="row">
-          <button id="joinBtn" class="btn" type="button" aria-label="انضمام للغرفة">
-            <span class="spinner" aria-hidden="true"></span>
-            <span class="btnText">انضم الآن</span>
-          </button>
-          <button id="hostBtn" class="btn secondary" type="button" aria-label="إنشاء غرفة جديدة">استضف</button>
-        </div>
-      </section>
-
-      <section class="panel side" aria-label="معلومات الاتصال">
-        <div class="sideTop">
-          <div></div>
-          <span id="lamp" class="lamp bad" role="status" aria-label="حالة الاتصال"></span>
-        </div>
-
-        <div class="chips">
-          <button class="chip" id="lastRoomBtn" type="button" aria-label="آخر غرفة">آخر غرفة</button>
-          <button class="chip" id="clearBtn" type="button" aria-label="مسح الحقول">مسح الكل</button>
-        </div>
-      </section>
+    <h1>استضافة غرفة جديدة</h1>
+    <div class="room-box" id="roomBox">
+      <div class="room-label">كود الغرفة</div>
+      <div class="room-code placeholder" id="roomCode">----</div>
+      <div class="quick-btns" id="quickBtns" style="display:none">
+        <button class="icon-btn" id="copyCodeBtn" title="نسخ الكود">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke-width="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="copyLinkBtn" title="نسخ الرابط">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke-width="2" stroke-linecap="round"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="info-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="10" stroke-width="2"/>
+        <line x1="12" y1="16" x2="12" y2="12" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="12" cy="8" r="0.5" fill="currentColor" stroke="none"/>
+      </svg>
+      <div>بعد إنشاء الغرفة، شارك الكود أو الرابط مع أصدقائك للانضمام.</div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="createBtn">
+        <span id="createText">إنشاء غرفة جديدة</span>
+      </button>
+      <button class="btn secondary" id="startBtn" style="display:none">ابدأ اللعبة</button>
+      <button class="btn secondary" id="backBtn">رجوع</button>
     </div>
   </div>
-
-  <div id="overlay" class="overlay" role="dialog" aria-labelledby="overlayTitle" aria-modal="true">
-    <div class="box">
-      <h3 id="overlayTitle">انقطع الاتصال</h3>
-      <p>جاري إعادة الاتصال تلقائيًا... يرجى الانتظار.</p>
-    </div>
-  </div>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
+  <div class="toast" id="toast"></div>
   <script>
-    const SERVER_URL = "https://api.gamehub4u.com";
-    const WEB_ORIGIN = location.origin;
-
-    function showToast(msg) {
-      const t = document.getElementById("toast");
-      if (!t) return;
-      t.textContent = String(msg || "تم");
-      t.classList.add("show");
-      clearTimeout(showToast._tm);
-      showToast._tm = setTimeout(() => t.classList.remove("show"), 2000);
+    function makeRoomCode(){
+      const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code='';
+      for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];
+      return code
     }
-
-    function showError(msg){
-      const err = document.getElementById("err");
-      if (!err) return;
-      if (!msg) { 
-        err.classList.remove("show");
-        err.textContent = "";
-        return;
-      }
-      err.textContent = String(msg);
-      err.classList.add("show");
-      err.classList.remove("shake");
-      void err.offsetWidth;
-      err.classList.add("shake");
+    function showToast(msg){
+      const toast=document.getElementById('toast');
+      toast.textContent=msg;
+      toast.classList.add('show');
+      setTimeout(()=>toast.classList.remove('show'),2000)
     }
-
-    function setLamp(cls){
-      const lamp = document.getElementById("lamp");
-      if (!lamp) return;
-      lamp.classList.remove("ok","warn","bad");
-      lamp.classList.add(cls);
-      lamp.setAttribute('aria-label', 
-        cls === 'ok' ? 'متصل' : 
-        cls === 'warn' ? 'جاري الاتصال' : 
-        'غير متصل'
-      );
-    }
-
-    function loadScriptWithTimeout(src, ms = 7000) {
-      return new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        const timer = setTimeout(() => { 
-          s.remove();
-          reject(new Error("timeout"));
-        }, ms);
-        s.src = src;
-        s.async = true;
-        s.onload = () => { 
-          clearTimeout(timer);
-          resolve(true);
-        };
-        s.onerror = () => { 
-          clearTimeout(timer);
-          reject(new Error("load_error"));
-        };
-        document.head.appendChild(s);
-      });
-    }
-
-    const boxes = Array.from({length: 4}, (_, i) => document.getElementById("c" + i));
-
-    function getCode(){
-      return boxes.map(b => (b.value || "").toUpperCase()).join("").replace(/[^A-Z0-9]/g, "");
-    }
-
-    function setCode(code){
-      const clean = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4);
-      boxes.forEach((b, i) => b.value = clean[i] || "");
-      if (clean.length < 4) boxes[clean.length]?.focus();
-    }
-
-    function markCodeInvalid(on){
-      boxes.forEach(b => b.classList.toggle("invalid", !!on));
-    }
-
-    function normalizeRoom(s) {
-      return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4);
-    }
-
-    function validateRoomCode(code) {
-      const v = normalizeRoom(code);
-      if (v.length !== 4) return { ok: false, msg: "الكود يجب أن يكون 4 أحرف" };
-      return { ok: true, value: v };
-    }
-
-    function validateName(s) {
-      const v = String(s || "").trim().replace(/\s+/g, " ").slice(0, 20);
-      if (v.length < 2) return { ok: false, msg: "الاسم يجب أن يكون حرفين على الأقل" };
-      return { ok: true, value: v };
-    }
-
-    function getOrCreateClientId() {
-      let id = localStorage.getItem("gh_clientId");
-      if (!id) {
-        id = crypto.randomUUID ? crypto.randomUUID() : ("cid_" + Math.random().toString(36).slice(2));
-        localStorage.setItem("gh_clientId", id);
-      }
-      return id;
-    }
-    const clientId = getOrCreateClientId();
-
-    function saveProfile(name) { 
-      localStorage.setItem("gh_name", String(name || ""));
-    }
-    
-    function loadProfile() { 
-      return { name: localStorage.getItem("gh_name") || "" };
-    }
-
-    function saveLastRoom(code){ 
-      localStorage.setItem("gh_lastRoom", String(code || ""));
-    }
-    
-    function loadLastRoom(){ 
-      return localStorage.getItem("gh_lastRoom") || "";
-    }
-
-    function setLoading(on){
-      const btn = document.getElementById("joinBtn");
-      if (!btn) return;
-      btn.classList.toggle("loading", !!on);
-      btn.disabled = !!on;
-      btn.setAttribute('aria-busy', !!on);
-    }
-
-    function extractRoomFromText(text){
-      const t = String(text || "").trim();
-      if (!t) return "";
-      
-      try {
-        const u = new URL(t);
-        const r = (u.searchParams.get("room") || "").trim();
-        if (r) return r;
-      } catch(_){}
-      
-      const m = t.match(/(?:\broom\s*=\s*)([A-Za-z0-9]{4})/i);
-      if (m && m[1]) return m[1];
-      
-      return t.replace(/[^A-Za-z0-9]/g, "").slice(0, 4);
-    }
-
-    async function pasteToCode(){
-      try {
-        const text = await navigator.clipboard.readText();
-        const room = extractRoomFromText(text);
-        if (!room) {
-          showToast("لم يتم العثور على كود");
-          return;
-        }
-        setCode(room);
-        markCodeInvalid(false);
-        showError("");
-        showToast("تم اللصق ✓");
-      } catch(_){
-        showToast("تعذر اللصق");
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        showToast('تم النسخ ✓')
+      }catch(e){
+        showToast('فشل النسخ')
       }
     }
-
-    async function start() {
-      setLamp("warn");
-
-      try {
-        await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
-      } catch (e) {
-        setLamp("bad");
-        showError("تعذر الاتصال بالخادم");
-        return;
+    const roomCodeEl=document.getElementById('roomCode');
+    const roomBox=document.getElementById('roomBox');
+    const quickBtns=document.getElementById('quickBtns');
+    const createBtn=document.getElementById('createBtn');
+    const createText=document.getElementById('createText');
+    const startBtn=document.getElementById('startBtn');
+    const backBtn=document.getElementById('backBtn');
+    const copyCodeBtn=document.getElementById('copyCodeBtn');
+    const copyLinkBtn=document.getElementById('copyLinkBtn');
+    let currentRoom='';
+    createBtn.onclick=()=>{
+      const code=makeRoomCode();
+      currentRoom=code;
+      roomCodeEl.textContent=code;
+      roomCodeEl.classList.remove('placeholder');
+      roomBox.classList.add('active');
+      quickBtns.style.display='flex';
+      startBtn.style.display='inline-flex';
+      createBtn.disabled=true;
+      createText.textContent='تم إنشاء الغرفة ✓';
+      localStorage.setItem('gh_lastRoom',code);
+      showToast('تم إنشاء الغرفة ✓')
+    };
+    copyCodeBtn.onclick=()=>{
+      if(!currentRoom)return showToast('لا يوجد كود');
+      copyText(currentRoom)
+    };
+    copyLinkBtn.onclick=()=>{
+      if(!currentRoom)return showToast('لا يوجد كود');
+      const link=location.origin+'/?room='+currentRoom;
+      copyText(link)
+    };
+    startBtn.onclick=()=>{
+      if(!currentRoom)return showToast('لا يوجد غرفة');
+      location.href='/lobby.html?room='+currentRoom
+    };
+    backBtn.onclick=()=>location.href='/';
+    const urlParams=new URLSearchParams(location.search);
+    const roomFromUrl=urlParams.get('room');
+    if(roomFromUrl){
+      currentRoom=roomFromUrl;
+      roomCodeEl.textContent=roomFromUrl;
+      roomCodeEl.classList.remove('placeholder');
+      roomBox.classList.add('active');
+      quickBtns.style.display='flex';
+      startBtn.style.display='inline-flex';
+      createBtn.disabled=true;
+      createText.textContent='تم إنشاء الغرفة ✓'
+    }else{
+      const last=localStorage.getItem('gh_lastRoom');
+      if(last){
+        currentRoom=last;
+        roomCodeEl.textContent=last;
+        roomCodeEl.classList.remove('placeholder');
+        roomBox.classList.add('active');
+        quickBtns.style.display='flex';
+        startBtn.style.display='inline-flex';
+        createBtn.disabled=true;
+        createText.textContent='تم إنشاء الغرفة ✓'
       }
-
-      let socket;
-      try {
-        socket = io(SERVER_URL, {
-          transports: ["websocket", "polling"],
-          auth: { clientId }
-        });
-      } catch (e) {
-        setLamp("bad");
-        showError("تعذر الاتصال");
-        return;
-      }
-
-      const ov = document.getElementById("overlay");
-      const showOv = () => ov && ov.classList.add("show");
-      const hideOv = () => ov && ov.classList.remove("show");
-
-      socket.on("connect", () => { 
-        setLamp("ok");
-        hideOv();
-        console.log("✅ متصل بالسيرفر");
-      });
-      
-      socket.on("disconnect", () => { 
-        setLamp("bad");
-        showOv();
-        console.log("❌ انقطع الاتصال");
-      });
-      
-      socket.on("connect_error", () => { 
-        setLamp("warn");
-        console.log("⚠️ خطأ في الاتصال");
-      });
-
-      // 🔥 الحل: نستقبل أي رد من السيرفر ونروح اللوبي
-      socket.onAny((eventName, data) => {
-        console.log("📩 استلمنا:", eventName, data);
-        
-        // إذا جاء أي رد فيه roomCode أو نجاح
-        if (data && (data.roomCode || data.success || data.joined)) {
-          setLoading(false);
-          const code = data.roomCode || data.code || data.room || getCode();
-          
-          if (code) {
-            showToast("✓ تم الانضمام");
-            console.log("🎮 رايحين للوبي:", code);
-            
-            setTimeout(() => {
-              window.location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
-            }, 300);
-          }
-        }
-        
-        // إذا جاء خطأ
-        if (data && (data.error || data.message)) {
-          setLoading(false);
-          showError(data.message || data.error || "حدث خطأ");
-        }
-      });
-
-      const nameInput = document.getElementById("name");
-      const roomFromUrl = (new URL(location.href).searchParams.get("room") || "").trim().toUpperCase();
-      const profile = loadProfile();
-      
-      if (profile.name) nameInput.value = profile.name;
-
-      if (roomFromUrl) {
-        setCode(roomFromUrl);
-      } else {
-        const last = loadLastRoom();
-        if (last) setCode(last);
-      }
-
-      boxes.forEach((b, idx) => {
-        b.addEventListener("input", () => {
-          b.value = b.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 1);
-          showError("");
-          markCodeInvalid(false);
-          if (b.value && idx < boxes.length - 1) {
-            boxes[idx + 1].focus();
-          }
-        });
-
-        b.addEventListener("keydown", (e) => {
-          if (e.key === "Backspace" && !b.value && idx > 0) {
-            boxes[idx - 1].focus();
-          }
-          if (e.key === "Enter") {
-            doJoin();
-          }
-        });
-
-        b.addEventListener("paste", (e) => {
-          const text = (e.clipboardData || window.clipboardData).getData("text");
-          if (text) {
-            e.preventDefault();
-            setCode(extractRoomFromText(text));
-          }
-        });
-      });
-
-      nameInput.addEventListener("keydown", (e) => { 
-        if (e.key === "Enter") doJoin();
-      });
-      
-      nameInput.addEventListener("input", () => { 
-        showError("");
-        nameInput.classList.remove("invalid");
-      });
-
-      document.getElementById("pasteBtn").onclick = pasteToCode;
-
-      document.getElementById("clearBtn").onclick = () => {
-        setCode("");
-        nameInput.value = "";
-        showError("");
-        markCodeInvalid(false);
-        nameInput.classList.remove("invalid");
-        boxes[0].focus();
-        showToast("تم المسح");
-      };
-
-      document.getElementById("lastRoomBtn").onclick = () => {
-        const last = loadLastRoom();
-        if (!last) {
-          showToast("لا توجد غرفة سابقة");
-          return;
-        }
-        setCode(last);
-        showToast("تم استرجاع الغرفة");
-      };
-
-      document.getElementById("hostBtn").onclick = () => {
-        location.href = WEB_ORIGIN + "/host.html";
-      };
-      
-      document.getElementById("joinBtn").onclick = () => doJoin();
-
-      function doJoin(){
-        showError("");
-        setLoading(false);
-
-        const code = getCode();
-        const rc = validateRoomCode(code);
-        if (!rc.ok) {
-          markCodeInvalid(true);
-          showError(rc.msg);
-          boxes[0].focus();
-          return;
-        }
-
-        const nm = validateName(nameInput.value);
-        if (!nm.ok) {
-          nameInput.classList.add("invalid");
-          showError(nm.msg);
-          nameInput.focus();
-          return;
-        }
-
-        saveProfile(nm.value);
-        saveLastRoom(rc.value);
-
-        setLoading(true);
-        
-        const payload = { 
-          roomCode: rc.value,
-          name: nm.value,
-          clientId 
-        };
-
-        console.log("🚀 باقي نرسل:", payload);
-
-        // نرسل كل الاحتمالات
-        socket.emit("player:join", payload);
-        socket.emit("join", payload);
-        socket.emit("joinRoom", payload);
-
-        // بعد 5 ثواني إذا ما صار شي، نروح للوبي على طول
-        setTimeout(() => {
-          if (document.getElementById("joinBtn").classList.contains("loading")) {
-            console.log("⏰ طال الانتظار - رايحين للوبي مباشرة");
-            setLoading(false);
-            showToast("✓ جاري الدخول");
-            setTimeout(() => {
-              window.location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(rc.value);
-            }, 300);
-          }
-        }, 5000);
-      }
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', start);
-    } else {
-      start();
     }
   </script>
 </body>
