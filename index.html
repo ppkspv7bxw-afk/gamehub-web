@@ -13,14 +13,11 @@
       --stroke: rgba(255,255,255,.14);
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.62);
-
       --primary:#6366f1;
       --primary2:#22d3ee;
-
       --ok:#22c55e;
       --warn:#fbbf24;
       --bad:#ff4d6d;
-
       --shadow: 0 26px 80px rgba(0,0,0,.55);
       --radius: 18px;
     }
@@ -41,12 +38,10 @@
       overflow-x:hidden;
     }
 
-    /* Animated blobs */
     .blob{
       position:fixed;
-      width:540px;
-      height:540px;
-      border-radius: 999px;
+      width:540px;height:540px;
+      border-radius:999px;
       filter: blur(40px);
       opacity:.28;
       z-index:-1;
@@ -55,7 +50,6 @@
     .blob.a{ left:-180px; top:-160px; background: rgba(99,102,241,.85); }
     .blob.b{ right:-220px; top:60px; background: rgba(34,211,238,.65); animation-duration: 15s; }
     .blob.c{ left:10%; bottom:-240px; background: rgba(16,185,129,.38); animation-duration: 18s; }
-
     @keyframes float{
       0%,100%{ transform: translate(0,0) scale(1); }
       50%{ transform: translate(22px, -18px) scale(1.05); }
@@ -124,37 +118,21 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    .subtitle{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.65;
-    }
 
-    .statusPill{
+    /* ✅ Lamp only */
+    .lampWrap{
       display:flex;
       align-items:center;
-      gap:9px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      user-select:none;
-      white-space:nowrap;
+      justify-content:flex-end;
     }
-    .dot{
+    .lamp{
       width:10px;height:10px;border-radius:50%;
       background: var(--bad);
       box-shadow: 0 0 0 4px rgba(255,77,109,.14);
     }
-    .dot.ok{ background: var(--ok); box-shadow: 0 0 0 4px rgba(34,197,94,.14); }
-    .dot.warn{ background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.14); }
-    .dot.bad{ background: var(--bad); box-shadow: 0 0 0 4px rgba(255,77,109,.14); }
-
-    .statusText{
-      font-size:13px;
-      color:var(--muted);
-    }
+    .lamp.ok{ background: var(--ok); box-shadow: 0 0 0 4px rgba(34,197,94,.14); }
+    .lamp.warn{ background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.14); }
+    .lamp.bad{ background: var(--bad); box-shadow: 0 0 0 4px rgba(255,77,109,.14); }
 
     .heroActions{
       display:flex;
@@ -210,22 +188,43 @@
       display:block;
     }
 
-    .codeRow{
+    .codeHeader{
       display:flex;
-      gap:10px;
       align-items:center;
       justify-content:space-between;
-      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:8px;
     }
+    .codeRight{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .iconBtn{
+      width:38px;height:38px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      cursor:pointer;
+      transition: transform .08s ease, filter .2s ease;
+      user-select:none;
+    }
+    .iconBtn:hover{ filter: brightness(1.08); }
+    .iconBtn:active{ transform: translateY(1px); }
+    .iconBtn svg{ width:18px; height:18px; opacity:.9; }
 
     .codeBoxes{
       display:flex;
       gap:8px;
-      direction:ltr; /* خانات الكود لليسار->يمين */
+      direction:ltr;
     }
     .box{
-      width:44px;
-      height:52px;
+      width:44px;height:52px;
       border-radius: 14px;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(0,0,0,.22);
@@ -306,12 +305,6 @@
     .btn.loading .spinner{ display:inline-block; }
     @keyframes spin{ to{ transform: rotate(360deg);} }
 
-    .hint{
-      color: var(--muted);
-      font-size:12px;
-      line-height:1.6;
-    }
-
     .toast{
       position: fixed;
       bottom: 16px;
@@ -370,47 +363,48 @@
           <h1>Gamehub4u</h1>
         </div>
 
-        <div class="statusPill">
-          <span id="light" class="dot bad"></span>
-          <span id="statusText" class="statusText">Loading...</span>
+        <div class="lampWrap">
+          <span id="lamp" class="lamp bad" aria-label="connection status"></span>
         </div>
       </div>
 
-      <p class="subtitle">
-        ادخل كود الغرفة واسمك. تقدر تنسخ رابط دعوة أو ترجع لآخر روم بسرعة.
-      </p>
-
       <div class="heroActions">
         <div class="chip" id="lastRoomBtn">آخر روم</div>
-        <div class="chip" id="copyInviteBtn">نسخ رابط الدعوة</div>
         <div class="chip" id="clearBtn">مسح</div>
       </div>
-
-      <div class="hint" id="serverHint" style="margin-top:6px;"></div>
     </section>
 
     <section class="panel form">
       <div id="err" class="errorBox"></div>
 
       <div>
-        <label>Room Code</label>
-        <div class="codeRow">
-          <div class="codeBoxes" id="codeBoxes">
-            <input class="box" inputmode="text" maxlength="1" id="c0" aria-label="code 1">
-            <input class="box" inputmode="text" maxlength="1" id="c1" aria-label="code 2">
-            <input class="box" inputmode="text" maxlength="1" id="c2" aria-label="code 3">
-            <input class="box" inputmode="text" maxlength="1" id="c3" aria-label="code 4">
-            <input class="box" inputmode="text" maxlength="1" id="c4" aria-label="code 5">
-            <input class="box" inputmode="text" maxlength="1" id="c5" aria-label="code 6">
+        <div class="codeHeader">
+          <label style="margin:0;">Room Code</label>
+
+          <div class="codeRight">
+            <button class="iconBtn" id="pasteBtn" type="button" aria-label="paste">
+              <!-- paste icon -->
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M16 4h-1.2a3 3 0 0 0-5.6 0H8a2 2 0 0 0-2 2v2h12V6a2 2 0 0 0-2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M8 8h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8h2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
           </div>
-          <div class="hint">ألصق الكود بالكامل وسيتم توزيعه تلقائيًا.</div>
+        </div>
+
+        <div class="codeBoxes" id="codeBoxes">
+          <input class="box" inputmode="text" maxlength="1" id="c0" aria-label="code 1">
+          <input class="box" inputmode="text" maxlength="1" id="c1" aria-label="code 2">
+          <input class="box" inputmode="text" maxlength="1" id="c2" aria-label="code 3">
+          <input class="box" inputmode="text" maxlength="1" id="c3" aria-label="code 4">
+          <input class="box" inputmode="text" maxlength="1" id="c4" aria-label="code 5">
+          <input class="box" inputmode="text" maxlength="1" id="c5" aria-label="code 6">
         </div>
       </div>
 
       <div>
         <label for="name">اسمك</label>
         <input id="name" class="nameInput" placeholder="مثال: محمد" maxlength="20" autocomplete="off"/>
-        <div class="hint" style="margin-top:6px;">Enter = Join</div>
       </div>
 
       <div class="row">
@@ -419,10 +413,6 @@
           <span class="btnText">Join</span>
         </button>
         <button id="hostBtn" class="btn secondary" type="button">Host</button>
-      </div>
-
-      <div class="hint">
-        إذا انقطع الاتصال، بيطلع لك overlay وبيحاول يرجع تلقائيًا.
       </div>
     </section>
 
@@ -438,20 +428,8 @@
   <div id="toast" class="toast">OK</div>
 
   <script>
-    // ===== Connection Config =====
     const SERVER_URL = "https://api.gamehub4u.com";
     const WEB_ORIGIN = location.origin;
-
-    // ===== UI Helpers =====
-    function setStatus(text, cls) {
-      const label = document.getElementById("statusText");
-      const light = document.getElementById("light");
-      if (label) label.textContent = text;
-      if (light) {
-        light.classList.remove("ok","warn","bad");
-        light.classList.add(cls);
-      }
-    }
 
     function showToast(msg) {
       const t = document.getElementById("toast");
@@ -473,6 +451,13 @@
       err.classList.add("shake");
     }
 
+    function setLamp(cls){
+      const lamp = document.getElementById("lamp");
+      if (!lamp) return;
+      lamp.classList.remove("ok","warn","bad");
+      lamp.classList.add(cls);
+    }
+
     function loadScriptWithTimeout(src, ms=7000) {
       return new Promise((resolve, reject) => {
         const s = document.createElement("script");
@@ -485,7 +470,6 @@
       });
     }
 
-    // ===== Code Boxes Helpers =====
     const boxes = Array.from({length:6}, (_,i)=>document.getElementById("c"+i));
 
     function getCode(){
@@ -500,26 +484,24 @@
 
     function markCodeInvalid(on){
       boxes.forEach(b => b.classList.toggle("invalid", !!on));
-      if (on) {
-        boxes[0].classList.remove("shake");
-      }
     }
 
     function normalizeRoom(s) {
       return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0,6);
     }
+
     function validateRoomCode(code) {
       const v = normalizeRoom(code);
       if (v.length < 3) return { ok:false, msg:"اكتب Room Code صحيح" };
       return { ok:true, value:v };
     }
+
     function validateName(s) {
       const v = String(s || "").trim().replace(/\s+/g," ").slice(0,20);
       if (v.length < 2) return { ok:false, msg:"اكتب اسم (حرفين على الأقل)" };
       return { ok:true, value:v };
     }
 
-    // ===== Identity =====
     function getOrCreateClientId() {
       let id = localStorage.getItem("gh_clientId");
       if (!id) {
@@ -543,17 +525,46 @@
       btn.disabled = !!on;
     }
 
-    // ===== Start App =====
+    // ✅ Parse pasted text: room=XXXX or /?room=XXXX or raw code
+    function extractRoomFromText(text){
+      const t = String(text || "").trim();
+      if (!t) return "";
+      // Try URL first
+      try{
+        const u = new URL(t);
+        const r = (u.searchParams.get("room") || "").trim();
+        if (r) return r;
+      }catch(_){}
+      // Try query-like
+      const m = t.match(/(?:\broom\s*=\s*)([A-Za-z0-9]{3,6})/i);
+      if (m && m[1]) return m[1];
+      // Raw code
+      return t.replace(/[^A-Za-z0-9]/g,"").slice(0,6);
+    }
+
+    async function pasteToCode(){
+      try{
+        const text = await navigator.clipboard.readText();
+        const room = extractRoomFromText(text);
+        if (!room) return showToast("ما فيه كود");
+        setCode(room);
+        markCodeInvalid(false);
+        showError("");
+        showToast("تم");
+      }catch(_){
+        showToast("ما قدرنا نلصق");
+      }
+    }
+
     async function start() {
-      setStatus("Connecting...", "warn");
-      document.getElementById("serverHint").textContent = "Server: " + SERVER_URL;
+      setLamp("warn");
 
       // Load socket.io client
       try {
         await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
       } catch (e) {
-        setStatus("Offline", "bad");
-        showError("ما قدرنا نحمل socket.io من api");
+        setLamp("bad");
+        showError("offline");
         return;
       }
 
@@ -565,36 +576,32 @@
           auth: { clientId }
         });
       } catch (e) {
-        setStatus("Offline", "bad");
-        showError("تعذر تشغيل socket");
+        setLamp("bad");
+        showError("offline");
         return;
       }
 
-      // Connection UI
       const ov = document.getElementById("overlay");
       const showOv = () => ov && ov.classList.add("show");
       const hideOv = () => ov && ov.classList.remove("show");
 
-      socket.on("connect", () => { setStatus("Connected", "ok"); hideOv(); });
-      socket.on("disconnect", () => { setStatus("Disconnected", "bad"); showOv(); });
-      socket.on("connect_error", () => { setStatus("Connecting...", "warn"); });
-
-      // Inputs
-      const nameInput = document.getElementById("name");
-      const joinBtn   = document.getElementById("joinBtn");
-      const hostBtn   = document.getElementById("hostBtn");
+      socket.on("connect", () => { setLamp("ok"); hideOv(); });
+      socket.on("disconnect", () => { setLamp("bad"); showOv(); });
+      socket.on("connect_error", () => { setLamp("warn"); });
 
       // Prefill
+      const nameInput = document.getElementById("name");
       const roomFromUrl = (new URL(location.href).searchParams.get("room") || "").trim().toUpperCase();
       const profile = loadProfile();
       if (profile.name) nameInput.value = profile.name;
+
       if (roomFromUrl) setCode(roomFromUrl);
       else {
         const last = loadLastRoom();
         if (last) setCode(last);
       }
 
-      // Boxes behavior (type, backspace, paste)
+      // Boxes behavior
       boxes.forEach((b, idx) => {
         b.addEventListener("input", () => {
           b.value = b.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,1);
@@ -604,9 +611,7 @@
         });
 
         b.addEventListener("keydown", (e) => {
-          if (e.key === "Backspace" && !b.value && idx > 0) {
-            boxes[idx-1].focus();
-          }
+          if (e.key === "Backspace" && !b.value && idx > 0) boxes[idx-1].focus();
           if (e.key === "Enter") doJoin();
         });
 
@@ -614,7 +619,7 @@
           const text = (e.clipboardData || window.clipboardData).getData("text");
           if (text) {
             e.preventDefault();
-            setCode(text);
+            setCode(extractRoomFromText(text));
           }
         });
       });
@@ -622,7 +627,7 @@
       nameInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doJoin(); });
       nameInput.addEventListener("input", ()=>{ showError(""); nameInput.classList.remove("invalid"); });
 
-      hostBtn.onclick = () => location.href = WEB_ORIGIN + "/host.html";
+      document.getElementById("pasteBtn").onclick = pasteToCode;
 
       document.getElementById("clearBtn").onclick = () => {
         setCode("");
@@ -635,25 +640,13 @@
 
       document.getElementById("lastRoomBtn").onclick = () => {
         const last = loadLastRoom();
-        if (!last) return showToast("ما فيه آخر روم");
+        if (!last) return showToast("—");
         setCode(last);
         showToast("تم");
       };
 
-      document.getElementById("copyInviteBtn").onclick = async () => {
-        const code = getCode();
-        const rc = validateRoomCode(code);
-        if (!rc.ok) return showToast("اكتب كود صحيح أول");
-        const link = WEB_ORIGIN + "/?room=" + encodeURIComponent(rc.value);
-        try {
-          await navigator.clipboard.writeText(link);
-          showToast("تم نسخ الرابط ✅");
-        } catch {
-          showToast("ما قدرنا ننسخ");
-        }
-      };
-
-      joinBtn.onclick = () => doJoin();
+      document.getElementById("hostBtn").onclick = () => location.href = WEB_ORIGIN + "/host.html";
+      document.getElementById("joinBtn").onclick = () => doJoin();
 
       function doJoin(){
         showError("");
@@ -691,7 +684,7 @@
       socket.on("player:joined", ({ roomCode: rc } = {}) => {
         setLoading(false);
         const code = String(rc || "").trim().toUpperCase();
-        showToast("Joined ✅");
+        showToast("✅");
         setTimeout(() => {
           location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
         }, 200);
