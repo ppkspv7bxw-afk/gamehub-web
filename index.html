@@ -37,32 +37,29 @@
               <button id="hostBtn" class="btn secondary" type="button" style="flex:1;min-width:160px;">Host</button>
             </div>
 
-            <div class="hint">
-              السيرفر الحالي: <b>Render</b><br/>
-              لو تبغى لاحقًا تربطه بـ <b>api.gamehub4u.com</b> نغيّر سطر واحد فقط.
-            </div>
+            <div class="hint" id="hint"></div>
           </div>
 
           <div class="panel">
             <div class="kv">
-              <div class="k">How it works</div>
-              <div class="v">Host يسوي روم → اللاعبين يدخلون بالكود</div>
+              <div class="k">تنبيه</div>
+              <div class="v">إذا اللمبة حمراء: السيرفر ما اتصل</div>
             </div>
             <div class="hr"></div>
             <ul class="list">
               <li class="item">
                 <div class="left">
-                  <span class="pill ok">Tip</span>
+                  <span class="pill warn">معلومة</span>
                   <div style="min-width:0">
-                    افتح صفحة الـ Host في جهاز منفصل لو تبي
+                    Host يسوي روم → اللاعبين يدخلون بالكود
                   </div>
                 </div>
               </li>
               <li class="item">
                 <div class="left">
-                  <span class="pill warn">Dev Mode</span>
+                  <span class="pill ok">Tip</span>
                   <div style="min-width:0">
-                    يخلّي المافيا تبدأ من لاعبين (للتجربة)
+                    افتح الـ Host في نافذة ثانية لو تبي
                   </div>
                 </div>
               </li>
@@ -83,58 +80,73 @@
 
   <div id="toast" class="toast">OK</div>
 
-  <script src="https://gamehub-server-okv5.onrender.com/socket.io/socket.io.js"></script>
   <script src="/common.js"></script>
   <script>
-    const roomFromUrl = (getParam("room") || "").trim().toUpperCase();
+    (async () => {
+      const roomFromUrl = (getParam("room") || "").trim().toUpperCase();
 
-    const roomInput = document.getElementById("room");
-    const nameInput = document.getElementById("name");
-    const joinBtn   = document.getElementById("joinBtn");
-    const hostBtn   = document.getElementById("hostBtn");
+      const roomInput = document.getElementById("room");
+      const nameInput = document.getElementById("name");
+      const joinBtn   = document.getElementById("joinBtn");
+      const hostBtn   = document.getElementById("hostBtn");
+      const hintEl    = document.getElementById("hint");
 
-    const profile = loadProfile();
-    if(profile.name) nameInput.value = profile.name;
-    if(roomFromUrl) roomInput.value = roomFromUrl;
+      const profile = loadProfile();
+      if (profile.name) nameInput.value = profile.name;
+      if (roomFromUrl) roomInput.value = roomFromUrl;
 
-    roomInput.addEventListener("input", () => {
-      roomInput.value = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-    });
+      roomInput.addEventListener("input", () => {
+        roomInput.value = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+      });
 
-    const socket = createSocket();
-    bindStatusLight(socket, document.getElementById("light"));
-    setupReconnectOverlay(socket);
-
-    hostBtn.onclick = () => location.href = WEB_ORIGIN + "/host.html";
-
-    joinBtn.onclick = () => {
-      const rc = validateRoomCode(roomInput.value);
-      if(!rc.ok){
-        roomInput.classList.add("invalid");
-        setTimeout(()=>roomInput.classList.remove("invalid"), 400);
-        return showToast(rc.msg);
+      // اتصال socket.io (يتحمّل تلقائيًا من السيرفر)
+      let socket;
+      try {
+        socket = await createSocket();
+      } catch (e) {
+        hintEl.textContent = "تعذر تحميل socket.io من السيرفر.";
+        showToast("Socket load failed");
+        return;
       }
 
-      const nm = validateName(nameInput.value);
-      if(!nm.ok){
-        nameInput.classList.add("invalid");
-        setTimeout(()=>nameInput.classList.remove("invalid"), 400);
-        return showToast(nm.msg);
-      }
+      bindStatusLight(socket, document.getElementById("light"));
+      setupReconnectOverlay(socket);
 
-      saveProfile(nm.value);
-      socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
-    };
+      hostBtn.onclick = () => location.href = WEB_ORIGIN + "/host.html";
 
-    socket.on("join:error", ({ message } = {}) => showToast(message || "Join error"));
+      joinBtn.onclick = () => {
+        const rc = validateRoomCode(roomInput.value);
+        if (!rc.ok) {
+          roomInput.classList.add("invalid");
+          setTimeout(() => roomInput.classList.remove("invalid"), 400);
+          return showToast(rc.msg);
+        }
 
-    socket.on("player:joined", ({ roomCode } = {}) => {
-      const code = (roomCode || "").trim().toUpperCase();
-      showToast("Joined ✅");
-      setTimeout(()=>{
-        location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
-      }, 200);
-    });
+        const nm = validateName(nameInput.value);
+        if (!nm.ok) {
+          nameInput.classList.add("invalid");
+          setTimeout(() => nameInput.classList.remove("invalid"), 400);
+          return showToast(nm.msg);
+        }
+
+        saveProfile(nm.value);
+
+        // نفس الحدث اللي كان عندك
+        socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
+      };
+
+      socket.on("join:error", ({ message } = {}) => {
+        showToast(message || "Join error");
+      });
+
+      socket.on("player:joined", ({ roomCode: rc } = {}) => {
+        const code = (rc || "").trim().toUpperCase();
+        showToast("Joined ✅");
+        setTimeout(() => {
+          location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
+        }, 200);
+      });
+    })();
   </script>
 </body>
 </html>
