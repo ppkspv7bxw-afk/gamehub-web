@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Lobby • Gamehub4u</title>
+  <link rel="stylesheet" href="/common.css"/>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <div class="brand">
+          <div class="title">
+            <div>Lobby</div>
+            <small id="roomLabel">Room: ...</small>
+          </div>
+        </div>
+
+        <div class="status">
+          <span id="light" class="statusLight"></span>
+          <span id="statusText">...</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="grid">
+          <div class="panel">
+            <div class="kv"><div class="k">Room Code</div><div class="v" id="roomCode">...</div></div>
+            <div class="kv"><div class="k">You</div><div class="v" id="me">...</div></div>
+
+            <div class="row" style="margin-top:12px">
+              <button id="readyBtn" class="btn" type="button">Ready: OFF</button>
+              <button id="mafiaBtn" class="btn secondary" type="button">Open Mafia</button>
+              <button id="homeBtn" class="btn ghost" type="button">Home</button>
+            </div>
+
+            <div class="hint">
+              إذا بدأت المافيا، افتح Mafia من هنا.
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="label">Players</div>
+            <ul id="players" class="list"></ul>
+
+            <div class="hr"></div>
+            <div class="hint" id="hostHint"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="box">
+      <h3>انقطع الاتصال</h3>
+      <p>بنحاول نرجع الاتصال تلقائيًا…</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">OK</div>
+
+  <script src="https://gamehub-server-okv5.onrender.com/socket.io/socket.io.js"></script>
+  <script src="/common.js"></script>
+  <script>
+    const socket = createSocket();
+    bindStatusLight(socket, document.getElementById("light"));
+    setupReconnectOverlay(socket);
+
+    const roomCodeEl = document.getElementById("roomCode");
+    const roomLabel = document.getElementById("roomLabel");
+    const meEl = document.getElementById("me");
+    const playersEl = document.getElementById("players");
+    const hostHint = document.getElementById("hostHint");
+
+    const readyBtn = document.getElementById("readyBtn");
+    const mafiaBtn = document.getElementById("mafiaBtn");
+    const homeBtn = document.getElementById("homeBtn");
+
+    const profile = loadProfile();
+    meEl.textContent = profile.name ? profile.name : ("client: " + clientId.slice(0,6));
+
+    let roomCode = normalizeRoom(getParam("room") || "");
+    let isReady = false;
+    let hostClientId = null;
+
+    function setRoomUI(code){
+      roomCode = code;
+      roomCodeEl.textContent = code;
+      roomLabel.textContent = "Room: " + code;
+      setParam("room", code);
+    }
+
+    function renderPlayers(state){
+      playersEl.innerHTML = "";
+      hostClientId = state.hostClientId || null;
+
+      const players = state.players || [];
+      for(const p of players){
+        const li = document.createElement("li");
+        li.className = "item";
+        li.innerHTML = `
+          <div class="left">
+            <span class="pill ${p.ready ? "ok":"warn"}">${p.ready ? "Ready":"Not Ready"}</span>
+            <div style="font-weight:900">${p.name}</div>
+          </div>
+          <div class="pill">${p.clientId === hostClientId ? "HOST" : "PLAYER"}</div>
+        `;
+        playersEl.appendChild(li);
+      }
+
+      if(hostClientId === clientId){
+        hostHint.innerHTML = `أنت الـ Host ✅ افتح لوحة التحكم من هنا: <a href="/host.html?room=${encodeURIComponent(roomCode)}">Host Panel</a>`;
+      }else{
+        hostHint.textContent = "";
+      }
+    }
+
+    function setReadyUI(){
+      readyBtn.textContent = "Ready: " + (isReady ? "ON" : "OFF");
+      readyBtn.classList.toggle("secondary", isReady);
+    }
+
+    setReadyUI();
+
+    socket.on("connect", () => {
+      if(!roomCode) return showToast("No room in URL");
+      setRoomUI(roomCode);
+      socket.emit("player:attach", { roomCode, clientId });
+      socket.emit("room:getState", { roomCode });
+      socket.emit("mafia:getState", { roomCode, clientId });
+    });
+
+    socket.on("room:state", (state) => {
+      if(!state) return;
+      if(state.roomCode) setRoomUI(state.roomCode);
+      renderPlayers(state);
+    });
+
+    socket.on("room:error", ({ message }={}) => showToast(message || "ROOM_ERROR"));
+    socket.on("room:closed", () => showToast("ROOM_CLOSED"));
+
+    readyBtn.onclick = () => {
+      if(!roomCode) return;
+      isReady = !isReady;
+      setReadyUI();
+      socket.emit("player:ready", { roomCode, ready: isReady, clientId });
+    };
+
+    mafiaBtn.onclick = () => {
+      if(!roomCode) return;
+      location.href = WEB_ORIGIN + "/mafia.html?room=" + encodeURIComponent(roomCode);
+    };
+
+    homeBtn.onclick = () => location.href = WEB_ORIGIN + "/";
+  </script>
+</body>
+</html>
