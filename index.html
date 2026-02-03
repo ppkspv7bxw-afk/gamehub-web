@@ -4,14 +4,138 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Gamehub4u</title>
-  <link rel="stylesheet" href="/common.css"/>
+
+  <style>
+    :root{
+      --bg:#0b0f17;
+      --card:#0f172a;
+      --border:#1f2a44;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --btn:#2563eb;
+      --btn2:#1f2937;
+      --bad:#ef4444;
+      --warn:#f59e0b;
+      --ok:#22c55e;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background: radial-gradient(1000px 600px at 20% 0%, #101a33 0%, var(--bg) 55%) no-repeat;
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{display:flex;justify-content:center;padding:28px}
+    .wrap--narrow{max-width:980px;margin:0 auto;width:100%}
+    .card{
+      width:100%;
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 12px 30px rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+    }
+    .header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 18px;border-bottom:1px solid var(--border);
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:12px;
+      object-fit:contain;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      padding:6px;
+    }
+    .status{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+    .statusLight{
+      width:10px;height:10px;border-radius:999px;display:inline-block;
+      background:var(--bad); box-shadow:0 0 0 3px rgba(239,68,68,.15);
+    }
+    .statusLight.ok{background:var(--ok); box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+    .statusLight.warn{background:var(--warn); box-shadow:0 0 0 3px rgba(245,158,11,.15)}
+    .statusLight.bad{background:var(--bad); box-shadow:0 0 0 3px rgba(239,68,68,.15)}
+
+    .content{padding:18px}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    @media (max-width:860px){.grid{grid-template-columns:1fr}}
+    .panel{
+      background:rgba(0,0,0,.18);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+    }
+    .label{font-size:12px;color:var(--muted);margin:10px 0 6px}
+    .input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      outline:none;
+    }
+    .input:focus{border-color:rgba(37,99,235,.6); box-shadow:0 0 0 3px rgba(37,99,235,.18)}
+    .row{display:flex;gap:10px}
+    .btn{
+      border:none;cursor:pointer;
+      padding:12px 14px;
+      border-radius:12px;
+      font-weight:700;
+      color:white;
+      background:linear-gradient(180deg, rgba(37,99,235,1), rgba(29,78,216,1));
+      box-shadow:0 10px 18px rgba(37,99,235,.18);
+    }
+    .btn.secondary{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:none;
+    }
+    .hint{color:var(--muted);font-size:13px;line-height:1.6}
+
+    .toast{
+      position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+      background:rgba(0,0,0,.75);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      padding:10px 14px;border-radius:12px;
+      opacity:0;pointer-events:none;
+      transition:.2s;
+    }
+    .toast.show{opacity:1}
+    .overlay{
+      position:fixed;inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;align-items:center;justify-content:center;
+      padding:16px;
+    }
+    .overlay.show{display:flex}
+    .overlay .box{
+      width:min(420px,100%);
+      background:rgba(17,24,39,.92);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:16px 16px;
+    }
+    .overlay h3{margin:0 0 8px;font-size:18px}
+    .overlay p{margin:0;color:var(--muted);line-height:1.6}
+
+    .invalid{animation:shake .25s linear 2; border-color: rgba(239,68,68,.7) !important}
+    @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-3px)}100%{transform:translateX(0)}}
+  </style>
 </head>
+
 <body>
   <div class="wrap wrap--narrow">
     <div class="card">
       <div class="header">
         <div class="brand">
-          <div class="title"><div>Gamehub4u</div></div>
+          <!-- ✅ بدّل الاسم بصورة -->
+          <img class="logo" src="/logo.png" alt="Gamehub4u"/>
         </div>
 
         <div class="status">
@@ -36,7 +160,7 @@
           </div>
 
           <div class="panel">
-            <div class="hint" style="margin:0;">اكتب الكود واسمك ثم Join — أو Host لإنشاء غرفة.</div>
+            <div class="hint">اكتب الكود واسمك ثم Join — أو Host لإنشاء غرفة.</div>
           </div>
         </div>
       </div>
@@ -78,13 +202,11 @@
     function normalizeRoom(s) {
       return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0,6);
     }
-
     function validateRoomCode(s) {
       const v = normalizeRoom(s);
       if (v.length < 3) return { ok:false, msg:"اكتب Room Code صحيح" };
       return { ok:true, value:v };
     }
-
     function validateName(s) {
       const v = String(s || "").trim().replace(/\s+/g," ").slice(0,20);
       if (v.length < 2) return { ok:false, msg:"اكتب اسم (حرفين على الأقل)" };
@@ -107,16 +229,11 @@
     function loadScriptWithTimeout(src, ms=7000) {
       return new Promise((resolve, reject) => {
         const s = document.createElement("script");
-        const timer = setTimeout(() => {
-          s.remove();
-          reject(new Error("timeout"));
-        }, ms);
-
+        const timer = setTimeout(() => { s.remove(); reject(new Error("timeout")); }, ms);
         s.src = src;
         s.async = true;
         s.onload = () => { clearTimeout(timer); resolve(true); };
         s.onerror = () => { clearTimeout(timer); reject(new Error("load_error")); };
-
         document.head.appendChild(s);
       });
     }
@@ -124,16 +241,13 @@
     async function start() {
       setStatus("Connecting...", "warn");
 
-      // 1) حمل socket.io client من السيرفر
       try {
         await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
       } catch (e) {
         setStatus("Offline", "bad");
-        showToast("ما قدرنا نحمل socket.io من api");
         return;
       }
 
-      // 2) اتصل
       let socket;
       try {
         socket = io(SERVER_URL, {
@@ -142,7 +256,6 @@
         });
       } catch (e) {
         setStatus("Offline", "bad");
-        showToast("تعذر تشغيل socket");
         return;
       }
 
@@ -150,11 +263,11 @@
       const showOv = () => ov && ov.classList.add("show");
       const hideOv = () => ov && ov.classList.remove("show");
 
-      socket.on("connect", () => { setStatus("Connected", "ok"); hideOv(); });
-      socket.on("disconnect", () => { setStatus("Disconnected", "bad"); showOv(); });
+      // ✅ شل Connected واستبدله بـ Online
+      socket.on("connect", () => { setStatus("Online", "ok"); hideOv(); });
+      socket.on("disconnect", () => { setStatus("Offline", "bad"); showOv(); });
       socket.on("connect_error", () => { setStatus("Connecting...", "warn"); });
 
-      // UI
       const roomInput = document.getElementById("room");
       const nameInput = document.getElementById("name");
       const joinBtn   = document.getElementById("joinBtn");
@@ -173,23 +286,23 @@
 
       joinBtn.onclick = () => {
         const rc = validateRoomCode(roomInput.value);
-        if (!rc.ok) return showToast(rc.msg);
-
+        if (!rc.ok) { roomInput.classList.add("invalid"); setTimeout(()=>roomInput.classList.remove("invalid"),400); return showToast(rc.msg); }
         const nm = validateName(nameInput.value);
-        if (!nm.ok) return showToast(nm.msg);
+        if (!nm.ok) { nameInput.classList.add("invalid"); setTimeout(()=>nameInput.classList.remove("invalid"),400); return showToast(nm.msg); }
 
         saveProfile(nm.value);
         socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
       };
 
       socket.on("join:error", ({ message } = {}) => showToast(message || "Join error"));
+
       socket.on("player:joined", ({ roomCode: rc } = {}) => {
         const code = String(rc || "").trim().toUpperCase();
         showToast("Joined ✅");
         setTimeout(() => {
           location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
         }, 200);
-      });
+      };
     }
 
     start();
