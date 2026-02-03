@@ -236,4 +236,922 @@
       border-radius: 50%;
       background: var(--bad);
       box-shadow: 
-        0 0 0 0 rgba​​​​​​​​​​​​​​​​
+        0 0 0 0 rgba(255,45,85,.6),
+        0 0 12px rgba(255,45,85,.4);
+      margin-top: 4px;
+      position: relative;
+      transition: all 0.3s ease;
+      animation: lampPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes lampPulse{
+      0%, 100%{ box-shadow: 0 0 0 0 rgba(255,45,85,.6), 0 0 12px rgba(255,45,85,.4); }
+      50%{ box-shadow: 0 0 0 6px rgba(255,45,85,.0), 0 0 20px rgba(255,45,85,.6); }
+    }
+
+    .lamp.ok{ 
+      background: var(--ok);
+      animation-name: lampPulseOk;
+    }
+
+    @keyframes lampPulseOk{
+      0%, 100%{ box-shadow: 0 0 0 0 rgba(34,197,94,.6), 0 0 12px rgba(34,197,94,.4); }
+      50%{ box-shadow: 0 0 0 6px rgba(34,197,94,.0), 0 0 20px rgba(34,197,94,.6); }
+    }
+
+    .lamp.warn{ 
+      background: var(--warn);
+      animation-name: lampPulseWarn;
+    }
+
+    @keyframes lampPulseWarn{
+      0%, 100%{ box-shadow: 0 0 0 0 rgba(251,191,36,.6), 0 0 12px rgba(251,191,36,.4); }
+      50%{ box-shadow: 0 0 0 6px rgba(251,191,36,.0), 0 0 20px rgba(251,191,36,.6); }
+    }
+
+    /* Chips - محسّن */
+    .chips{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .chip{
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chip::before{
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.1), transparent);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .chip:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.12);
+      border-color: rgba(255,255,255,.25);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chip:hover::before{
+      opacity: 1;
+    }
+
+    .chip:active{ 
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* Error Box - محسّن */
+    .errorBox{
+      display: none;
+      border: 1px solid rgba(255,45,85,.3);
+      background: linear-gradient(135deg, rgba(255,45,85,.12), rgba(255,45,85,.08));
+      color: rgba(255,240,245,.96);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 500;
+      backdrop-filter: blur(8px);
+    }
+
+    .errorBox.show{ 
+      display: block;
+      animation: errorSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes errorSlide{
+      from{
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+    }
+
+    .shake{ 
+      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97);
+    }
+
+    @keyframes shake{
+      0%, 100%{ transform: translateX(0); }
+      20%, 60%{ transform: translateX(-8px); }
+      40%, 80%{ transform: translateX(8px); }
+    }
+
+    label{
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: block;
+      letter-spacing: 0.3px;
+    }
+
+    .codeHeader{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .codeRight{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Icon Button - محسّن */
+    .iconBtn{
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .iconBtn::before{
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .iconBtn:hover{
+      transform: translateY(-2px) scale(1.05);
+      background: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.3);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .iconBtn:hover::before{
+      opacity: 1;
+    }
+
+    .iconBtn:active{ 
+      transform: translateY(0) scale(0.98);
+    }
+
+    .iconBtn svg{ 
+      width: 20px;
+      height: 20px;
+      opacity: 0.9;
+      transition: opacity 0.2s ease;
+    }
+
+    .iconBtn:hover svg{
+      opacity: 1;
+    }
+
+    /* Code Boxes - محسّن بشكل كبير */
+    .codeBoxes{
+      display: flex;
+      gap: 10px;
+      direction: ltr;
+    }
+
+    .box{
+      width: 48px;
+      height: 58px;
+      border-radius: var(--radius-sm);
+      border: 2px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.3);
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-align: center;
+      outline: none;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      backdrop-filter: blur(8px);
+    }
+
+    .box::before{
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: var(--radius-sm);
+      padding: 2px;
+      background: linear-gradient(135deg, rgba(255,61,107,0), rgba(255,61,107,0));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .box:focus{
+      border-color: var(--secondary);
+      background: rgba(0,0,0,.4);
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 
+        0 0 0 4px rgba(255,61,107,.2),
+        0 8px 20px rgba(255,61,107,.3);
+    }
+
+    .box:focus::before{
+      background: linear-gradient(135deg, rgba(255,61,107,.6), rgba(255,27,58,.4));
+      opacity: 1;
+    }
+
+    .box.invalid{
+      border-color: var(--bad);
+      background: rgba(255,45,85,.08);
+      animation: boxShake 0.4s ease;
+    }
+
+    @keyframes boxShake{
+      0%, 100%{ transform: translateX(0); }
+      25%, 75%{ transform: translateX(-4px); }
+      50%{ transform: translateX(4px); }
+    }
+
+    /* Name Input - محسّن */
+    .nameInput{
+      width: 100%;
+      padding: 15px 18px;
+      border-radius: var(--radius-sm);
+      border: 2px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.3);
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      backdrop-filter: blur(8px);
+      font-weight: 500;
+    }
+
+    .nameInput::placeholder{
+      color: rgba(255,255,255,.4);
+    }
+
+    .nameInput:focus{
+      border-color: var(--accent);
+      background: rgba(0,0,0,.4);
+      transform: translateY(-2px);
+      box-shadow: 
+        0 0 0 4px rgba(255,77,122,.18),
+        0 8px 20px rgba(255,77,122,.25);
+    }
+
+    .nameInput.invalid{
+      border-color: var(--bad);
+      background: rgba(255,45,85,.08);
+      animation: inputShake 0.4s ease;
+    }
+
+    @keyframes inputShake{
+      0%, 100%{ transform: translateX(0); }
+      25%, 75%{ transform: translateX(-6px); }
+      50%{ transform: translateX(6px); }
+    }
+
+    /* Buttons - تحسين كبير */
+    .row{
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn{
+      flex: 1;
+      border-radius: var(--radius-sm);
+      border: none;
+      padding: 15px 20px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+        0 4px 12px rgba(255,27,58,.3),
+        inset 0 1px 0 rgba(255,255,255,.2);
+    }
+
+    .btn::before{
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.2), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .btn:hover{
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 
+        0 8px 24px rgba(255,27,58,.45),
+        inset 0 1px 0 rgba(255,255,255,.25);
+    }
+
+    .btn:hover::before{
+      opacity: 1;
+    }
+
+    .btn:active{ 
+      transform: translateY(-1px) scale(0.98);
+      box-shadow: 
+        0 4px 12px rgba(255,27,58,.35),
+        inset 0 1px 0 rgba(255,255,255,.2);
+    }
+
+    .btn.secondary{
+      background: rgba(255,255,255,.1);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.2);
+      box-shadow: 
+        0 4px 12px rgba(0,0,0,.2),
+        inset 0 1px 0 rgba(255,255,255,.1);
+    }
+
+    .btn.secondary:hover{
+      background: rgba(255,255,255,.15);
+      border-color: rgba(255,255,255,.3);
+      box-shadow: 
+        0 8px 24px rgba(0,0,0,.3),
+        inset 0 1px 0 rgba(255,255,255,.15);
+    }
+
+    .btn[disabled]{ 
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+
+    /* Spinner - محسّن */
+    .spinner{
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(255,255,255,.3);
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    .btn.loading .spinner{ 
+      display: inline-block;
+    }
+
+    @keyframes spin{ 
+      to{ transform: rotate(360deg); }
+    }
+
+    /* Toast - محسّن */
+    .toast{
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(10,12,18,.92);
+      color: white;
+      padding: 14px 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 14px;
+      font-weight: 600;
+      backdrop-filter: blur(16px) saturate(180%);
+      box-shadow: var(--shadow-md);
+      z-index: 1000;
+    }
+
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Overlay - محسّن */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+      animation: overlayFade 0.3s ease;
+    }
+
+    @keyframes overlayFade{
+      from{ opacity: 0; }
+    }
+
+    .overlay.show{ 
+      display: flex;
+    }
+
+    .overlay .box{
+      width: min(440px, 100%);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(15,18,25,.94);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(20px) saturate(180%);
+      animation: overlayBoxSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes overlayBoxSlide{
+      from{
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+    }
+
+    .overlay h3{ 
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .overlay p{ 
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* Responsive - تحسينات */
+    @media (max-width: 600px){
+      .codeBoxes{
+        gap: 8px;
+      }
+      .box{
+        width: 44px;
+        height: 54px;
+        font-size: 18px;
+      }
+      .btn{
+        font-size: 14px;
+        padding: 13px 18px;
+      }
+    }
+
+    /* Dark scrollbar */
+    ::-webkit-scrollbar{
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track{
+      background: rgba(0,0,0,.2);
+    }
+    ::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,.2);
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb:hover{
+      background: rgba(255,255,255,.3);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blob a"></div>
+  <div class="blob b"></div>
+  <div class="blob c"></div>
+
+  <div class="wrap">
+    <div class="logoTop">
+      <img class="logoImg" src="/logo.png" alt="Gamehub4u Logo" loading="eager">
+    </div>
+
+    <div class="grid">
+      <section class="panel form" role="form" aria-label="نموذج الانضمام">
+        <div id="err" class="errorBox" role="alert"></div>
+
+        <div>
+          <div class="codeHeader">
+            <label style="margin:0;">كود الغرفة</label>
+            <div class="codeRight">
+              <button class="iconBtn" id="pasteBtn" type="button" aria-label="لصق الكود" title="لصق">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M16 4h-1.2a3 3 0 0 0-5.6 0H8a2 2 0 0 0-2 2v2h12V6a2 2 0 0 0-2-2Z" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M8 8h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8h2Z" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="codeBoxes" id="codeBoxes">
+            <input class="box" inputmode="text" maxlength="1" id="c0" aria-label="الحرف الأول">
+            <input class="box" inputmode="text" maxlength="1" id="c1" aria-label="الحرف الثاني">
+            <input class="box" inputmode="text" maxlength="1" id="c2" aria-label="الحرف الثالث">
+            <input class="box" inputmode="text" maxlength="1" id="c3" aria-label="الحرف الرابع">
+            <input class="box" inputmode="text" maxlength="1" id="c4" aria-label="الحرف الخامس">
+            <input class="box" inputmode="text" maxlength="1" id="c5" aria-label="الحرف السادس">
+          </div>
+        </div>
+
+        <div>
+          <label for="name">اسمك في اللعبة</label>
+          <input id="name" class="nameInput" placeholder="مثال: محمد" maxlength="20" autocomplete="off" aria-label="اسمك"/>
+        </div>
+
+        <div class="row">
+          <button id="joinBtn" class="btn" type="button" aria-label="انضمام للغرفة">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="btnText">انضم الآن</span>
+          </button>
+          <button id="hostBtn" class="btn secondary" type="button" aria-label="إنشاء غرفة جديدة">استضف</button>
+        </div>
+      </section>
+
+      <section class="panel side" aria-label="معلومات الاتصال">
+        <div class="sideTop">
+          <div></div>
+          <span id="lamp" class="lamp bad" role="status" aria-label="حالة الاتصال"></span>
+        </div>
+
+        <div class="chips">
+          <button class="chip" id="lastRoomBtn" type="button" aria-label="آخر غرفة">آخر غرفة</button>
+          <button class="chip" id="clearBtn" type="button" aria-label="مسح الحقول">مسح الكل</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay" role="dialog" aria-labelledby="overlayTitle" aria-modal="true">
+    <div class="box">
+      <h3 id="overlayTitle">انقطع الاتصال</h3>
+      <p>جاري إعادة الاتصال تلقائيًا... يرجى الانتظار.</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const SERVER_URL = "https://api.gamehub4u.com";
+    const WEB_ORIGIN = location.origin;
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      if (!t) return;
+      t.textContent = String(msg || "تم");
+      t.classList.add("show");
+      clearTimeout(showToast._tm);
+      showToast._tm = setTimeout(() => t.classList.remove("show"), 2000);
+    }
+
+    function showError(msg){
+      const err = document.getElementById("err");
+      if (!err) return;
+      if (!msg) { 
+        err.classList.remove("show");
+        err.textContent = "";
+        return;
+      }
+      err.textContent = String(msg);
+      err.classList.add("show");
+      err.classList.remove("shake");
+      void err.offsetWidth;
+      err.classList.add("shake");
+    }
+
+    function setLamp(cls){
+      const lamp = document.getElementById("lamp");
+      if (!lamp) return;
+      lamp.classList.remove("ok","warn","bad");
+      lamp.classList.add(cls);
+      lamp.setAttribute('aria-label', 
+        cls === 'ok' ? 'متصل' : 
+        cls === 'warn' ? 'جاري الاتصال' : 
+        'غير متصل'
+      );
+    }
+
+    function loadScriptWithTimeout(src, ms = 7000) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        const timer = setTimeout(() => { 
+          s.remove();
+          reject(new Error("timeout"));
+        }, ms);
+        s.src = src;
+        s.async = true;
+        s.onload = () => { 
+          clearTimeout(timer);
+          resolve(true);
+        };
+        s.onerror = () => { 
+          clearTimeout(timer);
+          reject(new Error("load_error"));
+        };
+        document.head.appendChild(s);
+      });
+    }
+
+    const boxes = Array.from({length: 6}, (_, i) => document.getElementById("c" + i));
+
+    function getCode(){
+      return boxes.map(b => (b.value || "").toUpperCase()).join("").replace(/[^A-Z0-9]/g, "");
+    }
+
+    function setCode(code){
+      const clean = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+      boxes.forEach((b, i) => b.value = clean[i] || "");
+      if (clean.length < 6) boxes[clean.length]?.focus();
+    }
+
+    function markCodeInvalid(on){
+      boxes.forEach(b => b.classList.toggle("invalid", !!on));
+    }
+
+    function normalizeRoom(s) {
+      return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
+    }
+
+    function validateRoomCode(code) {
+      const v = normalizeRoom(code);
+      if (v.length < 3) return { ok: false, msg: "الرجاء إدخال كود صحيح (3-6 أحرف)" };
+      return { ok: true, value: v };
+    }
+
+    function validateName(s) {
+      const v = String(s || "").trim().replace(/\s+/g, " ").slice(0, 20);
+      if (v.length < 2) return { ok: false, msg: "الاسم يجب أن يكون حرفين على الأقل" };
+      return { ok: true, value: v };
+    }
+
+    function getOrCreateClientId() {
+      let id = localStorage.getItem("gh_clientId");
+      if (!id) {
+        id = crypto.randomUUID ? crypto.randomUUID() : ("cid_" + Math.random().toString(36).slice(2));
+        localStorage.setItem("gh_clientId", id);
+      }
+      return id;
+    }
+    const clientId = getOrCreateClientId();
+
+    function saveProfile(name) { 
+      localStorage.setItem("gh_name", String(name || ""));
+    }
+    
+    function loadProfile() { 
+      return { name: localStorage.getItem("gh_name") || "" };
+    }
+
+    function saveLastRoom(code){ 
+      localStorage.setItem("gh_lastRoom", String(code || ""));
+    }
+    
+    function loadLastRoom(){ 
+      return localStorage.getItem("gh_lastRoom") || "";
+    }
+
+    function setLoading(on){
+      const btn = document.getElementById("joinBtn");
+      if (!btn) return;
+      btn.classList.toggle("loading", !!on);
+      btn.disabled = !!on;
+      btn.setAttribute('aria-busy', !!on);
+    }
+
+    function extractRoomFromText(text){
+      const t = String(text || "").trim();
+      if (!t) return "";
+      
+      try {
+        const u = new URL(t);
+        const r = (u.searchParams.get("room") || "").trim();
+        if (r) return r;
+      } catch(_){}
+      
+      const m = t.match(/(?:\broom\s*=\s*)([A-Za-z0-9]{3,6})/i);
+      if (m && m[1]) return m[1];
+      
+      return t.replace(/[^A-Za-z0-9]/g, "").slice(0, 6);
+    }
+
+    async function pasteToCode(){
+      try {
+        const text = await navigator.clipboard.readText();
+        const room = extractRoomFromText(text);
+        if (!room) {
+          showToast("لم يتم العثور على كود");
+          return;
+        }
+        setCode(room);
+        markCodeInvalid(false);
+        showError("");
+        showToast("تم اللصق ✓");
+      } catch(_){
+        showToast("تعذر اللصق");
+      }
+    }
+
+    async function start() {
+      setLamp("warn");
+
+      try {
+        await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
+      } catch (e) {
+        setLamp("bad");
+        showError("تعذر الاتصال بالخادم");
+        return;
+      }
+
+      let socket;
+      try {
+        socket = io(SERVER_URL, {
+          transports: ["websocket", "polling"],
+          auth: { clientId }
+        });
+      } catch (e) {
+        setLamp("bad");
+        showError("تعذر الاتصال");
+        return;
+      }
+
+      const ov = document.getElementById("overlay");
+      const showOv = () => ov && ov.classList.add("show");
+      const hideOv = () => ov && ov.classList.remove("show");
+
+      socket.on("connect", () => { 
+        setLamp("ok");
+        hideOv();
+      });
+      
+      socket.on("disconnect", () => { 
+        setLamp("bad");
+        showOv();
+      });
+      
+      socket.on("connect_error", () => { 
+        setLamp("warn");
+      });
+
+      const nameInput = document.getElementById("name");
+      const roomFromUrl = (new URL(location.href).searchParams.get("room") || "").trim().toUpperCase();
+      const profile = loadProfile();
+      
+      if (profile.name) nameInput.value = profile.name;
+
+      if (roomFromUrl) {
+        setCode(roomFromUrl);
+      } else {
+        const last = loadLastRoom();
+        if (last) setCode(last);
+      }
+
+      boxes.forEach((b, idx) => {
+        b.addEventListener("input", () => {
+          b.value = b.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 1);
+          showError("");
+          markCodeInvalid(false);
+          if (b.value && idx < boxes.length - 1) {
+            boxes[idx + 1].focus();
+          }
+        });
+
+        b.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !b.value && idx > 0) {
+            boxes[idx - 1].focus();
+          }
+          if (e.key === "Enter") {
+            doJoin();
+          }
+        });
+
+        b.addEventListener("paste", (e) => {
+          const text = (e.clipboardData || window.clipboardData).getData("text");
+          if (text) {
+            e.preventDefault();
+            setCode(extractRoomFromText(text));
+          }
+        });
+      });
+
+      nameInput.addEventListener("keydown", (e) => { 
+        if (e.key === "Enter") doJoin();
+      });
+      
+      nameInput.addEventListener("input", () => { 
+        showError("");
+        nameInput.classList.remove("invalid");
+      });
+
+      document.getElementById("pasteBtn").onclick = pasteToCode;
+
+      document.getElementById("clearBtn").onclick = () => {
+        setCode("");
+        nameInput.value = "";
+        showError("");
+        markCodeInvalid(false);
+        nameInput.classList.remove("invalid");
+        boxes[0].focus();
+        showToast("تم المسح");
+      };
+
+      document.getElementById("lastRoomBtn").onclick = () => {
+        const last = loadLastRoom();
+        if (!last) {
+          showToast("لا توجد غرفة سابقة");
+          return;
+        }
+        setCode(last);
+        showToast("تم استرجاع الغرفة");
+      };
+
+      document.getElementById("hostBtn").onclick = () => {
+        location.href = WEB_ORIGIN + "/host.html";
+      };
+      
+      document.getElementById("joinBtn").onclick = () => doJoin();
+
+      function doJoin(){
+        showError("");
+        setLoading(false);
+
+        const code = getCode();
+        const rc = validateRoomCode(code);
+        if (!rc.ok) {
+          markCodeInvalid(true);
+          showError(rc.msg);
+          boxes[0].focus();
+          return;
+        }
+
+        const nm = validateName(nameInput.value);
+        if (!nm.ok) {
+          nameInput.classList.add("invalid");
+          showError(nm.msg);
+          nameInput.focus();
+          return;
+        }
+
+        saveProfile(nm.value);
+        saveLastRoom(rc.value);
+
+        setLoading(true);
+        socket.emit("player:join", { 
+          roomCode: rc.value,
+          name: nm.value,
+          clientId 
+        });
+      }
+
+      socket.on("join:error", ({ message } = {}) => {
+        setLoading(false);
+        showError(message || "حدث خطأ أثناء الانضمام");
+      });
+
+      socket.on("player:joined", ({ roomCode: rc } = {}) => {
+        setLoading(false);
+        const code = String(rc || "").trim().toUpperCase();
+        showToast("✓ تم الانضمام");
+        setTimeout(() => {
+          location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
+        }, 300);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
+  </script>
+</body>
+</html>
