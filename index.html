@@ -6,119 +6,426 @@
   <title>Gamehub4u</title>
 
   <style>
-    body{
-      margin:0; min-height:100vh;
-      display:flex; align-items:center; justify-content:center;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
-      background:#0b1020; color:#fff;
-      padding:16px;
-    }
-    .card{
-      width:min(520px, 100%);
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:16px;
-      padding:18px;
-    }
-    .top{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px;
-      margin-bottom:14px;
-    }
-    h1{ margin:0; font-size:20px; }
-    .status{ display:flex; align-items:center; gap:8px; }
-    .dot{
-      width:10px; height:10px; border-radius:50%;
-      background:#ff4d4d;
-      box-shadow:0 0 0 4px rgba(255,77,77,.15);
-    }
-    .dot.ok{ background:#22c55e; box-shadow:0 0 0 4px rgba(34,197,94,.15); }
-    .dot.warn{ background:#fbbf24; box-shadow:0 0 0 4px rgba(251,191,36,.15); }
-    .dot.bad{ background:#ff4d4d; box-shadow:0 0 0 4px rgba(255,77,77,.15); }
-    .st{ font-size:13px; opacity:.8; }
+    :root{
+      --bg0:#050814;
+      --bg1:#070b1d;
+      --card: rgba(255,255,255,.07);
+      --stroke: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.62);
 
-    .field{ margin-top:10px; }
-    label{ display:block; font-size:13px; opacity:.75; margin-bottom:6px; }
-    input{
-      width:100%;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.25);
-      color:#fff;
-      outline:none;
-      font-size:15px;
+      --primary:#6366f1;
+      --primary2:#22d3ee;
+
+      --ok:#22c55e;
+      --warn:#fbbf24;
+      --bad:#ff4d6d;
+
+      --shadow: 0 26px 80px rgba(0,0,0,.55);
+      --radius: 18px;
     }
-    input:focus{ border-color: rgba(99,102,241,.7); box-shadow:0 0 0 4px rgba(99,102,241,.18); }
-    .row{ display:flex; gap:10px; margin-top:14px; }
-    button{
-      flex:1;
-      padding:12px 12px;
-      border-radius:12px;
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px 14px;
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
+      background: radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.18), transparent 60%),
+                  radial-gradient(900px 650px at 85% 18%, rgba(34,211,238,.14), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    /* Animated blobs */
+    .blob{
+      position:fixed;
+      width:540px;
+      height:540px;
+      border-radius: 999px;
+      filter: blur(40px);
+      opacity:.28;
+      z-index:-1;
+      animation: float 12s ease-in-out infinite;
+    }
+    .blob.a{ left:-180px; top:-160px; background: rgba(99,102,241,.85); }
+    .blob.b{ right:-220px; top:60px; background: rgba(34,211,238,.65); animation-duration: 15s; }
+    .blob.c{ left:10%; bottom:-240px; background: rgba(16,185,129,.38); animation-duration: 18s; }
+
+    @keyframes float{
+      0%,100%{ transform: translate(0,0) scale(1); }
+      50%{ transform: translate(22px, -18px) scale(1.05); }
+    }
+
+    .shell{
+      width:min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    @media (max-width: 900px){
+      .shell{ grid-template-columns:1fr; }
+    }
+
+    .panel{
+      background: var(--card);
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+      position:relative;
+    }
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(600px 260px at 15% 0%, rgba(99,102,241,.18), transparent 60%),
+                  radial-gradient(600px 260px at 80% 15%, rgba(34,211,238,.12), transparent 60%);
+      pointer-events:none;
+    }
+    .panel > *{ position:relative; }
+
+    .hero{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .mark{
+      width:12px;height:12px;border-radius:999px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      box-shadow: 0 0 18px rgba(99,102,241,.35);
+      flex:0 0 auto;
+    }
+    h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.3px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.65;
+    }
+
+    .statusPill{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      user-select:none;
+      white-space:nowrap;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: var(--bad);
+      box-shadow: 0 0 0 4px rgba(255,77,109,.14);
+    }
+    .dot.ok{ background: var(--ok); box-shadow: 0 0 0 4px rgba(34,197,94,.14); }
+    .dot.warn{ background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.14); }
+    .dot.bad{ background: var(--bad); box-shadow: 0 0 0 4px rgba(255,77,109,.14); }
+
+    .statusText{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .heroActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:4px;
+    }
+    .chip{
       border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--text);
       cursor:pointer;
-      font-weight:700;
+      transition: transform .08s ease, filter .2s ease;
+      user-select:none;
     }
-    .primary{ background:#6366f1; color:#fff; }
-    .secondary{ background:rgba(255,255,255,.06); color:#fff; }
+    .chip:hover{ filter: brightness(1.06); }
+    .chip:active{ transform: translateY(1px); }
+
+    .form{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .errorBox{
+      display:none;
+      border:1px solid rgba(255,77,109,.25);
+      background: rgba(255,77,109,.10);
+      color: rgba(255,220,226,.95);
+      padding:10px 12px;
+      border-radius: 14px;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .errorBox.show{ display:block; }
+    .shake{ animation: shake .35s ease; }
+    @keyframes shake{
+      0%,100%{ transform: translateX(0); }
+      20%{ transform: translateX(6px); }
+      40%{ transform: translateX(-6px); }
+      60%{ transform: translateX(4px); }
+      80%{ transform: translateX(-4px); }
+    }
+
+    label{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:6px;
+      display:block;
+    }
+
+    .codeRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .codeBoxes{
+      display:flex;
+      gap:8px;
+      direction:ltr; /* خانات الكود لليسار->يمين */
+    }
+    .box{
+      width:44px;
+      height:52px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      font-size:18px;
+      font-weight:800;
+      text-transform:uppercase;
+      text-align:center;
+      outline:none;
+      transition: box-shadow .2s ease, border-color .2s ease, transform .08s ease;
+    }
+    .box:focus{
+      border-color: rgba(99,102,241,.65);
+      box-shadow: 0 0 0 4px rgba(99,102,241,.18);
+      transform: translateY(-1px);
+    }
+    .box.invalid{
+      border-color: rgba(255,77,109,.55);
+      box-shadow: 0 0 0 4px rgba(255,77,109,.14);
+    }
+
+    .nameInput{
+      width:100%;
+      padding:14px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      font-size:15px;
+      outline:none;
+      transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    .nameInput:focus{
+      border-color: rgba(34,211,238,.55);
+      box-shadow: 0 0 0 4px rgba(34,211,238,.14);
+    }
+    .nameInput.invalid{
+      border-color: rgba(255,77,109,.55);
+      box-shadow: 0 0 0 4px rgba(255,77,109,.14);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      margin-top:6px;
+    }
+    .btn{
+      flex:1;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      padding:12px 14px;
+      cursor:pointer;
+      font-weight:800;
+      color:white;
+      background: linear-gradient(135deg, rgba(99,102,241,.95), rgba(34,211,238,.55));
+      transition: transform .08s ease, filter .2s ease, opacity .2s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+    }
+    .btn:hover{ filter: brightness(1.06); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.secondary{
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+    }
+    .btn[disabled]{ opacity:.55; cursor:not-allowed; }
+
+    .spinner{
+      width:16px;height:16px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.35);
+      border-top-color: rgba(255,255,255,.95);
+      animation: spin 1s linear infinite;
+      display:none;
+    }
+    .btn.loading .spinner{ display:inline-block; }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+
+    .hint{
+      color: var(--muted);
+      font-size:12px;
+      line-height:1.6;
+    }
 
     .toast{
-      position:fixed; left:50%; bottom:16px;
-      transform:translateX(-50%);
-      background:rgba(0,0,0,.75);
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.78);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
       border:1px solid rgba(255,255,255,.14);
-      padding:10px 14px;
-      border-radius:999px;
       opacity:0;
-      transition:.2s;
       pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
       font-size:13px;
+      backdrop-filter: blur(10px);
     }
-    .toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px); }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-4px);
+    }
 
     .overlay{
-      position:fixed; inset:0;
-      background:rgba(0,0,0,.45);
-      display:none; align-items:center; justify-content:center;
-      padding:16px;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
     }
     .overlay.show{ display:flex; }
     .overlay .box{
       width:min(420px, 100%);
-      background:rgba(10,12,18,.86);
+      border-radius: 18px;
       border:1px solid rgba(255,255,255,.14);
-      border-radius:16px;
-      padding:14px;
+      background: rgba(10,12,18,.86);
+      padding: 16px;
+      box-shadow: var(--shadow);
     }
     .overlay h3{ margin:0 0 8px; font-size:16px; }
-    .overlay p{ margin:0; opacity:.75; font-size:13px; line-height:1.6; }
+    .overlay p{ margin:0; color:var(--muted); font-size:13px; line-height:1.6; }
   </style>
 </head>
+
 <body>
+  <div class="blob a"></div>
+  <div class="blob b"></div>
+  <div class="blob c"></div>
 
-  <div class="card">
-    <div class="top">
-      <h1>Gamehub4u</h1>
-      <div class="status">
-        <span id="light" class="dot bad"></span>
-        <span id="statusText" class="st">Loading...</span>
+  <div class="shell">
+
+    <section class="panel hero">
+      <div class="topbar">
+        <div class="brand">
+          <span class="mark"></span>
+          <h1>Gamehub4u</h1>
+        </div>
+
+        <div class="statusPill">
+          <span id="light" class="dot bad"></span>
+          <span id="statusText" class="statusText">Loading...</span>
+        </div>
       </div>
-    </div>
 
-    <div class="field">
-      <label for="room">Room Code</label>
-      <input id="room" placeholder="مثال: 6F3J" maxlength="6" autocomplete="off"/>
-    </div>
+      <p class="subtitle">
+        ادخل كود الغرفة واسمك. تقدر تنسخ رابط دعوة أو ترجع لآخر روم بسرعة.
+      </p>
 
-    <div class="field">
-      <label for="name">اسمك</label>
-      <input id="name" placeholder="مثال: محمد" maxlength="20" autocomplete="off"/>
-    </div>
+      <div class="heroActions">
+        <div class="chip" id="lastRoomBtn">آخر روم</div>
+        <div class="chip" id="copyInviteBtn">نسخ رابط الدعوة</div>
+        <div class="chip" id="clearBtn">مسح</div>
+      </div>
 
-    <div class="row">
-      <button id="joinBtn" class="primary" type="button">Join</button>
-      <button id="hostBtn" class="secondary" type="button">Host</button>
-    </div>
+      <div class="hint" id="serverHint" style="margin-top:6px;"></div>
+    </section>
+
+    <section class="panel form">
+      <div id="err" class="errorBox"></div>
+
+      <div>
+        <label>Room Code</label>
+        <div class="codeRow">
+          <div class="codeBoxes" id="codeBoxes">
+            <input class="box" inputmode="text" maxlength="1" id="c0" aria-label="code 1">
+            <input class="box" inputmode="text" maxlength="1" id="c1" aria-label="code 2">
+            <input class="box" inputmode="text" maxlength="1" id="c2" aria-label="code 3">
+            <input class="box" inputmode="text" maxlength="1" id="c3" aria-label="code 4">
+            <input class="box" inputmode="text" maxlength="1" id="c4" aria-label="code 5">
+            <input class="box" inputmode="text" maxlength="1" id="c5" aria-label="code 6">
+          </div>
+          <div class="hint">ألصق الكود بالكامل وسيتم توزيعه تلقائيًا.</div>
+        </div>
+      </div>
+
+      <div>
+        <label for="name">اسمك</label>
+        <input id="name" class="nameInput" placeholder="مثال: محمد" maxlength="20" autocomplete="off"/>
+        <div class="hint" style="margin-top:6px;">Enter = Join</div>
+      </div>
+
+      <div class="row">
+        <button id="joinBtn" class="btn" type="button">
+          <span class="spinner"></span>
+          <span class="btnText">Join</span>
+        </button>
+        <button id="hostBtn" class="btn secondary" type="button">Host</button>
+      </div>
+
+      <div class="hint">
+        إذا انقطع الاتصال، بيطلع لك overlay وبيحاول يرجع تلقائيًا.
+      </div>
+    </section>
+
   </div>
 
   <div id="overlay" class="overlay">
@@ -131,9 +438,11 @@
   <div id="toast" class="toast">OK</div>
 
   <script>
+    // ===== Connection Config =====
     const SERVER_URL = "https://api.gamehub4u.com";
     const WEB_ORIGIN = location.origin;
 
+    // ===== UI Helpers =====
     function setStatus(text, cls) {
       const label = document.getElementById("statusText");
       const light = document.getElementById("light");
@@ -148,117 +457,3 @@
       const t = document.getElementById("toast");
       if (!t) return;
       t.textContent = String(msg || "OK");
-      t.classList.add("show");
-      clearTimeout(showToast._tm);
-      showToast._tm = setTimeout(() => t.classList.remove("show"), 1600);
-    }
-
-    function normalizeRoom(s) {
-      return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0,6);
-    }
-    function validateRoomCode(s) {
-      const v = normalizeRoom(s);
-      if (v.length < 3) return { ok:false, msg:"اكتب Room Code صحيح" };
-      return { ok:true, value:v };
-    }
-    function validateName(s) {
-      const v = String(s || "").trim().replace(/\s+/g," ").slice(0,20);
-      if (v.length < 2) return { ok:false, msg:"اكتب اسم (حرفين على الأقل)" };
-      return { ok:true, value:v };
-    }
-    function getOrCreateClientId() {
-      let id = localStorage.getItem("gh_clientId");
-      if (!id) {
-        id = (crypto.randomUUID ? crypto.randomUUID() : ("cid_" + Math.random().toString(16).slice(2)));
-        localStorage.setItem("gh_clientId", id);
-      }
-      return id;
-    }
-    const clientId = getOrCreateClientId();
-
-    function saveProfile(name) { localStorage.setItem("gh_name", String(name||"")); }
-    function loadProfile() { return { name: localStorage.getItem("gh_name") || "" }; }
-
-    function loadScriptWithTimeout(src, ms=7000) {
-      return new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        const timer = setTimeout(() => { s.remove(); reject(new Error("timeout")); }, ms);
-        s.src = src;
-        s.async = true;
-        s.onload = () => { clearTimeout(timer); resolve(true); };
-        s.onerror = () => { clearTimeout(timer); reject(new Error("load_error")); };
-        document.head.appendChild(s);
-      });
-    }
-
-    async function start() {
-      setStatus("Connecting...", "warn");
-
-      // تحميل socket.io client
-      try {
-        await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
-      } catch (e) {
-        setStatus("Offline", "bad");
-        showToast("socket.io ما انحمّل من api");
-        return;
-      }
-
-      const socket = io(SERVER_URL, {
-        transports: ["websocket","polling"],
-        auth: { clientId }
-      });
-
-      const ov = document.getElementById("overlay");
-      const showOv = () => ov && ov.classList.add("show");
-      const hideOv = () => ov && ov.classList.remove("show");
-
-      socket.on("connect", () => { setStatus("Connected", "ok"); hideOv(); });
-      socket.on("disconnect", () => { setStatus("Disconnected", "bad"); showOv(); });
-      socket.on("connect_error", () => { setStatus("Connecting...", "warn"); });
-
-      const roomInput = document.getElementById("room");
-      const nameInput = document.getElementById("name");
-      const joinBtn   = document.getElementById("joinBtn");
-      const hostBtn   = document.getElementById("hostBtn");
-
-      const roomFromUrl = (new URL(location.href).searchParams.get("room") || "").trim().toUpperCase();
-      const profile = loadProfile();
-      if (profile.name) nameInput.value = profile.name;
-      if (roomFromUrl) roomInput.value = roomFromUrl;
-
-      roomInput.addEventListener("input", () => {
-        roomInput.value = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-      });
-
-      hostBtn.onclick = () => location.href = WEB_ORIGIN + "/host.html";
-
-      function doJoin(){
-        const rc = validateRoomCode(roomInput.value);
-        if (!rc.ok) return showToast(rc.msg);
-
-        const nm = validateName(nameInput.value);
-        if (!nm.ok) return showToast(nm.msg);
-
-        saveProfile(nm.value);
-        socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
-      }
-
-      joinBtn.onclick = doJoin;
-      roomInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doJoin(); });
-      nameInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doJoin(); });
-
-      socket.on("join:error", ({ message } = {}) => showToast(message || "Join error"));
-
-      socket.on("player:joined", ({ roomCode: rc } = {}) => {
-        const code = String(rc || "").trim().toUpperCase();
-        showToast("Joined ✅");
-        setTimeout(() => {
-          location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
-        }, 200);
-      });
-    }
-
-    start();
-  </script>
-</body>
-</html>
