@@ -3,228 +3,553 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Host</title>
+  <title>Gamehub4u - استضافة غرفة</title>
+  <meta name="description" content="أنشئ غرفة جديدة وادعُ أصدقائك للعب"/>
 
   <style>
     :root{
-      --bg0:#07030a;
-      --bg1:#14040e;
+      --bg0: #0a0415;
+      --bg1: #1a0820;
 
-      --card: rgba(255,255,255,.07);
-      --stroke: rgba(255,255,255,.14);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.62);
+      --card: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.16);
+      --text: rgba(255,255,255,.94);
+      --muted: rgba(255,255,255,.65);
 
-      --red1:#ff1b3a;
-      --red2:#ff3d6b;
+      --primary: #ff1b3a;
+      --primary-hover: #ff2d4d;
+      --secondary: #ff3d6b;
+      --accent: #ff4d7a;
 
-      --ok:#22c55e;
-      --warn:#fbbf24;
-      --bad:#ff2d55;
+      --ok: #22c55e;
+      --warn: #fbbf24;
+      --bad: #ff2d55;
 
-      --shadow: 0 26px 80px rgba(0,0,0,.62);
-      --radius: 18px;
+      --shadow-sm: 0 4px 12px rgba(0,0,0,.3);
+      --shadow-md: 0 12px 32px rgba(0,0,0,.45);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,.6);
+      --radius: 20px;
+      --radius-sm: 14px;
     }
 
-    *{ box-sizing:border-box; }
+    *{ 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body{
-      margin:0;
-      min-height:100vh;
-      color:var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: 'Tajawal', system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", sans-serif;
       background:
-        radial-gradient(1200px 720px at 18% 10%, rgba(255,27,58,.22), transparent 60%),
-        radial-gradient(1000px 720px at 86% 18%, rgba(255,61,107,.16), transparent 58%),
-        radial-gradient(900px 620px at 52% 92%, rgba(255,77,77,.10), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      overflow-x:hidden;
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
-      padding:28px 14px 34px;
+        radial-gradient(1400px 800px at 20% 15%, rgba(255,27,58,.28), transparent 65%),
+        radial-gradient(1200px 800px at 85% 20%, rgba(255,61,107,.20), transparent 60%),
+        radial-gradient(1000px 700px at 50% 95%, rgba(255,77,122,.14), transparent 65%),
+        linear-gradient(165deg, var(--bg0), var(--bg1));
+      background-attachment: fixed;
+      overflow-x: hidden;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: clamp(20px, 5vw, 40px) 16px;
     }
 
+    /* Animated gradient blobs */
     .blob{
-      position:fixed;
-      width:620px;height:620px;
-      border-radius:999px;
-      filter: blur(48px);
-      opacity:.22;
-      z-index:-1;
-      animation: float 14s ease-in-out infinite;
-      pointer-events:none;
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0;
+      z-index: 0;
+      pointer-events: none;
+      will-change: transform;
+      animation: blobFade 1s ease-out forwards, blobFloat 20s ease-in-out infinite;
     }
-    .blob.a{ left:-240px; top:-220px; background: rgba(255,27,58,.95); }
-    .blob.b{ right:-280px; top:40px; background: rgba(255,61,107,.78); animation-duration: 18s; }
-    .blob.c{ left:18%; bottom:-320px; background: rgba(255,77,77,.46); animation-duration: 22s; }
-    @keyframes float{
-      0%,100%{ transform: translate(0,0) scale(1); }
-      50%{ transform: translate(28px, -22px) scale(1.06); }
+    .blob.a{ 
+      width: 700px; 
+      height: 700px;
+      left: -280px; 
+      top: -250px; 
+      background: radial-gradient(circle, rgba(255,27,58,.85), rgba(255,27,58,.4)); 
+      animation-delay: 0s, 0.5s;
+    }
+    .blob.b{ 
+      width: 650px; 
+      height: 650px;
+      right: -300px; 
+      top: 60px; 
+      background: radial-gradient(circle, rgba(255,61,107,.7), rgba(255,61,107,.3)); 
+      animation-delay: 0.3s, 1s;
+      animation-duration: 1s, 24s;
+    }
+    .blob.c{ 
+      width: 600px; 
+      height: 600px;
+      left: 20%; 
+      bottom: -280px; 
+      background: radial-gradient(circle, rgba(255,77,122,.5), rgba(255,77,122,.2)); 
+      animation-delay: 0.6s, 1.5s;
+      animation-duration: 1s, 28s;
+    }
+
+    @keyframes blobFade{
+      to{ opacity: .24; }
+    }
+
+    @keyframes blobFloat{
+      0%, 100%{ transform: translate(0, 0) scale(1) rotate(0deg); }
+      33%{ transform: translate(40px, -30px) scale(1.08) rotate(5deg); }
+      66%{ transform: translate(-30px, 20px) scale(0.95) rotate(-5deg); }
     }
 
     .wrap{
-      width:min(980px, 100%);
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-      align-items:stretch;
+      width: min(700px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(16px, 3vw, 24px);
+      align-items: stretch;
+      position: relative;
+      z-index: 1;
     }
 
+    /* Logo */
     .logoTop{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:10px 0 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 0 8px;
+      animation: logoEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    
+    @keyframes logoEnter{
+      from{ 
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+      }
+      to{
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
     .logoImg{
-      width:min(520px, 92vw);
-      height:auto;
-      display:block;
-      filter: drop-shadow(0 16px 36px rgba(0,0,0,.62));
-      user-select:none;
-      -webkit-user-drag:none;
+      width: min(480px, 85vw);
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 8px 24px rgba(255,27,58,.3)) drop-shadow(0 16px 48px rgba(0,0,0,.5));
+      user-select: none;
+      -webkit-user-drag: none;
       transform: translateZ(0);
+      transition: filter 0.3s ease;
+    }
+
+    .logoImg:hover{
+      filter: drop-shadow(0 12px 32px rgba(255,27,58,.4)) drop-shadow(0 20px 60px rgba(0,0,0,.6));
     }
 
     .panel{
       background: var(--card);
-      border:1px solid var(--stroke);
+      border: 1px solid var(--stroke);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      overflow:hidden;
-      position:relative;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+      animation: panelEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
     }
+
+    @keyframes panelEnter{
+      from{
+        opacity: 0;
+        transform: translateY(30px);
+      }
+    }
+
+    .panel:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 24px 72px rgba(0,0,0,.65);
+    }
+
     .panel::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
+      content: "";
+      position: absolute;
+      inset: -2px;
       background:
-        radial-gradient(700px 320px at 15% 0%, rgba(255,27,58,.18), transparent 60%),
-        radial-gradient(700px 320px at 85% 18%, rgba(255,61,107,.12), transparent 60%);
-      pointer-events:none;
+        radial-gradient(800px 400px at 18% 0%, rgba(255,27,58,.22), transparent 65%),
+        radial-gradient(800px 400px at 82% 20%, rgba(255,61,107,.15), transparent 65%);
+      pointer-events: none;
+      opacity: 0.8;
     }
-    .panel > *{ position:relative; }
+
+    .panel > *{ 
+      position: relative;
+      z-index: 1;
+    }
 
     .card{
-      padding:18px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+      padding: clamp(20px, 4vw, 32px);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
     }
 
     .topRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
-    .muted{ color: var(--muted); font-size: 12px; }
 
+    .muted{ 
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* Lamp */
     .lamp{
-      width:10px;height:10px;border-radius:50%;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
       background: var(--bad);
-      box-shadow: 0 0 0 4px rgba(255,45,85,.14);
-    }
-    .lamp.ok{ background: var(--ok); box-shadow: 0 0 0 4px rgba(34,197,94,.14); }
-    .lamp.warn{ background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.14); }
-    .lamp.bad{ background: var(--bad); box-shadow: 0 0 0 4px rgba(255,45,85,.14); }
-
-    .roomBox{
-      margin-top:6px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
-      border-radius: 18px;
-      padding:16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-    }
-    .roomCode{
-      direction:ltr;
-      font-weight:900;
-      letter-spacing: 6px;
-      font-size: 34px;
-      line-height: 1;
-      text-transform: uppercase;
+      box-shadow: 
+        0 0 0 0 rgba(255,45,85,.6),
+        0 0 12px rgba(255,45,85,.4);
+      position: relative;
+      transition: all 0.3s ease;
+      animation: lampPulse 2s ease-in-out infinite;
     }
 
-    .btnRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
+    @keyframes lampPulse{
+      0%, 100%{ box-shadow: 0 0 0 0 rgba(255,45,85,.6), 0 0 12px rgba(255,45,85,.4); }
+      50%{ box-shadow: 0 0 0 6px rgba(255,45,85,.0), 0 0 20px rgba(255,45,85,.6); }
     }
-    .btn{
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.14);
-      padding:12px 14px;
-      cursor:pointer;
-      font-weight:800;
-      color:white;
-      background: linear-gradient(135deg, rgba(255,27,58,.95), rgba(255,61,107,.65));
-      transition: transform .08s ease, filter .2s ease, opacity .2s ease;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      user-select:none;
-      min-width: 160px;
-    }
-    .btn:hover{ filter: brightness(1.06); }
-    .btn:active{ transform: translateY(1px); }
-    .btn.secondary{
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      min-width: 140px;
-      padding:10px 12px;
-    }
-    .btn[disabled]{ opacity:.55; cursor:not-allowed; }
 
-    .spinner{
-      width:16px;height:16px;border-radius:50%;
-      border:2px solid rgba(255,255,255,.35);
-      border-top-color: rgba(255,255,255,.95);
-      animation: spin 1s linear infinite;
-      display:none;
+    .lamp.ok{ 
+      background: var(--ok);
+      animation-name: lampPulseOk;
     }
-    .btn.loading .spinner{ display:inline-block; }
-    @keyframes spin{ to{ transform: rotate(360deg);} }
 
+    @keyframes lampPulseOk{
+      0%, 100%{ box-shadow: 0 0 0 0 rgba(34,197,94,.6), 0 0 12px rgba(34,197,94,.4); }
+      50%{ box-shadow: 0 0 0 6px rgba(34,197,94,.0), 0 0 20px rgba(34,197,94,.6); }
+    }
+
+    .lamp.warn{ 
+      background: var(--warn);
+      animation-name: lampPulseWarn;
+    }
+
+    @keyframes lampPulseWarn{
+      0%, 100%{ box-shadow: 0 0 0 0 rgba(251,191,36,.6), 0 0 12px rgba(251,191,36,.4); }
+      50%{ box-shadow: 0 0 0 6px rgba(251,191,36,.0), 0 0 20px rgba(251,191,36,.6); }
+    }
+
+    /* Error Box */
     .errorBox{
-      display:none;
-      border:1px solid rgba(255,45,85,.25);
-      background: rgba(255,45,85,.10);
-      color: rgba(255,220,226,.95);
-      padding:10px 12px;
-      border-radius: 14px;
-      font-size:13px;
-      line-height:1.5;
+      display: none;
+      border: 1px solid rgba(255,45,85,.3);
+      background: linear-gradient(135deg, rgba(255,45,85,.12), rgba(255,45,85,.08));
+      color: rgba(255,240,245,.96);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 500;
+      backdrop-filter: blur(8px);
     }
-    .errorBox.show{ display:block; }
 
+    .errorBox.show{ 
+      display: block;
+      animation: errorSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes errorSlide{
+      from{
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+    }
+
+    /* Room Box - محسّن بشكل كبير */
+    .roomBox{
+      border: 2px solid rgba(255,255,255,.16);
+      background: linear-gradient(135deg, rgba(0,0,0,.35), rgba(0,0,0,.25));
+      border-radius: var(--radius);
+      padding: clamp(20px, 4vw, 28px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .roomBox::before{
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px 300px at 50% 0%, rgba(255,27,58,.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .roomBox.active{
+      border-color: rgba(255,61,107,.35);
+      background: linear-gradient(135deg, rgba(255,27,58,.08), rgba(0,0,0,.3));
+      box-shadow: 
+        0 0 0 1px rgba(255,61,107,.2),
+        0 8px 24px rgba(255,27,58,.15);
+    }
+
+    .codeSection{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .codeDisplay{
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .roomCode{
+      direction: ltr;
+      font-weight: 900;
+      letter-spacing: 10px;
+      font-size: clamp(32px, 6vw, 44px);
+      line-height: 1.2;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--text), rgba(255,255,255,.7));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(255,27,58,.3));
+      transition: all 0.3s ease;
+      user-select: all;
+    }
+
+    .roomCode.placeholder{
+      opacity: 0.3;
+      letter-spacing: 8px;
+      filter: none;
+    }
+
+    .roomCode:not(.placeholder):hover{
+      letter-spacing: 12px;
+      filter: drop-shadow(0 4px 12px rgba(255,27,58,.5));
+    }
+
+    .quickCopy{
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Buttons */
+    .btnRow{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn{
+      flex: 1;
+      min-width: 140px;
+      border-radius: var(--radius-sm);
+      border: none;
+      padding: 14px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+        0 4px 12px rgba(255,27,58,.3),
+        inset 0 1px 0 rgba(255,255,255,.2);
+    }
+
+    .btn::before{
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.2), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .btn:hover{
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 
+        0 8px 24px rgba(255,27,58,.45),
+        inset 0 1px 0 rgba(255,255,255,.25);
+    }
+
+    .btn:hover::before{
+      opacity: 1;
+    }
+
+    .btn:active{ 
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    .btn.secondary{
+      background: rgba(255,255,255,.1);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.2);
+      box-shadow: 
+        0 4px 12px rgba(0,0,0,.2),
+        inset 0 1px 0 rgba(255,255,255,.1);
+      min-width: 110px;
+      padding: 12px 16px;
+    }
+
+    .btn.secondary:hover{
+      background: rgba(255,255,255,.15);
+      border-color: rgba(255,255,255,.3);
+      box-shadow: 
+        0 8px 24px rgba(0,0,0,.3),
+        inset 0 1px 0 rgba(255,255,255,.15);
+    }
+
+    .btn.icon-btn{
+      min-width: auto;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      border-radius: 12px;
+    }
+
+    .btn[disabled]{ 
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+
+    .btn svg{
+      width: 20px;
+      height: 20px;
+      opacity: 0.9;
+    }
+
+    /* Spinner */
+    .spinner{
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(255,255,255,.3);
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    .btn.loading .spinner{ 
+      display: inline-block;
+    }
+
+    @keyframes spin{ 
+      to{ transform: rotate(360deg); }
+    }
+
+    /* Toast */
     .toast{
       position: fixed;
-      bottom: 16px;
+      bottom: 24px;
       left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,.78);
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(10,12,18,.92);
       color: white;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border:1px solid rgba(255,255,255,.14);
-      opacity:0;
-      pointer-events:none;
-      transition: opacity .2s ease, transform .2s ease;
-      font-size:13px;
-      backdrop-filter: blur(10px);
+      padding: 14px 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 14px;
+      font-weight: 600;
+      backdrop-filter: blur(16px) saturate(180%);
+      box-shadow: var(--shadow-md);
+      z-index: 1000;
     }
+
     .toast.show{
-      opacity:1;
-      transform: translateX(-50%) translateY(-4px);
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Info Box */
+    .infoBox{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .infoBox svg{
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px){
+      .codeSection{
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .quickCopy{
+        width: 100%;
+      }
+
+      .btn.icon-btn{
+        flex: 1;
+      }
+
+      .roomCode{
+        text-align: center;
+        letter-spacing: 8px;
+      }
+
+      .roomCode:not(.placeholder):hover{
+        letter-spacing: 10px;
+      }
+    }
+
+    /* Dark scrollbar */
+    ::-webkit-scrollbar{
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track{
+      background: rgba(0,0,0,.2);
+    }
+    ::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,.2);
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb:hover{
+      background: rgba(255,255,255,.3);
     }
   </style>
 </head>
@@ -236,40 +561,74 @@
 
   <div class="wrap">
     <div class="logoTop">
-      <img class="logoImg" src="/logo.png" alt="Logo">
+      <img class="logoImg" src="/logo.png" alt="Gamehub4u Logo" loading="eager">
     </div>
 
-    <section class="panel card">
+    <section class="panel card" role="main" aria-label="استضافة غرفة">
       <div class="topRow">
-        <div class="muted">Host</div>
-        <span id="lamp" class="lamp bad" aria-label="connection status"></span>
+        <div class="muted">استضافة غرفة جديدة</div>
+        <span id="lamp" class="lamp bad" role="status" aria-label="حالة الاتصال"></span>
       </div>
 
-      <div id="err" class="errorBox"></div>
+      <div id="err" class="errorBox" role="alert"></div>
 
-      <div class="roomBox">
-        <div>
-          <div class="muted">Room Code</div>
-          <div id="roomCode" class="roomCode">----</div>
+      <div id="roomBox" class="roomBox">
+        <div class="codeSection">
+          <div class="codeDisplay">
+            <div class="muted" style="margin-bottom: 8px;">كود الغرفة</div>
+            <div id="roomCode" class="roomCode placeholder">----</div>
+          </div>
+
+          <div class="quickCopy" id="quickCopyBtns" style="display: none;">
+            <button id="copyCodeBtn" class="btn secondary icon-btn" type="button" aria-label="نسخ الكود" title="نسخ الكود">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke-width="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
+              </svg>
+            </button>
+            <button id="copyLinkBtn" class="btn secondary icon-btn" type="button" aria-label="نسخ الرابط" title="نسخ الرابط">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke-width="2" stroke-linecap="round"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div class="btnRow">
-          <button id="createBtn" class="btn" type="button">
-            <span class="spinner"></span>
-            <span id="createText">إنشاء روم</span>
+          <button id="createBtn" class="btn" type="button" aria-label="إنشاء غرفة جديدة">
+            <span class="spinner" aria-hidden="true"></span>
+            <span id="createText">إنشاء غرفة جديدة</span>
           </button>
-          <button id="copyCodeBtn" class="btn secondary" type="button">نسخ الكود</button>
-          <button id="copyLinkBtn" class="btn secondary" type="button">نسخ رابط</button>
+          <button id="startGameBtn" class="btn secondary" type="button" style="display: none;" aria-label="بدء اللعبة">
+            ابدأ اللعبة
+          </button>
+        </div>
+      </div>
+
+      <div class="infoBox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" stroke-width="2"/>
+          <line x1="12" y1="16" x2="12" y2="12" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="8" r="0.5" fill="currentColor" stroke="none"/>
+        </svg>
+        <div>
+          بعد إنشاء الغرفة، شارك الكود أو الرابط مع أصدقائك للانضمام. يمكنك نسخ الكود أو الرابط بالضغط على الأيقونات.
         </div>
       </div>
 
       <div class="btnRow">
-        <button id="backBtn" class="btn secondary" type="button">رجوع</button>
+        <button id="backBtn" class="btn secondary" type="button" aria-label="العودة للصفحة الرئيسية">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 18px; height: 18px;">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          رجوع
+        </button>
       </div>
     </section>
   </div>
 
-  <div id="toast" class="toast">OK</div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
     const SERVER_URL = "https://api.gamehub4u.com";
@@ -277,33 +636,54 @@
 
     function showToast(msg) {
       const t = document.getElementById("toast");
-      t.textContent = String(msg || "OK");
+      if (!t) return;
+      t.textContent = String(msg || "تم");
       t.classList.add("show");
       clearTimeout(showToast._tm);
-      showToast._tm = setTimeout(() => t.classList.remove("show"), 1600);
+      showToast._tm = setTimeout(() => t.classList.remove("show"), 2000);
     }
 
     function showError(msg){
       const err = document.getElementById("err");
-      if (!msg) { err.classList.remove("show"); err.textContent=""; return; }
+      if (!err) return;
+      if (!msg) { 
+        err.classList.remove("show");
+        err.textContent = "";
+        return;
+      }
       err.textContent = String(msg);
       err.classList.add("show");
     }
 
     function setLamp(cls){
       const lamp = document.getElementById("lamp");
+      if (!lamp) return;
       lamp.classList.remove("ok","warn","bad");
       lamp.classList.add(cls);
+      lamp.setAttribute('aria-label', 
+        cls === 'ok' ? 'متصل' : 
+        cls === 'warn' ? 'جاري الاتصال' : 
+        'غير متصل'
+      );
     }
 
-    function loadScriptWithTimeout(src, ms=7000) {
+    function loadScriptWithTimeout(src, ms = 7000) {
       return new Promise((resolve, reject) => {
         const s = document.createElement("script");
-        const timer = setTimeout(() => { s.remove(); reject(new Error("timeout")); }, ms);
+        const timer = setTimeout(() => { 
+          s.remove();
+          reject(new Error("timeout"));
+        }, ms);
         s.src = src;
         s.async = true;
-        s.onload = () => { clearTimeout(timer); resolve(true); };
-        s.onerror = () => { clearTimeout(timer); reject(new Error("load_error")); };
+        s.onload = () => { 
+          clearTimeout(timer);
+          resolve(true);
+        };
+        s.onerror = () => { 
+          clearTimeout(timer);
+          reject(new Error("load_error"));
+        };
         document.head.appendChild(s);
       });
     }
@@ -311,7 +691,7 @@
     function getOrCreateClientId() {
       let id = localStorage.getItem("gh_clientId");
       if (!id) {
-        id = (crypto.randomUUID ? crypto.randomUUID() : ("cid_" + Math.random().toString(16).slice(2)));
+        id = crypto.randomUUID ? crypto.randomUUID() : ("cid_" + Math.random().toString(36).slice(2));
         localStorage.setItem("gh_clientId", id);
       }
       return id;
@@ -320,135 +700,197 @@
 
     function setRoomCode(code){
       const el = document.getElementById("roomCode");
+      const box = document.getElementById("roomBox");
+      const quickCopy = document.getElementById("quickCopyBtns");
+      const startBtn = document.getElementById("startGameBtn");
+      
       const v = String(code || "").trim().toUpperCase();
-      el.textContent = v || "----";
-      if (v) localStorage.setItem("gh_lastRoom", v);
+      
+      if (v && v !== "----") {
+        el.textContent = v;
+        el.classList.remove("placeholder");
+        box.classList.add("active");
+        quickCopy.style.display = "flex";
+        startBtn.style.display = "inline-flex";
+        localStorage.setItem("gh_lastRoom", v);
+      } else {
+        el.textContent = "----";
+        el.classList.add("placeholder");
+        box.classList.remove("active");
+        quickCopy.style.display = "none";
+        startBtn.style.display = "none";
+      }
     }
+
     function getRoomCode(){
-      const v = document.getElementById("roomCode").textContent.trim();
-      return v === "----" ? "" : v;
+      const el = document.getElementById("roomCode");
+      const v = el.textContent.trim();
+      return (v === "----" || el.classList.contains("placeholder")) ? "" : v;
     }
 
     function setLoadingCreate(on){
       const btn = document.getElementById("createBtn");
       const txt = document.getElementById("createText");
+      if (!btn || !txt) return;
+      
       btn.classList.toggle("loading", !!on);
       btn.disabled = !!on;
-      txt.textContent = on ? "جاري..." : "إنشاء روم";
+      btn.setAttribute('aria-busy', !!on);
+      txt.textContent = on ? "جاري الإنشاء..." : "إنشاء غرفة جديدة";
     }
 
-    function makeRoomCode(len=4){
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // بدون I O 0 1
+    function makeRoomCode(len = 4){
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
       let out = "";
-      for (let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
+      for (let i = 0; i < len; i++) {
+        out += chars[Math.floor(Math.random() * chars.length)];
+      }
       return out;
     }
 
     async function copyText(text){
-      try{
-        await navigator.clipboard.writeText(String(text||""));
-        showToast("تم");
-      }catch(_){
-        showToast("ما قدرنا");
+      try {
+        await navigator.clipboard.writeText(String(text || ""));
+        showToast("تم النسخ ✓");
+      } catch(_){
+        showToast("فشل النسخ");
       }
     }
 
     let socket = null;
 
-    function emitMany(eventNames, payload){
-      if (!socket) return;
-      for (const ev of eventNames) socket.emit(ev, payload);
-    }
-
     async function start(){
       setLamp("warn");
       showError("");
 
-      try{
+      try {
         await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
-      }catch(_){
+      } catch(_){
         setLamp("bad");
-        showError("offline");
+        showError("تعذر الاتصال بالخادم");
         return;
       }
 
-      socket = io(SERVER_URL, {
-        transports: ["websocket","polling"],
-        auth: { clientId }
-      });
+      try {
+        socket = io(SERVER_URL, {
+          transports: ["websocket", "polling"],
+          auth: { clientId }
+        });
+      } catch(_){
+        setLamp("bad");
+        showError("تعذر الاتصال");
+        return;
+      }
 
-      socket.on("connect", ()=> setLamp("ok"));
-      socket.on("disconnect", ()=> setLamp("bad"));
-      socket.on("connect_error", ()=> setLamp("warn"));
+      socket.on("connect", () => setLamp("ok"));
+      socket.on("disconnect", () => setLamp("bad"));
+      socket.on("connect_error", () => setLamp("warn"));
 
-      // لو السيرفر يرجع كود بأي اسم معروف نلتقطه
-      const acceptRoom = (obj={}) => {
+      // معالجة استجابة إنشاء الغرفة
+      const acceptRoom = (obj = {}) => {
         const code = obj.roomCode || obj.code || obj.room || "";
-        if (code) setRoomCode(code);
+        if (code) {
+          setRoomCode(code);
+          showToast("تم إنشاء الغرفة ✓");
+        }
         setLoadingCreate(false);
       };
+
       socket.on("host:roomCreated", acceptRoom);
       socket.on("room:created", acceptRoom);
       socket.on("hub:roomCreated", acceptRoom);
       socket.on("create:ok", acceptRoom);
       socket.on("host:ok", acceptRoom);
 
-      socket.on("host:error", ({message}={}) => { setLoadingCreate(false); showError(message || "خطأ"); });
-      socket.on("error", () => { setLoadingCreate(false); });
+      socket.on("host:error", ({ message } = {}) => { 
+        setLoadingCreate(false);
+        showError(message || "حدث خطأ أثناء الإنشاء");
+      });
 
-      // Buttons
+      socket.on("error", () => { 
+        setLoadingCreate(false);
+        showError("حدث خطأ غير متوقع");
+      });
+
+      // زر إنشاء الغرفة
       document.getElementById("createBtn").onclick = () => {
         showError("");
-        setLoadingCreate(true);
-
-        // ✅ نسوي كود فورًا (عشان ما تحس ببطء)
+        
         const code = makeRoomCode(4);
         setRoomCode(code);
+        setLoadingCreate(true);
 
-        // ✅ نرسل أكثر من event محتمل عشان نضمن السيرفر يلتقط
         const payload = { roomCode: code, clientId };
 
-        emitMany([
+        // إرسال طلبات متعددة لضمان الوصول
+        const events = [
           "host:createRoom",
           "host:create",
           "room:create",
           "hub:createRoom",
           "createRoom",
-          "create:room",
-          "host:claim",
-          "host:join",
-          "host:openRoom",
-          "room:open"
-        ], payload);
+          "create:room"
+        ];
 
-        // ✅ إذا ما جاء رد من السيرفر خلال 1.5 ثانية، خلاص نوقف اللودنق
-        setTimeout(() => setLoadingCreate(false), 1500);
+        events.forEach(ev => socket.emit(ev, payload));
+
+        // timeout احتياطي
+        setTimeout(() => setLoadingCreate(false), 2000);
       };
 
+      // زر نسخ الكود
       document.getElementById("copyCodeBtn").onclick = async () => {
         const code = getRoomCode();
-        if (!code) return showToast("—");
+        if (!code) {
+          showToast("لا يوجد كود");
+          return;
+        }
         await copyText(code);
       };
 
+      // زر نسخ الرابط
       document.getElementById("copyLinkBtn").onclick = async () => {
         const code = getRoomCode();
-        if (!code) return showToast("—");
-        await copyText(WEB_ORIGIN + "/?room=" + encodeURIComponent(code));
+        if (!code) {
+          showToast("لا يوجد كود");
+          return;
+        }
+        const link = WEB_ORIGIN + "/?room=" + encodeURIComponent(code);
+        await copyText(link);
       };
 
-      document.getElementById("backBtn").onclick = () => location.href = WEB_ORIGIN + "/";
+      // زر بدء اللعبة
+      document.getElementById("startGameBtn").onclick = () => {
+        const code = getRoomCode();
+        if (!code) {
+          showToast("لا يوجد غرفة");
+          return;
+        }
+        location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
+      };
 
-      // Auto load from URL or last room
+      // زر الرجوع
+      document.getElementById("backBtn").onclick = () => {
+        location.href = WEB_ORIGIN + "/";
+      };
+
+      // تحميل تلقائي من URL أو آخر غرفة
       const fromUrl = (new URL(location.href).searchParams.get("room") || "").trim();
-      if (fromUrl) setRoomCode(fromUrl);
-      else {
+      if (fromUrl) {
+        setRoomCode(fromUrl);
+      } else {
         const last = (localStorage.getItem("gh_lastRoom") || "").trim();
-        if (last) setRoomCode(last);
+        if (last) {
+          setRoomCode(last);
+        }
       }
     }
 
-    start();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
   </script>
 </body>
 </html>
