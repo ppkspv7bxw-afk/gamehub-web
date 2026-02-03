@@ -1,23 +1,140 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Gamehub4u</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;display:grid;place-items:center;height:100vh;margin:0;background:#0b0f14;color:#e8eef6}
-    .card{max-width:720px;padding:28px;border:1px solid #223045;border-radius:16px;background:#111824}
-    h1{margin:0 0 10px;font-size:28px}
-    p{margin:0 0 16px;line-height:1.7;color:#b8c4d6}
-    a{color:#7cc4ff}
-    code{background:#0b0f14;border:1px solid #223045;padding:2px 6px;border-radius:8px}
-  </style>
+  <link rel="stylesheet" href="/common.css"/>
 </head>
 <body>
-  <div class="card">
-    <h1>✅ Gamehub4u شغال</h1>
-    <p>إذا تشوف هالصفحة، معناها ربط <code>Cloudflare Pages</code> مع الدومين تمام.</p>
-    <p>الخطوة الجاية: نرفع ملفات اللعبة (مثل <code>host.html</code> و <code>lobby.html</code> و <code>common.js</code>) في نفس المكان.</p>
+  <div class="wrap wrap--narrow">
+    <div class="card">
+      <div class="header">
+        <div class="brand">
+          <div class="title">
+            <div>Gamehub4u</div>
+            <small>Lobby • Mafia</small>
+          </div>
+        </div>
+
+        <div class="status">
+          <span id="light" class="statusLight"></span>
+          <span id="statusText">...</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="grid">
+          <div class="panel">
+            <div class="label">Room Code</div>
+            <input id="room" class="input" placeholder="مثال: 6F3J" maxlength="6" autocomplete="off"/>
+
+            <div class="label">اسمك</div>
+            <input id="name" class="input" placeholder="مثال: محمد" maxlength="20" autocomplete="off"/>
+
+            <div class="row" style="margin-top:12px;">
+              <button id="joinBtn" class="btn" type="button" style="flex:1;min-width:160px;">Join</button>
+              <button id="hostBtn" class="btn secondary" type="button" style="flex:1;min-width:160px;">Host</button>
+            </div>
+
+            <div class="hint">
+              السيرفر الحالي: <b>Render</b><br/>
+              لو تبغى لاحقًا تربطه بـ <b>api.gamehub4u.com</b> نغيّر سطر واحد فقط.
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="kv">
+              <div class="k">How it works</div>
+              <div class="v">Host يسوي روم → اللاعبين يدخلون بالكود</div>
+            </div>
+            <div class="hr"></div>
+            <ul class="list">
+              <li class="item">
+                <div class="left">
+                  <span class="pill ok">Tip</span>
+                  <div style="min-width:0">
+                    افتح صفحة الـ Host في جهاز منفصل لو تبي
+                  </div>
+                </div>
+              </li>
+              <li class="item">
+                <div class="left">
+                  <span class="pill warn">Dev Mode</span>
+                  <div style="min-width:0">
+                    يخلّي المافيا تبدأ من لاعبين (للتجربة)
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
+
+  <div id="overlay" class="overlay">
+    <div class="box">
+      <h3>انقطع الاتصال</h3>
+      <p>ثواني… بنحاول نرجع الاتصال تلقائيًا.</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">OK</div>
+
+  <script src="https://gamehub-server-okv5.onrender.com/socket.io/socket.io.js"></script>
+  <script src="/common.js"></script>
+  <script>
+    const roomFromUrl = (getParam("room") || "").trim().toUpperCase();
+
+    const roomInput = document.getElementById("room");
+    const nameInput = document.getElementById("name");
+    const joinBtn   = document.getElementById("joinBtn");
+    const hostBtn   = document.getElementById("hostBtn");
+
+    const profile = loadProfile();
+    if(profile.name) nameInput.value = profile.name;
+    if(roomFromUrl) roomInput.value = roomFromUrl;
+
+    roomInput.addEventListener("input", () => {
+      roomInput.value = roomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    });
+
+    const socket = createSocket();
+    bindStatusLight(socket, document.getElementById("light"));
+    setupReconnectOverlay(socket);
+
+    hostBtn.onclick = () => location.href = WEB_ORIGIN + "/host.html";
+
+    joinBtn.onclick = () => {
+      const rc = validateRoomCode(roomInput.value);
+      if(!rc.ok){
+        roomInput.classList.add("invalid");
+        setTimeout(()=>roomInput.classList.remove("invalid"), 400);
+        return showToast(rc.msg);
+      }
+
+      const nm = validateName(nameInput.value);
+      if(!nm.ok){
+        nameInput.classList.add("invalid");
+        setTimeout(()=>nameInput.classList.remove("invalid"), 400);
+        return showToast(nm.msg);
+      }
+
+      saveProfile(nm.value);
+      socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
+    };
+
+    socket.on("join:error", ({ message } = {}) => showToast(message || "Join error"));
+
+    socket.on("player:joined", ({ roomCode } = {}) => {
+      const code = (roomCode || "").trim().toUpperCase();
+      showToast("Joined ✅");
+      setTimeout(()=>{
+        location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
+      }, 200);
+    });
+  </script>
 </body>
 </html>
