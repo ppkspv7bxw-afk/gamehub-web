@@ -3,1175 +3,316 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Gamehub4u - انضم للعبة</title>
-  <meta name="description" content="انضم إلى غرفة اللعب مع أصدقائك"/>
+  <title>Gamehub4u</title>
 
   <style>
     :root{
       --bg0: #0a0415;
       --bg1: #1a0820;
-
       --card: rgba(255,255,255,.08);
       --stroke: rgba(255,255,255,.16);
       --text: rgba(255,255,255,.94);
       --muted: rgba(255,255,255,.65);
-
       --primary: #ff1b3a;
-      --primary-hover: #ff2d4d;
       --secondary: #ff3d6b;
-      --accent: #ff4d7a;
-
       --ok: #22c55e;
       --warn: #fbbf24;
       --bad: #ff2d55;
-
-      --shadow-sm: 0 4px 12px rgba(0,0,0,.3);
-      --shadow-md: 0 12px 32px rgba(0,0,0,.45);
-      --shadow-lg: 0 20px 60px rgba(0,0,0,.6);
       --radius: 20px;
       --radius-sm: 14px;
     }
 
-    *{ 
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *{ box-sizing: border-box; margin: 0; padding: 0; }
 
     body{
       min-height: 100vh;
       color: var(--text);
-      font-family: 'Tajawal', system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", sans-serif;
-      background:
-        radial-gradient(1400px 800px at 20% 15%, rgba(255,27,58,.28), transparent 65%),
-        radial-gradient(1200px 800px at 85% 20%, rgba(255,61,107,.20), transparent 60%),
-        radial-gradient(1000px 700px at 50% 95%, rgba(255,77,122,.14), transparent 65%),
-        linear-gradient(165deg, var(--bg0), var(--bg1));
-      background-attachment: fixed;
-      overflow-x: hidden;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(165deg, var(--bg0), var(--bg1));
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
-      padding: clamp(20px, 5vw, 40px) 16px;
-    }
-
-    /* Animated gradient blobs */
-    .blob{
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(70px);
-      opacity: 0;
-      z-index: 0;
-      pointer-events: none;
-      will-change: transform;
-      animation: blobFade 1s ease-out forwards, blobFloat 20s ease-in-out infinite;
-    }
-    .blob.a{ 
-      width: 700px; 
-      height: 700px;
-      left: -280px; 
-      top: -250px; 
-      background: radial-gradient(circle, rgba(255,27,58,.85), rgba(255,27,58,.4)); 
-      animation-delay: 0s, 0.5s;
-    }
-    .blob.b{ 
-      width: 650px; 
-      height: 650px;
-      right: -300px; 
-      top: 60px; 
-      background: radial-gradient(circle, rgba(255,61,107,.7), rgba(255,61,107,.3)); 
-      animation-delay: 0.3s, 1s;
-      animation-duration: 1s, 24s;
-    }
-    .blob.blob.c{ 
-      width: 600px; 
-      height: 600px;
-      left: 20%; 
-      bottom: -280px; 
-      background: radial-gradient(circle, rgba(255,77,122,.5), rgba(255,77,122,.2)); 
-      animation-delay: 0.6s, 1.5s;
-      animation-duration: 1s, 28s;
-    }
-
-    @keyframes blobFade{
-      to{ opacity: .24; }
-    }
-
-    @keyframes blobFloat{
-      0%, 100%{ transform: translate(0, 0) scale(1) rotate(0deg); }
-      33%{ transform: translate(40px, -30px) scale(1.08) rotate(5deg); }
-      66%{ transform: translate(-30px, 20px) scale(0.95) rotate(-5deg); }
+      padding: 20px;
     }
 
     .wrap{
-      width: min(1000px, 100%);
-      display: flex;
-      flex-direction: column;
-      gap: clamp(16px, 3vw, 24px);
-      align-items: stretch;
-      position: relative;
-      z-index: 1;
-    }
-
-    .logoTop{
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0 0 8px;
-      animation: logoEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    
-    @keyframes logoEnter{
-      from{ 
-        opacity: 0;
-        transform: translateY(-20px) scale(0.9);
-      }
-      to{
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .logoImg{
-      width: min(540px, 90vw);
-      height: auto;
-      display: block;
-      filter: drop-shadow(0 8px 24px rgba(255,27,58,.3)) drop-shadow(0 16px 48px rgba(0,0,0,.5));
-      user-select: none;
-      -webkit-user-drag: none;
-      transform: translateZ(0);
-      transition: filter 0.3s ease;
-    }
-
-    .logoImg:hover{
-      filter: drop-shadow(0 12px 32px rgba(255,27,58,.4)) drop-shadow(0 20px 60px rgba(0,0,0,.6));
-    }
-
-    .grid{
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: clamp(12px, 2.5vw, 20px);
-      align-items: stretch;
-    }
-    
-    @media (max-width: 900px){
-      .grid{ 
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .panel{
+      width: min(500px, 100%);
       background: var(--card);
       border: 1px solid var(--stroke);
       border-radius: var(--radius);
-      box-shadow: var(--shadow-lg);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      overflow: hidden;
-      position: relative;
-      min-height: 300px;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-      animation: panelEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      padding: 30px;
+      backdrop-filter: blur(16px);
     }
 
-    @keyframes panelEnter{
-      from{
-        opacity: 0;
-        transform: translateY(30px);
-      }
+    .logo{
+      text-align: center;
+      margin-bottom: 30px;
     }
 
-    .panel:nth-child(1){ animation-delay: 0.1s; }
-    .panel:nth-child(2){ animation-delay: 0.2s; }
-
-    .panel:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 24px 72px rgba(0,0,0,.65);
+    .logo img{
+      width: min(300px, 80vw);
+      height: auto;
     }
 
-    .panel::before{
-      content: "";
-      position: absolute;
-      inset: -2px;
-      background:
-        radial-gradient(800px 400px at 18% 0%, rgba(255,27,58,.22), transparent 65%),
-        radial-gradient(800px 400px at 82% 20%, rgba(255,61,107,.15), transparent 65%);
-      pointer-events: none;
-      opacity: 0.8;
+    h1{
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
     }
 
-    .panel > *{ 
-      position: relative;
-      z-index: 1;
-    }
-
-    .form{
-      padding: clamp(18px, 4vw, 28px);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .side{
-      padding: clamp(18px, 4vw, 28px);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .sideTop{
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .lamp{
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--bad);
-      box-shadow: 
-        0 0 0 0 rgba(255,45,85,.6),
-        0 0 12px rgba(255,45,85,.4);
-      margin-top: 4px;
-      position: relative;
-      transition: all 0.3s ease;
-      animation: lampPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes lampPulse{
-      0%, 100%{ box-shadow: 0 0 0 0 rgba(255,45,85,.6), 0 0 12px rgba(255,45,85,.4); }
-      50%{ box-shadow: 0 0 0 6px rgba(255,45,85,.0), 0 0 20px rgba(255,45,85,.6); }
-    }
-
-    .lamp.ok{ 
-      background: var(--ok);
-      animation-name: lampPulseOk;
-    }
-
-    @keyframes lampPulseOk{
-      0%, 100%{ box-shadow: 0 0 0 0 rgba(34,197,94,.6), 0 0 12px rgba(34,197,94,.4); }
-      50%{ box-shadow: 0 0 0 6px rgba(34,197,94,.0), 0 0 20px rgba(34,197,94,.6); }
-    }
-
-    .lamp.warn{ 
-      background: var(--warn);
-      animation-name: lampPulseWarn;
-    }
-
-    @keyframes lampPulseWarn{
-      0%, 100%{ box-shadow: 0 0 0 0 rgba(251,191,36,.6), 0 0 12px rgba(251,191,36,.4); }
-      50%{ box-shadow: 0 0 0 6px rgba(251,191,36,.0), 0 0 20px rgba(251,191,36,.6); }
-    }
-
-    .chips{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .chip{
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
-      padding: 10px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      user-select: none;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .chip::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.1), transparent);
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .chip:hover{
-      transform: translateY(-2px);
-      background: rgba(255,255,255,.12);
-      border-color: rgba(255,255,255,.25);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .chip:hover::before{
-      opacity: 1;
-    }
-
-    .chip:active{ 
-      transform: translateY(0);
-      box-shadow: none;
-    }
-
-    .errorBox{
-      display: none;
-      border: 1px solid rgba(255,45,85,.3);
-      background: linear-gradient(135deg, rgba(255,45,85,.12), rgba(255,45,85,.08));
-      color: rgba(255,240,245,.96);
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      line-height: 1.5;
-      font-weight: 500;
-      backdrop-filter: blur(8px);
-    }
-
-    .errorBox.show{ 
-      display: block;
-      animation: errorSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes errorSlide{
-      from{
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-    }
-
-    .shake{ 
-      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97);
-    }
-
-    @keyframes shake{
-      0%, 100%{ transform: translateX(0); }
-      20%, 60%{ transform: translateX(-8px); }
-      40%, 80%{ transform: translateX(8px); }
+    .form-group{
+      margin-bottom: 20px;
     }
 
     label{
+      display: block;
       font-size: 14px;
       font-weight: 600;
       color: var(--muted);
       margin-bottom: 8px;
-      display: block;
-      letter-spacing: 0.3px;
     }
 
-    .codeHeader{
+    .code-boxes{
       display: flex;
-      align-items: center;
-      justify-content: space-between;
       gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .codeRight{
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .iconBtn{
-      width: 42px;
-      height: 42px;
-      display: inline-flex;
-      align-items: center;
       justify-content: center;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(0,0,0,.25);
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      user-select: none;
-      position: relative;
-      overflow: hidden;
+      margin-bottom: 20px;
     }
 
-    .iconBtn::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .iconBtn:hover{
-      transform: translateY(-2px) scale(1.05);
-      background: rgba(255,255,255,.1);
-      border-color: rgba(255,255,255,.3);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .iconBtn:hover::before{
-      opacity: 1;
-    }
-
-    .iconBtn:active{ 
-      transform: translateY(0) scale(0.98);
-    }
-
-    .iconBtn svg{ 
-      width: 20px;
-      height: 20px;
-      opacity: 0.9;
-      transition: opacity 0.2s ease;
-    }
-
-    .iconBtn:hover svg{
-      opacity: 1;
-    }
-
-    .codeBoxes{
-      display: flex;
-      gap: 12px;
-      direction: ltr;
-      justify-content: center;
-    }
-
-    .box{
-      width: 56px;
-      height: 64px;
-      border-radius: var(--radius-sm);
-      border: 2px solid rgba(255,255,255,.16);
+    .code-box{
+      width: 50px;
+      height: 60px;
+      border: 2px solid var(--stroke);
       background: rgba(0,0,0,.3);
       color: var(--text);
       font-size: 24px;
       font-weight: 800;
-      text-transform: uppercase;
       text-align: center;
+      border-radius: 12px;
       outline: none;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-      backdrop-filter: blur(8px);
+      text-transform: uppercase;
     }
 
-    .box::before{
-      content: '';
-      position: absolute;
-      inset: -2px;
-      border-radius: var(--radius-sm);
-      padding: 2px;
-      background: linear-gradient(135deg, rgba(255,61,107,0), rgba(255,61,107,0));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-
-    .box:focus{
+    .code-box:focus{
       border-color: var(--secondary);
-      background: rgba(0,0,0,.4);
-      transform: translateY(-3px) scale(1.08);
-      box-shadow: 
-        0 0 0 4px rgba(255,61,107,.2),
-        0 8px 20px rgba(255,61,107,.3);
+      box-shadow: 0 0 0 3px rgba(255,61,107,.2);
     }
 
-    .box:focus::before{
-      background: linear-gradient(135deg, rgba(255,61,107,.6), rgba(255,27,58,.4));
-      opacity: 1;
-    }
-
-    .box.invalid{
-      border-color: var(--bad);
-      background: rgba(255,45,85,.08);
-      animation: boxShake 0.4s ease;
-    }
-
-    @keyframes boxShake{
-      0%, 100%{ transform: translateX(0); }
-      25%, 75%{ transform: translateX(-4px); }
-      50%{ transform: translateX(4px); }
-    }
-
-    .nameInput{
+    input[type="text"]{
       width: 100%;
-      padding: 15px 18px;
-      border-radius: var(--radius-sm);
-      border: 2px solid rgba(255,255,255,.16);
+      padding: 12px 16px;
+      border: 2px solid var(--stroke);
       background: rgba(0,0,0,.3);
       color: var(--text);
       font-size: 16px;
+      border-radius: 12px;
       outline: none;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-      backdrop-filter: blur(8px);
-      font-weight: 500;
     }
 
-    .nameInput::placeholder{
-      color: rgba(255,255,255,.4);
-    }
-
-    .nameInput:focus{
-      border-color: var(--accent);
-      background: rgba(0,0,0,.4);
-      transform: translateY(-2px);
-      box-shadow: 
-        0 0 0 4px rgba(255,77,122,.18),
-        0 8px 20px rgba(255,77,122,.25);
-    }
-
-    .nameInput.invalid{
-      border-color: var(--bad);
-      background: rgba(255,45,85,.08);
-      animation: inputShake 0.4s ease;
-    }
-
-    @keyframes inputShake{
-      0%, 100%{ transform: translateX(0); }
-      25%, 75%{ transform: translateX(-6px); }
-      50%{ transform: translateX(6px); }
-    }
-
-    .row{
-      display: flex;
-      gap: 12px;
-      margin-top: 8px;
+    input[type="text"]:focus{
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(255,61,107,.2);
     }
 
     .btn{
-      flex: 1;
-      border-radius: var(--radius-sm);
+      width: 100%;
+      padding: 14px;
       border: none;
-      padding: 15px 20px;
-      cursor: pointer;
+      border-radius: 12px;
+      font-size: 16px;
       font-weight: 700;
-      font-size: 15px;
       color: white;
       background: linear-gradient(135deg, var(--primary), var(--secondary));
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      user-select: none;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 
-        0 4px 12px rgba(255,27,58,.3),
-        inset 0 1px 0 rgba(255,255,255,.2);
-    }
-
-    .btn::before{
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,.2), transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      cursor: pointer;
+      transition: transform 0.2s;
     }
 
     .btn:hover{
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 
-        0 8px 24px rgba(255,27,58,.45),
-        inset 0 1px 0 rgba(255,255,255,.25);
+      transform: translateY(-2px);
     }
 
-    .btn:hover::before{
-      opacity: 1;
-    }
-
-    .btn:active{ 
-      transform: translateY(-1px) scale(0.98);
-      box-shadow: 
-        0 4px 12px rgba(255,27,58,.35),
-        inset 0 1px 0 rgba(255,255,255,.2);
+    .btn:disabled{
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .btn.secondary{
       background: rgba(255,255,255,.1);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.2);
-      box-shadow: 
-        0 4px 12px rgba(0,0,0,.2),
-        inset 0 1px 0 rgba(255,255,255,.1);
+      margin-top: 10px;
     }
 
-    .btn.secondary:hover{
-      background: rgba(255,255,255,.15);
-      border-color: rgba(255,255,255,.3);
-      box-shadow: 
-        0 8px 24px rgba(0,0,0,.3),
-        inset 0 1px 0 rgba(255,255,255,.15);
-    }
-
-    .btn[disabled]{ 
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,.2);
-    }
-
-    .spinner{
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2.5px solid rgba(255,255,255,.3);
-      border-top-color: white;
-      animation: spin 0.8s linear infinite;
+    .error{
+      background: rgba(255,45,85,.1);
+      border: 1px solid rgba(255,45,85,.3);
+      color: #ffaab8;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      font-size: 14px;
       display: none;
     }
 
-    .btn.loading .spinner{ 
-      display: inline-block;
+    .error.show{
+      display: block;
     }
 
-    @keyframes spin{ 
+    .status{
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--bad);
+    }
+
+    .status.ok{ background: var(--ok); }
+    .status.warn{ background: var(--warn); }
+
+    .spinner{
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin{
       to{ transform: rotate(360deg); }
     }
 
-    .toast{
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: rgba(10,12,18,.92);
-      color: white;
-      padding: 14px 24px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.2);
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      font-size: 14px;
-      font-weight: 600;
-      backdrop-filter: blur(16px) saturate(180%);
-      box-shadow: var(--shadow-md);
-      z-index: 1000;
-    }
-
-    .toast.show{
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 999;
-      animation: overlayFade 0.3s ease;
-    }
-
-    @keyframes overlayFade{
-      from{ opacity: 0; }
-    }
-
-    .overlay.show{ 
-      display: flex;
-    }
-
-    .overlay .box{
-      width: min(440px, 100%);
-      border-radius: var(--radius);
-      border: 1px solid rgba(255,255,255,.2);
-      background: rgba(15,18,25,.94);
-      padding: 24px;
-      box-shadow: var(--shadow-lg);
-      backdrop-filter: blur(20px) saturate(180%);
-      animation: overlayBoxSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    @keyframes overlayBoxSlide{
-      from{
-        opacity: 0;
-        transform: scale(0.9) translateY(20px);
-      }
-    }
-
-    .overlay h3{ 
-      margin: 0 0 12px;
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .overlay p{ 
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    @media (max-width: 600px){
-      .codeBoxes{
-        gap: 10px;
-      }
-      .box{
-        width: 52px;
-        height: 60px;
-        font-size: 22px;
-      }
-      .btn{
-        font-size: 14px;
-        padding: 13px 18px;
-      }
-    }
-
-    ::-webkit-scrollbar{
-      width: 10px;
-    }
-    ::-webkit-scrollbar-track{
-      background: rgba(0,0,0,.2);
-    }
-    ::-webkit-scrollbar-thumb{
-      background: rgba(255,255,255,.2);
-      border-radius: 5px;
-    }
-    ::-webkit-scrollbar-thumb:hover{
-      background: rgba(255,255,255,.3);
+    .loading .spinner{
+      margin-left: 10px;
     }
   </style>
 </head>
 
 <body>
-  <div class="blob a"></div>
-  <div class="blob b"></div>
-  <div class="blob c"></div>
+  <div class="status" id="status"></div>
 
   <div class="wrap">
-    <div class="logoTop">
-      <img class="logoImg" src="/logo.png" alt="Gamehub4u Logo" loading="eager">
+    <div class="logo">
+      <img src="/logo.png" alt="Gamehub4u">
     </div>
 
-    <div class="grid">
-      <section class="panel form" role="form" aria-label="نموذج الانضمام">
-        <div id="err" class="errorBox" role="alert"></div>
+    <h1>انضم للعبة</h1>
 
-        <div>
-          <div class="codeHeader">
-            <label style="margin:0;">كود الغرفة</label>
-            <div class="codeRight">
-              <button class="iconBtn" id="pasteBtn" type="button" aria-label="لصق الكود" title="لصق">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M16 4h-1.2a3 3 0 0 0-5.6 0H8a2 2 0 0 0-2 2v2h12V6a2 2 0 0 0-2-2Z" stroke-width="2" stroke-linecap="round"/>
-                  <path d="M8 8h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8h2Z" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
-          </div>
+    <div class="error" id="error"></div>
 
-          <div class="codeBoxes" id="codeBoxes">
-            <input class="box" inputmode="text" maxlength="1" id="c0" aria-label="الحرف الأول">
-            <input class="box" inputmode="text" maxlength="1" id="c1" aria-label="الحرف الثاني">
-            <input class="box" inputmode="text" maxlength="1" id="c2" aria-label="الحرف الثالث">
-            <input class="box" inputmode="text" maxlength="1" id="c3" aria-label="الحرف الرابع">
-          </div>
-        </div>
-
-        <div>
-          <label for="name">اسمك في اللعبة</label>
-          <input id="name" class="nameInput" placeholder="مثال: محمد" maxlength="20" autocomplete="off" aria-label="اسمك"/>
-        </div>
-
-        <div class="row">
-          <button id="joinBtn" class="btn" type="button" aria-label="انضمام للغرفة">
-            <span class="spinner" aria-hidden="true"></span>
-            <span class="btnText">انضم الآن</span>
-          </button>
-          <button id="hostBtn" class="btn secondary" type="button" aria-label="إنشاء غرفة جديدة">استضف</button>
-        </div>
-      </section>
-
-      <section class="panel side" aria-label="معلومات الاتصال">
-        <div class="sideTop">
-          <div></div>
-          <span id="lamp" class="lamp bad" role="status" aria-label="حالة الاتصال"></span>
-        </div>
-
-        <div class="chips">
-          <button class="chip" id="lastRoomBtn" type="button" aria-label="آخر غرفة">آخر غرفة</button>
-          <button class="chip" id="clearBtn" type="button" aria-label="مسح الحقول">مسح الكل</button>
-        </div>
-      </section>
+    <div class="form-group">
+      <label>كود الغرفة</label>
+      <div class="code-boxes">
+        <input type="text" class="code-box" maxlength="1" id="c0">
+        <input type="text" class="code-box" maxlength="1" id="c1">
+        <input type="text" class="code-box" maxlength="1" id="c2">
+        <input type="text" class="code-box" maxlength="1" id="c3">
+      </div>
     </div>
+
+    <div class="form-group">
+      <label for="name">اسمك</label>
+      <input type="text" id="name" placeholder="مثال: محمد" maxlength="20">
+    </div>
+
+    <button class="btn" id="joinBtn">انضم الآن</button>
+    <button class="btn secondary" id="hostBtn">استضف غرفة</button>
   </div>
-
-  <div id="overlay" class="overlay" role="dialog" aria-labelledby="overlayTitle" aria-modal="true">
-    <div class="box">
-      <h3 id="overlayTitle">انقطع الاتصال</h3>
-      <p>جاري إعادة الاتصال تلقائيًا... يرجى الانتظار.</p>
-    </div>
-  </div>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const SERVER_URL = "https://api.gamehub4u.com";
-    const WEB_ORIGIN = location.origin;
-
-    function showToast(msg) {
-      const t = document.getElementById("toast");
-      if (!t) return;
-      t.textContent = String(msg || "تم");
-      t.classList.add("show");
-      clearTimeout(showToast._tm);
-      showToast._tm = setTimeout(() => t.classList.remove("show"), 2000);
-    }
+    const SERVER = "https://api.gamehub4u.com";
+    const boxes = [0,1,2,3].map(i => document.getElementById('c'+i));
+    const nameInput = document.getElementById('name');
+    const joinBtn = document.getElementById('joinBtn');
+    const hostBtn = document.getElementById('hostBtn');
+    const error = document.getElementById('error');
+    const status = document.getElementById('status');
 
     function showError(msg){
-      const err = document.getElementById("err");
-      if (!err) return;
-      if (!msg) { 
-        err.classList.remove("show");
-        err.textContent = "";
-        return;
-      }
-      err.textContent = String(msg);
-      err.classList.add("show");
-      err.classList.remove("shake");
-      void err.offsetWidth;
-      err.classList.add("shake");
+      error.textContent = msg;
+      error.classList.add('show');
     }
 
-    function setLamp(cls){
-      const lamp = document.getElementById("lamp");
-      if (!lamp) return;
-      lamp.classList.remove("ok","warn","bad");
-      lamp.classList.add(cls);
-      lamp.setAttribute('aria-label', 
-        cls === 'ok' ? 'متصل' : 
-        cls === 'warn' ? 'جاري الاتصال' : 
-        'غير متصل'
-      );
+    function hideError(){
+      error.classList.remove('show');
     }
-
-    function loadScriptWithTimeout(src, ms = 7000) {
-      return new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        const timer = setTimeout(() => { 
-          s.remove();
-          reject(new Error("timeout"));
-        }, ms);
-        s.src = src;
-        s.async = true;
-        s.onload = () => { 
-          clearTimeout(timer);
-          resolve(true);
-        };
-        s.onerror = () => { 
-          clearTimeout(timer);
-          reject(new Error("load_error"));
-        };
-        document.head.appendChild(s);
-      });
-    }
-
-    const boxes = Array.from({length: 4}, (_, i) => document.getElementById("c" + i));
 
     function getCode(){
-      return boxes.map(b => (b.value || "").toUpperCase()).join("").replace(/[^A-Z0-9]/g, "");
+      return boxes.map(b => b.value.toUpperCase()).join('');
     }
 
-    function setCode(code){
-      const clean = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4);
-      boxes.forEach((b, i) => b.value = clean[i] || "");
-      if (clean.length < 4) boxes[clean.length]?.focus();
-    }
+    boxes.forEach((box, i) => {
+      box.addEventListener('input', (e) => {
+        box.value = box.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if(box.value && i < 3) boxes[i+1].focus();
+      });
 
-    function markCodeInvalid(on){
-      boxes.forEach(b => b.classList.toggle("invalid", !!on));
-    }
+      box.addEventListener('keydown', (e) => {
+        if(e.key === 'Backspace' && !box.value && i > 0) boxes[i-1].focus();
+        if(e.key === 'Enter') join();
+      });
+    });
 
-    function normalizeRoom(s) {
-      return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4);
-    }
+    nameInput.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter') join();
+    });
 
-    function validateRoomCode(code) {
-      const v = normalizeRoom(code);
-      if (v.length !== 4) return { ok: false, msg: "الكود يجب أن يكون 4 أحرف" };
-      return { ok: true, value: v };
-    }
+    hostBtn.onclick = () => {
+      window.location.href = '/host.html';
+    };
 
-    function validateName(s) {
-      const v = String(s || "").trim().replace(/\s+/g, " ").slice(0, 20);
-      if (v.length < 2) return { ok: false, msg: "الاسم يجب أن يكون حرفين على الأقل" };
-      return { ok: true, value: v };
-    }
+    joinBtn.onclick = join;
 
-    function getOrCreateClientId() {
-      let id = localStorage.getItem("gh_clientId");
-      if (!id) {
-        id = crypto.randomUUID ? crypto.randomUUID() : ("cid_" + Math.random().toString(36).slice(2));
-        localStorage.setItem("gh_clientId", id);
-      }
-      return id;
-    }
-    const clientId = getOrCreateClientId();
-
-    function saveProfile(name) { 
-      localStorage.setItem("gh_name", String(name || ""));
-    }
-    
-    function loadProfile() { 
-      return { name: localStorage.getItem("gh_name") || "" };
-    }
-
-    function saveLastRoom(code){ 
-      localStorage.setItem("gh_lastRoom", String(code || ""));
-    }
-    
-    function loadLastRoom(){ 
-      return localStorage.getItem("gh_lastRoom") || "";
-    }
-
-    function setLoading(on){
-      const btn = document.getElementById("joinBtn");
-      if (!btn) return;
-      btn.classList.toggle("loading", !!on);
-      btn.disabled = !!on;
-      btn.setAttribute('aria-busy', !!on);
-    }
-
-    function extractRoomFromText(text){
-      const t = String(text || "").trim();
-      if (!t) return "";
+    function join(){
+      hideError();
       
-      try {
-        const u = new URL(t);
-        const r = (u.searchParams.get("room") || "").trim();
-        if (r) return r;
-      } catch(_){}
-      
-      const m = t.match(/(?:\broom\s*=\s*)([A-Za-z0-9]{4})/i);
-      if (m && m[1]) return m[1];
-      
-      return t.replace(/[^A-Za-z0-9]/g, "").slice(0, 4);
-    }
+      const code = getCode();
+      const name = nameInput.value.trim();
 
-    async function pasteToCode(){
-      try {
-        const text = await navigator.clipboard.readText();
-        const room = extractRoomFromText(text);
-        if (!room) {
-          showToast("لم يتم العثور على كود");
-          return;
-        }
-        setCode(room);
-        markCodeInvalid(false);
-        showError("");
-        showToast("تم اللصق ✓");
-      } catch(_){
-        showToast("تعذر اللصق");
-      }
-    }
-
-    async function start() {
-      setLamp("warn");
-
-      try {
-        await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
-      } catch (e) {
-        setLamp("bad");
-        showError("تعذر الاتصال بالخادم");
+      if(code.length !== 4){
+        showError('الرجاء إدخال كود مكون من 4 أحرف');
         return;
       }
 
-      let socket;
-      try {
-        socket = io(SERVER_URL, {
-          transports: ["websocket", "polling"],
-          auth: { clientId }
-        });
-      } catch (e) {
-        setLamp("bad");
-        showError("تعذر الاتصال");
+      if(name.length < 2){
+        showError('الرجاء إدخال اسم صحيح');
         return;
       }
 
-      const ov = document.getElementById("overlay");
-      const showOv = () => ov && ov.classList.add("show");
-      const hideOv = () => ov && ov.classList.remove("show");
+      joinBtn.disabled = true;
+      joinBtn.innerHTML = 'جاري الانضمام... <span class="spinner"></span>';
 
-      socket.on("connect", () => { 
-        setLamp("ok");
-        hideOv();
-        console.log("✅ متصل بالسيرفر");
-      });
-      
-      socket.on("disconnect", () => { 
-        setLamp("bad");
-        showOv();
-        console.log("❌ انقطع الاتصال");
-      });
-      
-      socket.on("connect_error", () => { 
-        setLamp("warn");
-        console.log("⚠️ خطأ في الاتصال");
-      });
+      // حفظ البيانات
+      localStorage.setItem('gh_name', name);
+      localStorage.setItem('gh_lastRoom', code);
 
-      // 🔥 الحل: نستقبل أي رد من السيرفر ونروح اللوبي
-      socket.onAny((eventName, data) => {
-        console.log("📩 استلمنا:", eventName, data);
-        
-        // إذا جاء أي رد فيه roomCode أو نجاح
-        if (data && (data.roomCode || data.success || data.joined)) {
-          setLoading(false);
-          const code = data.roomCode || data.code || data.room || getCode();
-          
-          if (code) {
-            showToast("✓ تم الانضمام");
-            console.log("🎮 رايحين للوبي:", code);
-            
-            setTimeout(() => {
-              window.location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
-            }, 300);
-          }
-        }
-        
-        // إذا جاء خطأ
-        if (data && (data.error || data.message)) {
-          setLoading(false);
-          showError(data.message || data.error || "حدث خطأ");
-        }
-      });
-
-      const nameInput = document.getElementById("name");
-      const roomFromUrl = (new URL(location.href).searchParams.get("room") || "").trim().toUpperCase();
-      const profile = loadProfile();
-      
-      if (profile.name) nameInput.value = profile.name;
-
-      if (roomFromUrl) {
-        setCode(roomFromUrl);
-      } else {
-        const last = loadLastRoom();
-        if (last) setCode(last);
-      }
-
-      boxes.forEach((b, idx) => {
-        b.addEventListener("input", () => {
-          b.value = b.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 1);
-          showError("");
-          markCodeInvalid(false);
-          if (b.value && idx < boxes.length - 1) {
-            boxes[idx + 1].focus();
-          }
-        });
-
-        b.addEventListener("keydown", (e) => {
-          if (e.key === "Backspace" && !b.value && idx > 0) {
-            boxes[idx - 1].focus();
-          }
-          if (e.key === "Enter") {
-            doJoin();
-          }
-        });
-
-        b.addEventListener("paste", (e) => {
-          const text = (e.clipboardData || window.clipboardData).getData("text");
-          if (text) {
-            e.preventDefault();
-            setCode(extractRoomFromText(text));
-          }
-        });
-      });
-
-      nameInput.addEventListener("keydown", (e) => { 
-        if (e.key === "Enter") doJoin();
-      });
-      
-      nameInput.addEventListener("input", () => { 
-        showError("");
-        nameInput.classList.remove("invalid");
-      });
-
-      document.getElementById("pasteBtn").onclick = pasteToCode;
-
-      document.getElementById("clearBtn").onclick = () => {
-        setCode("");
-        nameInput.value = "";
-        showError("");
-        markCodeInvalid(false);
-        nameInput.classList.remove("invalid");
-        boxes[0].focus();
-        showToast("تم المسح");
-      };
-
-      document.getElementById("lastRoomBtn").onclick = () => {
-        const last = loadLastRoom();
-        if (!last) {
-          showToast("لا توجد غرفة سابقة");
-          return;
-        }
-        setCode(last);
-        showToast("تم استرجاع الغرفة");
-      };
-
-      document.getElementById("hostBtn").onclick = () => {
-        location.href = WEB_ORIGIN + "/host.html";
-      };
-      
-      document.getElementById("joinBtn").onclick = () => doJoin();
-
-      function doJoin(){
-        showError("");
-        setLoading(false);
-
-        const code = getCode();
-        const rc = validateRoomCode(code);
-        if (!rc.ok) {
-          markCodeInvalid(true);
-          showError(rc.msg);
-          boxes[0].focus();
-          return;
-        }
-
-        const nm = validateName(nameInput.value);
-        if (!nm.ok) {
-          nameInput.classList.add("invalid");
-          showError(nm.msg);
-          nameInput.focus();
-          return;
-        }
-
-        saveProfile(nm.value);
-        saveLastRoom(rc.value);
-
-        setLoading(true);
-        
-        const payload = { 
-          roomCode: rc.value,
-          name: nm.value,
-          clientId 
-        };
-
-        console.log("🚀 باقي نرسل:", payload);
-
-        // نرسل كل الاحتمالات
-        socket.emit("player:join", payload);
-        socket.emit("join", payload);
-        socket.emit("joinRoom", payload);
-
-        // بعد 5 ثواني إذا ما صار شي، نروح للوبي على طول
-        setTimeout(() => {
-          if (document.getElementById("joinBtn").classList.contains("loading")) {
-            console.log("⏰ طال الانتظار - رايحين للوبي مباشرة");
-            setLoading(false);
-            showToast("✓ جاري الدخول");
-            setTimeout(() => {
-              window.location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(rc.value);
-            }, 300);
-          }
-        }, 5000);
-      }
+      // الانتقال للوبي مباشرة بعد ثانية
+      setTimeout(() => {
+        window.location.href = `/lobby.html?room=${code}`;
+      }, 1000);
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', start);
-    } else {
-      start();
+    // تحميل آخر اسم
+    const savedName = localStorage.getItem('gh_name');
+    if(savedName) nameInput.value = savedName;
+
+    // تحميل كود من URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomFromUrl = urlParams.get('room');
+    if(roomFromUrl){
+      const chars = roomFromUrl.toUpperCase().split('');
+      chars.forEach((c, i) => {
+        if(boxes[i]) boxes[i].value = c;
+      });
     }
+
+    // محاولة الاتصال بالسيرفر (اختياري)
+    status.classList.add('warn');
+    
+    fetch(SERVER + '/socket.io/socket.io.js')
+      .then(() => status.classList.add('ok'))
+      .catch(() => status.classList.add('bad'));
   </script>
 </body>
 </html>
