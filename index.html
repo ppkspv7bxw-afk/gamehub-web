@@ -6,150 +6,357 @@
   <title>Gamehub4u</title>
 
   <style>
-    :root {
-      --bg0: #050814;
-      --bg1: #070b1d;
+    :root{
+      /* Red theme */
+      --bg0:#09040a;
+      --bg1:#120610;
+
       --card: rgba(255,255,255,.07);
       --stroke: rgba(255,255,255,.14);
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.62);
-      --primary: #6366f1;
-      --primary2: #22d3ee;
-      --ok: #22c55e;
-      --warn: #fbbf24;
-      --bad: #ff4d6d;
-      --shadow: 0 26px 80px rgba(0,0,0,.55);
+
+      --red1:#ff1b3a;
+      --red2:#ff3d6b;
+      --red3:#ff4d4d;
+
+      --ok:#22c55e;
+      --warn:#fbbf24;
+      --bad:#ff2d55;
+
+      --shadow: 0 26px 80px rgba(0,0,0,.60);
       --radius: 18px;
     }
 
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 22px 14px;
-      color: var(--text);
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px 14px;
+      color:var(--text);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
-      background: radial-gradient(1200px 700px at 20% 10%, rgba(99,102,241,.18), transparent 60%),
-                  radial-gradient(900px 650px at 85% 18%, rgba(34,211,238,.14), transparent 55%),
-                  linear-gradient(180deg, var(--bg0), var(--bg1));
-      overflow-x: hidden;
+      background:
+        radial-gradient(1100px 650px at 18% 12%, rgba(255,27,58,.20), transparent 60%),
+        radial-gradient(900px 650px at 85% 18%, rgba(255,61,107,.16), transparent 55%),
+        radial-gradient(900px 650px at 50% 90%, rgba(255,77,77,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
     }
 
-    /* تحسين الـ Blobs ليكون أخف (قللت الـ blur) */
-    .blob {
-      position: fixed;
-      width: 540px; height: 540px;
-      border-radius: 999px;
-      filter: blur(30px); /* خففت الـ blur عشان أداء أفضل */
-      opacity: .28;
-      z-index: -1;
+    /* Animated blobs */
+    .blob{
+      position:fixed;
+      width:560px;height:560px;
+      border-radius:999px;
+      filter: blur(44px);
+      opacity:.26;
+      z-index:-1;
       animation: float 12s ease-in-out infinite;
     }
-    .blob.a { left: -180px; top: -160px; background: rgba(99,102,241,.85); }
-    .blob.b { right: -220px; top: 60px; background: rgba(34,211,238,.65); animation-duration: 15s; }
-    .blob.c { left: 10%; bottom: -240px; background: rgba(16,185,129,.38); animation-duration: 18s; }
-    @keyframes float {
-      0%, 100% { transform: translate(0,0) scale(1); }
-      50% { transform: translate(22px, -18px) scale(1.05); }
+    .blob.a{ left:-200px; top:-180px; background: rgba(255,27,58,.90); }
+    .blob.b{ right:-240px; top:70px; background: rgba(255,61,107,.75); animation-duration: 15s; }
+    .blob.c{ left:12%; bottom:-260px; background: rgba(255,77,77,.45); animation-duration: 18s; }
+
+    @keyframes float{
+      0%,100%{ transform: translate(0,0) scale(1); }
+      50%{ transform: translate(22px, -18px) scale(1.05); }
     }
 
-    .shell {
-      width: min(980px, 100%);
-      display: grid;
+    .shell{
+      width:min(980px, 100%);
+      display:grid;
       grid-template-columns: 1.05fr .95fr;
-      gap: 16px;
-      align-items: stretch;
+      gap:16px;
+      align-items:stretch;
     }
-    @media (max-width: 900px) { .shell { grid-template-columns: 1fr; } }
-    @media (max-width: 600px) { /* إضافة لشاشات صغيرة */
-      .shell { padding: 0 10px; }
-      .blob { width: 400px; height: 400px; filter: blur(20px); } /* خففت للموبايل */
+    @media (max-width: 900px){
+      .shell{ grid-template-columns:1fr; }
     }
 
-    .panel {
+    .panel{
       background: var(--card);
-      border: 1px solid var(--stroke);
+      border:1px solid var(--stroke);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       backdrop-filter: blur(10px);
-      overflow: hidden;
-      position: relative;
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+      position:relative;
     }
-    .panel::before {
-      content: "";
-      position: absolute;
-      inset: -2px;
-      background: radial-gradient(600px 260px at 15% 0%, rgba(99,102,241,.18), transparent 60%),
-                  radial-gradient(600px 260px at 80% 15%, rgba(34,211,238,.12), transparent 60%);
-      pointer-events: none;
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(680px 300px at 15% 0%, rgba(255,27,58,.18), transparent 60%),
+        radial-gradient(680px 300px at 85% 15%, rgba(255,61,107,.12), transparent 60%);
+      pointer-events:none;
     }
-    .panel > * { position: relative; }
+    .panel > *{ position:relative; }
 
-    /* باقي الـ CSS مشابه، بس حسنت الـ Transitions لتكون smoother */
-    .hero { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .mark { width: 12px; height: 12px; border-radius: 999px; background: linear-gradient(135deg, var(--primary), var(--primary2)); box-shadow: 0 0 18px rgba(99,102,241,.35); flex: 0 0 auto; }
-    h1 { margin: 0; font-size: 22px; letter-spacing: .3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hero{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
 
-    .lampWrap { display: flex; align-items: center; justify-content: flex-end; }
-    .lamp { width: 10px; height: 10px; border-radius: 50%; background: var(--bad); box-shadow: 0 0 0 4px rgba(255,77,109,.14); }
-    .lamp.ok { background: var(--ok); box-shadow: 0 0 0 4px rgba(34,197,94,.14); }
-    .lamp.warn { background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.14); }
-    .lamp.bad { background: var(--bad); box-shadow: 0 0 0 4px rgba(255,77,109,.14); }
+    .topbar{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
 
-    .heroActions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
-    .chip { border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); padding: 8px 10px; border-radius: 999px; font-size: 12px; color: var(--text); cursor: pointer; transition: transform .08s ease, filter .2s ease; user-select: none; }
-    .chip:hover { filter: brightness(1.06); }
-    .chip:active { transform: translateY(1px); }
+    /* ✅ Logo header */
+    .logoWrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+    .logoImg{
+      width: 210px;
+      max-width: 72vw;
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 28px rgba(0,0,0,.55));
+      transform: translateZ(0);
+      user-select:none;
+      -webkit-user-drag:none;
+    }
 
-    .form { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
-    .errorBox { display: none; border: 1px solid rgba(255,77,109,.25); background: rgba(255,77,109,.10); color: rgba(255,220,226,.95); padding: 10px 12px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
-    .errorBox.show { display: block; }
-    .shake { animation: shake .35s ease; }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(6px); } 40% { transform: translateX(-6px); } 60% { transform: translateX(4px); } 80% { transform: translateX(-4px); } }
+    /* ✅ Lamp only */
+    .lampWrap{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      padding-top:6px;
+    }
+    .lamp{
+      width:10px;height:10px;border-radius:50%;
+      background: var(--bad);
+      box-shadow: 0 0 0 4px rgba(255,45,85,.14);
+    }
+    .lamp.ok{ background: var(--ok); box-shadow: 0 0 0 4px rgba(34,197,94,.14); }
+    .lamp.warn{ background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.14); }
+    .lamp.bad{ background: var(--bad); box-shadow: 0 0 0 4px rgba(255,45,85,.14); }
 
-    label { font-size: 13px; color: var(--muted); margin-bottom: 6px; display: block; }
+    .heroActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:4px;
+    }
+    .chip{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--text);
+      cursor:pointer;
+      transition: transform .08s ease, filter .2s ease;
+      user-select:none;
+    }
+    .chip:hover{ filter: brightness(1.06); }
+    .chip:active{ transform: translateY(1px); }
 
-    .codeHeader { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-    .codeRight { display: flex; align-items: center; gap: 8px; }
+    .form{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
 
-    .iconBtn { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.18); color: var(--text); cursor: pointer; transition: transform .08s ease, filter .2s ease; user-select: none; }
-    .iconBtn:hover { filter: brightness(1.08); }
-    .iconBtn:active { transform: translateY(1px); }
-    .iconBtn svg { width: 18px; height: 18px; opacity: .9; }
+    .errorBox{
+      display:none;
+      border:1px solid rgba(255,45,85,.25);
+      background: rgba(255,45,85,.10);
+      color: rgba(255,220,226,.95);
+      padding:10px 12px;
+      border-radius: 14px;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .errorBox.show{ display:block; }
+    .shake{ animation: shake .35s ease; }
+    @keyframes shake{
+      0%,100%{ transform: translateX(0); }
+      20%{ transform: translateX(6px); }
+      40%{ transform: translateX(-6px); }
+      60%{ transform: translateX(4px); }
+      80%{ transform: translateX(-4px); }
+    }
 
-    .codeBoxes { display: flex; gap: 8px; direction: ltr; }
-    .box { width: 44px; height: 52px; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.22); color: var(--text); font-size: 18px; font-weight: 800; text-transform: uppercase; text-align: center; outline: none; transition: box-shadow .2s ease, border-color .2s ease, transform .08s ease; }
-    .box:focus { border-color: rgba(99,102,241,.65); box-shadow: 0 0 0 4px rgba(99,102,241,.18); transform: translateY(-1px); }
-    .box.invalid { border-color: rgba(255,77,109,.55); box-shadow: 0 0 0 4px rgba(255,77,109,.14); }
+    label{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:6px;
+      display:block;
+    }
 
-    .nameInput { width: 100%; padding: 14px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.22); color: var(--text); font-size: 15px; outline: none; transition: box-shadow .2s ease, border-color .2s ease; }
-    .nameInput:focus { border-color: rgba(34,211,238,.55); box-shadow: 0 0 0 4px rgba(34,211,238,.14); }
-    .nameInput.invalid { border-color: rgba(255,77,109,.55); box-shadow: 0 0 0 4px rgba(255,77,109,.14); }
+    .codeHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .codeRight{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
 
-    .row { display: flex; gap: 10px; margin-top: 6px; }
-    .btn { flex: 1; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); padding: 12px 14px; cursor: pointer; font-weight: 800; color: white; background: linear-gradient(135deg, rgba(99,102,241,.95), rgba(34,211,238,.55)); transition: transform .08s ease, filter .2s ease, opacity .2s ease; display: flex; align-items: center; justify-content: center; gap: 10px; user-select: none; }
-    .btn:hover { filter: brightness(1.06); }
-    .btn:active { transform: translateY(1px); }
-    .btn.secondary { background: rgba(255,255,255,.06); color: var(--text); }
-    .btn[disabled] { opacity: .55; cursor: not-allowed; }
+    .iconBtn{
+      width:38px;height:38px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      cursor:pointer;
+      transition: transform .08s ease, filter .2s ease;
+      user-select:none;
+    }
+    .iconBtn:hover{ filter: brightness(1.08); }
+    .iconBtn:active{ transform: translateY(1px); }
+    .iconBtn svg{ width:18px; height:18px; opacity:.9; }
 
-    .spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); border-top-color: rgba(255,255,255,.95); animation: spin 1s linear infinite; display: none; }
-    .btn.loading .spinner { display: inline-block; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .codeBoxes{
+      display:flex;
+      gap:8px;
+      direction:ltr;
+    }
+    .box{
+      width:44px;height:52px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      font-size:18px;
+      font-weight:800;
+      text-transform:uppercase;
+      text-align:center;
+      outline:none;
+      transition: box-shadow .2s ease, border-color .2s ease, transform .08s ease;
+    }
+    .box:focus{
+      border-color: rgba(255,61,107,.65);
+      box-shadow: 0 0 0 4px rgba(255,61,107,.18);
+      transform: translateY(-1px);
+    }
+    .box.invalid{
+      border-color: rgba(255,45,85,.55);
+      box-shadow: 0 0 0 4px rgba(255,45,85,.14);
+    }
 
-    .toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.78); color: white; padding: 10px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; font-size: 13px; backdrop-filter: blur(10px); }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+    .nameInput{
+      width:100%;
+      padding:14px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      font-size:15px;
+      outline:none;
+      transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    .nameInput:focus{
+      border-color: rgba(255,77,77,.55);
+      box-shadow: 0 0 0 4px rgba(255,77,77,.14);
+    }
+    .nameInput.invalid{
+      border-color: rgba(255,45,85,.55);
+      box-shadow: 0 0 0 4px rgba(255,45,85,.14);
+    }
 
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; padding: 18px; }
-    .overlay.show { display: flex; }
-    .overlay .box { width: min(420px, 100%); border-radius: 18px; border: 1px solid rgba(255,255,255,.14); background: rgba(10,12,18,.86); padding: 16px; box-shadow: var(--shadow); }
-    .overlay h3 { margin: 0 0 8px; font-size: 16px; }
-    .overlay p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .row{
+      display:flex;
+      gap:10px;
+      margin-top:6px;
+    }
+    .btn{
+      flex:1;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      padding:12px 14px;
+      cursor:pointer;
+      font-weight:800;
+      color:white;
+      background: linear-gradient(135deg, rgba(255,27,58,.95), rgba(255,61,107,.65));
+      transition: transform .08s ease, filter .2s ease, opacity .2s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+    }
+    .btn:hover{ filter: brightness(1.06); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.secondary{
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+    }
+    .btn[disabled]{ opacity:.55; cursor:not-allowed; }
+
+    .spinner{
+      width:16px;height:16px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.35);
+      border-top-color: rgba(255,255,255,.95);
+      animation: spin 1s linear infinite;
+      display:none;
+    }
+    .btn.loading .spinner{ display:inline-block; }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+
+    .toast{
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.78);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      font-size:13px;
+      backdrop-filter: blur(10px);
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+    .overlay.show{ display:flex; }
+    .overlay .box{
+      width:min(420px, 100%);
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(10,12,18,.86);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .overlay h3{ margin:0 0 8px; font-size:16px; }
+    .overlay p{ margin:0; color:var(--muted); font-size:13px; line-height:1.6; }
   </style>
 </head>
 
@@ -162,13 +369,12 @@
 
     <section class="panel hero">
       <div class="topbar">
-        <div class="brand">
-          <span class="mark"></span>
-          <h1>Gamehub4u</h1>
+        <div class="logoWrap">
+          <img class="logoImg" src="/logo.png" alt="Logo">
         </div>
 
         <div class="lampWrap">
-          <span id="lamp" class="lamp bad" aria-label="حالة الاتصال: سيئة"></span>
+          <span id="lamp" class="lamp bad" aria-label="connection status"></span>
         </div>
       </div>
 
@@ -179,333 +385,11 @@
     </section>
 
     <section class="panel form">
-      <div id="err" class="errorBox" aria-live="assertive"></div>
+      <div id="err" class="errorBox"></div>
 
       <div>
         <div class="codeHeader">
-          <label style="margin:0;" for="c0">Room Code</label> <!-- أضفت for للوصولية -->
+          <label style="margin:0;">Room Code</label>
 
           <div class="codeRight">
-            <button class="iconBtn" id="pasteBtn" type="button" aria-label="لصق الكود">
-              <!-- paste icon -->
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M16 4h-1.2a3 3 0 0 0-5.6 0H8a2 2 0 0 0-2 2v2h12V6a2 2 0 0 0-2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                <path d="M8 8h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8h2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <button class="iconBtn" id="copyBtn" type="button" aria-label="نسخ الكود"> <!-- زر جديد للنسخ -->
-              <!-- copy icon -->
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M15 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                <path d="M18 2H9a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="codeBoxes" id="codeBoxes">
-          <input class="box" inputmode="text" maxlength="1" id="c0" aria-label="الحرف الأول من الكود">
-          <input class="box" inputmode="text" maxlength="1" id="c1" aria-label="الحرف الثاني من الكود">
-          <input class="box" inputmode="text" maxlength="1" id="c2" aria-label="الحرف الثالث من الكود">
-          <input class="box" inputmode="text" maxlength="1" id="c3" aria-label="الحرف الرابع من الكود">
-          <input class="box" inputmode="text" maxlength="1" id="c4" aria-label="الحرف الخامس من الكود">
-          <input class="box" inputmode="text" maxlength="1" id="c5" aria-label="الحرف السادس من الكود">
-        </div>
-      </div>
-
-      <div>
-        <label for="name">اسمك</label>
-        <input id="name" class="nameInput" placeholder="مثال: محمد" maxlength="20" autocomplete="off" aria-required="true"/>
-      </div>
-
-      <div class="row">
-        <button id="joinBtn" class="btn" type="button">
-          <span class="spinner"></span>
-          <span class="btnText">Join</span>
-        </button>
-        <button id="hostBtn" class="btn secondary" type="button">Host</button>
-      </div>
-    </section>
-
-  </div>
-
-  <div id="overlay" class="overlay" aria-modal="true" role="dialog">
-    <div class="box">
-      <h3>انقطع الاتصال</h3>
-      <p>ثواني… بنحاول نرجع الاتصال تلقائيًا.</p>
-    </div>
-  </div>
-
-  <div id="toast" class="toast" aria-live="polite">OK</div>
-
-  <script>
-    const SERVER_URL = "https://api.gamehub4u.com";
-    const WEB_ORIGIN = location.origin;
-
-    function showToast(msg) {
-      const t = document.getElementById("toast");
-      if (!t) return;
-      t.textContent = String(msg || "OK");
-      t.classList.add("show");
-      clearTimeout(showToast._tm);
-      showToast._tm = setTimeout(() => t.classList.remove("show"), 1600);
-    }
-
-    function showError(msg) {
-      const err = document.getElementById("err");
-      if (!err) return;
-      if (!msg) { err.classList.remove("show"); err.textContent = ""; return; }
-      err.textContent = String(msg);
-      err.classList.add("show", "shake");
-      setTimeout(() => err.classList.remove("shake"), 350); // حسنت الـ animation
-    }
-
-    function setLamp(cls, label) {
-      const lamp = document.getElementById("lamp");
-      if (!lamp) return;
-      lamp.classList.remove("ok", "warn", "bad");
-      lamp.classList.add(cls);
-      lamp.setAttribute("aria-label", `حالة الاتصال: ${label}`);
-    }
-
-    async function loadScriptWithTimeout(src, ms = 7000) {
-      return new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        const timer = setTimeout(() => { s.remove(); reject(new Error("timeout")); }, ms);
-        s.src = src;
-        s.async = true;
-        s.onload = () => { clearTimeout(timer); resolve(true); };
-        s.onerror = () => { clearTimeout(timer); reject(new Error("load_error")); };
-        document.head.appendChild(s);
-      });
-    }
-
-    const boxes = Array.from({ length: 6 }, (_, i) => document.getElementById("c" + i));
-
-    function getCode() {
-      return boxes.map(b => (b.value || "").toUpperCase()).join("").replace(/[^A-Z0-9]/g, "");
-    }
-
-    function setCode(code) {
-      const clean = String(code || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
-      boxes.forEach((b, i) => b.value = clean[i] || "");
-      if (clean.length < 6) boxes[clean.length]?.focus();
-    }
-
-    function markCodeInvalid(on) {
-      boxes.forEach(b => b.classList.toggle("invalid", !!on));
-    }
-
-    function normalizeRoom(s) {
-      return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
-    }
-
-    function validateRoomCode(code) {
-      const v = normalizeRoom(code);
-      if (v.length < 3) return { ok: false, msg: "اكتب Room Code صحيح" };
-      return { ok: true, value: v };
-    }
-
-    function validateName(s) {
-      const v = String(s || "").trim().replace(/\s+/g, " ").slice(0, 20);
-      if (v.length < 2) return { ok: false, msg: "اكتب اسم (حرفين على الأقل)" };
-      return { ok: true, value: v };
-    }
-
-    function getOrCreateClientId() {
-      let id = localStorage.getItem("gh_clientId");
-      if (!id) {
-        id = crypto.randomUUID ? crypto.randomUUID() : ("cid_" + Math.random().toString(16).slice(2));
-        localStorage.setItem("gh_clientId", id);
-      }
-      return id;
-    }
-    const clientId = getOrCreateClientId();
-
-    function saveProfile(name) { localStorage.setItem("gh_name", String(name || "")); }
-    function loadProfile() { return { name: localStorage.getItem("gh_name") || "" }; }
-
-    function saveLastRoom(code) { localStorage.setItem("gh_lastRoom", String(code || "")); }
-    function loadLastRoom() { return localStorage.getItem("gh_lastRoom") || ""; }
-
-    function setLoading(on) {
-      const btn = document.getElementById("joinBtn");
-      if (!btn) return;
-      btn.classList.toggle("loading", !!on);
-      btn.disabled = !!on;
-    }
-
-    function extractRoomFromText(text) {
-      const t = String(text || "").trim();
-      if (!t) return "";
-      try {
-        const u = new URL(t);
-        const r = (u.searchParams.get("room") || "").trim();
-        if (r) return r;
-      } catch (_) {}
-      const m = t.match(/(?:\broom\s*=\s*)([A-Za-z0-9]{3,6})/i);
-      if (m && m[1]) return m[1];
-      return t.replace(/[^A-Za-z0-9]/g, "").slice(0, 6);
-    }
-
-    async function pasteToCode() {
-      try {
-        const text = await navigator.clipboard.readText();
-        const room = extractRoomFromText(text);
-        if (!room) return showToast("ما فيه كود");
-        setCode(room);
-        markCodeInvalid(false);
-        showError("");
-        showToast("تم");
-      } catch (_) {
-        showToast("ما قدرنا نلصق");
-      }
-    }
-
-    async function copyCode() {
-      const code = getCode();
-      if (!code) return showToast("ما فيه كود");
-      try {
-        await navigator.clipboard.writeText(code);
-        showToast("نسخنا الكود");
-      } catch (_) {
-        showToast("ما قدرنا ننسخ");
-      }
-    }
-
-    async function start() {
-      setLamp("warn", "تحذير");
-
-      try {
-        await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
-      } catch (e) {
-        setLamp("bad", "سيئة");
-        showError("غير متصل");
-        return;
-      }
-
-      let socket;
-      try {
-        socket = io(SERVER_URL, {
-          transports: ["websocket", "polling"],
-          auth: { clientId }
-        });
-      } catch (e) {
-        setLamp("bad", "سيئة");
-        showError("غير متصل");
-        return;
-      }
-
-      const ov = document.getElementById("overlay");
-      const showOv = () => ov?.classList.add("show");
-      const hideOv = () => ov?.classList.remove("show");
-
-      socket.on("connect", () => { setLamp("ok", "جيدة"); hideOv(); });
-      socket.on("disconnect", () => { setLamp("bad", "سيئة"); showOv(); });
-      socket.on("connect_error", () => { setLamp("warn", "تحذير"); });
-
-      const nameInput = document.getElementById("name");
-      const roomFromUrl = (new URL(location.href).searchParams.get("room") || "").trim().toUpperCase();
-      const profile = loadProfile();
-      if (profile.name) nameInput.value = profile.name;
-
-      if (roomFromUrl) setCode(roomFromUrl);
-      else {
-        const last = loadLastRoom();
-        if (last) setCode(last);
-      }
-
-      boxes.forEach((b, idx) => {
-        b.addEventListener("input", () => {
-          b.value = b.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 1);
-          showError("");
-          markCodeInvalid(false);
-          if (b.value && idx < boxes.length - 1) boxes[idx + 1].focus();
-        });
-
-        b.addEventListener("keydown", (e) => {
-          if (e.key === "Backspace" && !b.value && idx > 0) boxes[idx - 1].focus();
-          if (e.key === "Enter") doJoin();
-        });
-
-        b.addEventListener("paste", (e) => {
-          const text = (e.clipboardData || window.clipboardData).getData("text");
-          if (text) {
-            e.preventDefault();
-            setCode(extractRoomFromText(text));
-          }
-        });
-      });
-
-      nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") doJoin(); });
-      nameInput.addEventListener("input", () => { showError(""); nameInput.classList.remove("invalid"); });
-
-      document.getElementById("pasteBtn").onclick = pasteToCode;
-      document.getElementById("copyBtn").onclick = copyCode; // الزر الجديد
-
-      document.getElementById("clearBtn").onclick = () => {
-        setCode("");
-        nameInput.value = "";
-        showError("");
-        markCodeInvalid(false);
-        nameInput.classList.remove("invalid");
-        boxes[0].focus();
-      };
-
-      document.getElementById("lastRoomBtn").onclick = () => {
-        const last = loadLastRoom();
-        if (!last) return showToast("—");
-        setCode(last);
-        showToast("تم");
-      };
-
-      document.getElementById("hostBtn").onclick = () => location.href = WEB_ORIGIN + "/host.html";
-      document.getElementById("joinBtn").onclick = () => doJoin();
-
-      function doJoin() {
-        showError("");
-        setLoading(false);
-
-        const code = getCode();
-        const rc = validateRoomCode(code);
-        if (!rc.ok) {
-          markCodeInvalid(true);
-          showError(rc.msg);
-          boxes[0].focus();
-          return;
-        }
-
-        const nm = validateName(nameInput.value);
-        if (!nm.ok) {
-          nameInput.classList.add("invalid");
-          showError(nm.msg);
-          nameInput.focus();
-          return;
-        }
-
-        saveProfile(nm.value);
-        saveLastRoom(rc.value);
-
-        setLoading(true);
-        socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
-      }
-
-      socket.on("join:error", ({ message } = {}) => {
-        setLoading(false);
-        showError(message || "خطأ في الـ Join");
-      });
-
-      socket.on("player:joined", ({ roomCode: rc } = {}) => {
-        setLoading(false);
-        const code = String(rc || "").trim().toUpperCase();
-        showToast("✅");
-        setTimeout(() => {
-          location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
-        }, 200);
-      });
-    }
-
-    start();
-  </script>
-</body>
-</html>
+            <button class="iconBtn" id="pasteBtn" type="button" aria-label="pa
