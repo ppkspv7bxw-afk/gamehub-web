@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Gamehub4u - انضم للعبة</title>
-  <meta name="description" content="انضم إلى غرفة اللعب مع أصدقائك"/>
+  <title>Gamehub4u - انضم أو استضف</title>
+  <meta name="description" content="العب مع أصدقائك - انضم لغرفة أو أنشئ غرفة جديدة"/>
 
   <style>
     :root{
@@ -55,7 +55,7 @@
       padding: clamp(20px, 5vw, 40px) 16px;
     }
 
-    /* Animated gradient blobs - محسّن */
+    /* Animated gradient blobs */
     .blob{
       position: fixed;
       border-radius: 50%;
@@ -113,7 +113,7 @@
       z-index: 1;
     }
 
-    /* Logo محسّن */
+    /* Logo */
     .logoTop{
       display: flex;
       justify-content: center;
@@ -207,7 +207,7 @@
       z-index: 1;
     }
 
-    /* Form styles - محسّن */
+    /* Form styles */
     .form{
       padding: clamp(18px, 4vw, 28px);
       display: flex;
@@ -229,7 +229,7 @@
       gap: 12px;
     }
 
-    /* Lamp - محسّن مع أنيميشن */
+    /* Lamp */
     .lamp{
       width: 12px;
       height: 12px;
@@ -269,7 +269,7 @@
       50%{ box-shadow: 0 0 0 6px rgba(251,191,36,.0), 0 0 20px rgba(251,191,36,.6); }
     }
 
-    /* Chips - محسّن */
+    /* Chips */
     .chips{
       display: flex;
       gap: 10px;
@@ -317,7 +317,7 @@
       box-shadow: none;
     }
 
-    /* Error Box - محسّن */
+    /* Error Box */
     .errorBox{
       display: none;
       border: 1px solid rgba(255,45,85,.3);
@@ -376,7 +376,7 @@
       gap: 8px;
     }
 
-    /* Icon Button - محسّن */
+    /* Icon Button */
     .iconBtn{
       width: 42px;
       height: 42px;
@@ -429,7 +429,7 @@
       opacity: 1;
     }
 
-    /* Code Boxes - محسّن ل 4 خانات */
+    /* Code Boxes - 4 خانات */
     .codeBoxes{
       display: flex;
       gap: 12px;
@@ -495,7 +495,7 @@
       50%{ transform: translateX(4px); }
     }
 
-    /* Name Input - محسّن */
+    /* Name Input */
     .nameInput{
       width: 100%;
       padding: 15px 18px;
@@ -535,7 +535,7 @@
       50%{ transform: translateX(6px); }
     }
 
-    /* Buttons - تحسين كبير */
+    /* Buttons */
     .row{
       display: flex;
       gap: 12px;
@@ -616,7 +616,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,.2);
     }
 
-    /* Spinner - محسّن */
+    /* Spinner */
     .spinner{
       width: 18px;
       height: 18px;
@@ -635,7 +635,7 @@
       to{ transform: rotate(360deg); }
     }
 
-    /* Toast - محسّن */
+    /* Toast */
     .toast{
       position: fixed;
       bottom: 24px;
@@ -661,7 +661,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Overlay - محسّن */
+    /* Overlay */
     .overlay{
       position: fixed;
       inset: 0;
@@ -715,7 +715,7 @@
       line-height: 1.7;
     }
 
-    /* Responsive - تحسينات */
+    /* Responsive */
     @media (max-width: 600px){
       .codeBoxes{
         gap: 10px;
@@ -881,7 +881,6 @@
       });
     }
 
-    // ✅ تغيير لـ 4 خانات فقط
     const boxes = Array.from({length: 4}, (_, i) => document.getElementById("c" + i));
 
     function getCode(){
@@ -996,7 +995,10 @@
       try {
         socket = io(SERVER_URL, {
           transports: ["websocket", "polling"],
-          auth: { clientId }
+          auth: { clientId },
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000
         });
       } catch (e) {
         setLamp("bad");
@@ -1021,6 +1023,32 @@
       socket.on("connect_error", () => { 
         setLamp("warn");
       });
+
+      // معالجة نجاح الانضمام
+      const handleJoinSuccess = (data = {}) => {
+        setLoading(false);
+        const code = data.roomCode || data.code || data.room || "";
+        if (code) {
+          showToast("✓ تم الانضمام");
+          setTimeout(() => {
+            window.location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
+          }, 300);
+        }
+      };
+
+      socket.on("player:joined", handleJoinSuccess);
+      socket.on("join:success", handleJoinSuccess);
+      socket.on("room:joined", handleJoinSuccess);
+
+      // معالجة فشل الانضمام
+      const handleJoinError = (data = {}) => {
+        setLoading(false);
+        showError(data.message || data.msg || data.error || "حدث خطأ أثناء الانضمام");
+      };
+
+      socket.on("join:error", handleJoinError);
+      socket.on("player:error", handleJoinError);
+      socket.on("error", handleJoinError);
 
       const nameInput = document.getElementById("name");
       const roomFromUrl = (new URL(location.href).searchParams.get("room") || "").trim().toUpperCase();
@@ -1125,26 +1153,26 @@
         saveLastRoom(rc.value);
 
         setLoading(true);
-        socket.emit("player:join", { 
+        
+        const payload = { 
           roomCode: rc.value,
           name: nm.value,
           clientId 
-        });
-      }
+        };
 
-      socket.on("join:error", ({ message } = {}) => {
-        setLoading(false);
-        showError(message || "حدث خطأ أثناء الانضمام");
-      });
+        // إرسال طلبات متعددة
+        socket.emit("player:join", payload);
+        socket.emit("join:room", payload);
+        socket.emit("room:join", payload);
 
-      socket.on("player:joined", ({ roomCode: rc } = {}) => {
-        setLoading(false);
-        const code = String(rc || "").trim().toUpperCase();
-        showToast("✓ تم الانضمام");
+        // Safety timeout
         setTimeout(() => {
-          location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
-        }, 300);
-      });
+          if (document.getElementById("joinBtn").classList.contains("loading")) {
+            setLoading(false);
+            showError("انتهت مهلة الانتظار - تحقق من كود الغرفة");
+          }
+        }, 10000);
+      }
     }
 
     if (document.readyState === 'loading') {
