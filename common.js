@@ -1,6 +1,5 @@
 // ====== CONFIG ======
-// غيّر هذا السطر فقط إذا تغيّر رابط السيرفر:
-const SERVER_URL = "https://gamehub-server-okv5.onrender.com";
+const SERVER_URL = "https://api.gamehub4u.com"; // ✅ هذا هو الجديد
 
 // ====== Helpers ======
 const WEB_ORIGIN = location.origin;
@@ -59,7 +58,7 @@ function loadProfile() {
   return { name: localStorage.getItem("gh_name") || "" };
 }
 
-// ====== Socket.io Loader (بدون وسم script ثابت) ======
+// ====== Socket.io Loader (تحميل تلقائي من api) ======
 function ensureSocketIoLoaded() {
   if (window.io) return Promise.resolve();
 
