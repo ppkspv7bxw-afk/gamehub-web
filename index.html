@@ -11,9 +11,7 @@
     <div class="card">
       <div class="header">
         <div class="brand">
-          <div class="title">
-            <div>Gamehub4u</div>
-          </div>
+          <div class="title"><div>Gamehub4u</div></div>
         </div>
 
         <div class="status">
@@ -38,9 +36,7 @@
           </div>
 
           <div class="panel">
-            <div class="hint" style="margin:0;">
-              اكتب الكود واسمك ثم Join — أو Host لإنشاء غرفة.
-            </div>
+            <div class="hint" style="margin:0;">اكتب الكود واسمك ثم Join — أو Host لإنشاء غرفة.</div>
           </div>
         </div>
       </div>
@@ -78,11 +74,11 @@
       try {
         socket = await createSocket();
       } catch (e) {
-        showToast("Socket load failed");
+        // common.js بيحوّل الحالة إلى Offline تلقائيًا
         return;
       }
 
-      bindStatusLight(socket, document.getElementById("light"));
+      bindStatusLight(socket);
       setupReconnectOverlay(socket);
 
       hostBtn.onclick = () => location.href = WEB_ORIGIN + "/host.html";
@@ -106,9 +102,7 @@
         socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
       };
 
-      socket.on("join:error", ({ message } = {}) => {
-        showToast(message || "Join error");
-      });
+      socket.on("join:error", ({ message } = {}) => showToast(message || "Join error"));
 
       socket.on("player:joined", ({ roomCode: rc } = {}) => {
         const code = (rc || "").trim().toUpperCase();
