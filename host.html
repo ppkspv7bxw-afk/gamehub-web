@@ -237,7 +237,6 @@
   <div class="blob c"></div>
 
   <div class="wrap">
-
     <div class="logoTop">
       <img class="logoImg" src="/logo.png" alt="Logo">
     </div>
@@ -259,15 +258,15 @@
         <div class="btnRow">
           <button id="createBtn" class="btn" type="button">
             <span class="spinner"></span>
-            <span>إنشاء روم</span>
+            <span id="createText">إنشاء روم</span>
           </button>
+          <button id="cancelBtn" class="btn secondary small" type="button" disabled>إلغاء</button>
           <button id="copyCodeBtn" class="btn secondary small" type="button">نسخ الكود</button>
           <button id="copyLinkBtn" class="btn secondary small" type="button">نسخ رابط</button>
         </div>
       </div>
 
       <div class="btnRow">
-        <button id="startMafiaBtn" class="btn secondary" type="button">بدء المافيا</button>
         <button id="backBtn" class="btn secondary" type="button">رجوع</button>
       </div>
     </section>
@@ -331,16 +330,20 @@
       el.textContent = v || "----";
       if (v) localStorage.setItem("gh_lastRoom", v);
     }
-
     function getRoomCode(){
       const v = document.getElementById("roomCode").textContent.trim();
       return v === "----" ? "" : v;
     }
 
-    function setLoading(btn, on){
+    function setLoadingCreate(on){
+      const btn = document.getElementById("createBtn");
+      const txt = document.getElementById("createText");
+      const cancel = document.getElementById("cancelBtn");
       if (!btn) return;
       btn.classList.toggle("loading", !!on);
       btn.disabled = !!on;
+      if (txt) txt.textContent = on ? "جاري الإنشاء..." : "إنشاء روم";
+      if (cancel) cancel.disabled = !on;
     }
 
     async function copyText(text){
@@ -374,29 +377,58 @@
       socket.on("connect_error", ()=> setLamp("warn"));
 
       const createBtn = document.getElementById("createBtn");
+      const cancelBtn = document.getElementById("cancelBtn");
       const copyCodeBtn = document.getElementById("copyCodeBtn");
       const copyLinkBtn = document.getElementById("copyLinkBtn");
-      const startMafiaBtn = document.getElementById("startMafiaBtn");
 
-      // ✅ Create Room
+      // ✅ Fast create with timeout + cancel
+      let waiting = false;
+      let timeoutId = null;
+
+      function stopWaiting(){
+        waiting = false;
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = null;
+        setLoadingCreate(false);
+      }
+
+      function startWaiting(){
+        waiting = true;
+        setLoadingCreate(true);
+        // If no response in 6s: show message but don't break
+        timeoutId = setTimeout(() => {
+          if (!waiting) return;
+          showError("تأخر إنشاء الروم… جرّب مره ثانية");
+          stopWaiting();
+        }, 6000);
+      }
+
       createBtn.onclick = () => {
         showError("");
-        setLoading(createBtn, true);
+        startWaiting();
         socket.emit("host:createRoom");
       };
 
-      // Expected response: { roomCode }
+      cancelBtn.onclick = () => {
+        showError("");
+        stopWaiting();
+        showToast("تم الإلغاء");
+      };
+
       socket.on("host:roomCreated", ({ roomCode } = {}) => {
-        setLoading(createBtn, false);
-        if (!roomCode) return showError("فشل إنشاء الروم");
+        if (!roomCode) {
+          showError("فشل إنشاء الروم");
+          stopWaiting();
+          return;
+        }
         setRoomCode(roomCode);
         showToast("تم");
+        stopWaiting();
       });
 
-      // If your server emits a different error event, this still won't break.
       socket.on("host:error", ({ message } = {}) => {
-        setLoading(createBtn, false);
         showError(message || "خطأ");
+        stopWaiting();
       });
 
       copyCodeBtn.onclick = async () => {
@@ -412,32 +444,15 @@
         await copyText(link);
       };
 
-      // ✅ Start Mafia (optional)
-      startMafiaBtn.onclick = () => {
-        const code = getRoomCode();
-        if (!code) return showToast("—");
-        socket.emit("mafia:start", { roomCode: code });
-        showToast("تم");
-      };
-
-      // Show server start errors (if exists)
-      socket.on("start:error", ({ message, minPlayers } = {}) => {
-        const msg = message === "NEED_MIN_PLAYERS"
-          ? ("عدد اللاعبين غير كافي: " + (minPlayers || 0))
-          : (message || "خطأ");
-        showError(msg);
-      });
-
-      // Auto-load last room code if exists
-      const last = (localStorage.getItem("gh_lastRoom") || "").trim();
-      if (last) setRoomCode(last);
-
-      // Back
-      document.getElementById("backBtn").onclick = () => location.href = WEB_ORIGIN + "/";
-
-      // Safety: if host page opened with ?room=XXXX use it
+      // Auto-load last room if exists (nice)
       const fromUrl = (new URL(location.href).searchParams.get("room") || "").trim();
       if (fromUrl) setRoomCode(fromUrl);
+      else {
+        const last = (localStorage.getItem("gh_lastRoom") || "").trim();
+        if (last) setRoomCode(last);
+      }
+
+      document.getElementById("backBtn").onclick = () => location.href = WEB_ORIGIN + "/";
     }
 
     start();
