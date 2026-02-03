@@ -1,13 +1,12 @@
 const PRIMARY_SERVER_URL = "https://api.gamehub4u.com";
-const FALLBACK_SERVER_URL = "https://gamehub-server-okv5.onrender.com";
+const BACKUP_SERVER_URL = "https://gamehub-server-okv5.onrender.com"; // احتياطي صامت
 
 let SERVER_URL = PRIMARY_SERVER_URL;
 
 const WEB_ORIGIN = location.origin;
 
 function getParam(key) {
-  const url = new URL(location.href);
-  return url.searchParams.get(key);
+  return new URL(location.href).searchParams.get(key);
 }
 
 function setStatus(text, cls) {
@@ -31,11 +30,7 @@ function showToast(msg) {
 }
 
 function normalizeRoom(s) {
-  return String(s || "")
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
-    .slice(0, 6);
+  return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
 }
 
 function validateRoomCode(s) {
@@ -53,9 +48,7 @@ function validateName(s) {
 function getOrCreateClientId() {
   let id = localStorage.getItem("gh_clientId");
   if (!id) {
-    id = crypto.randomUUID
-      ? crypto.randomUUID()
-      : "cid_" + Math.random().toString(16).slice(2);
+    id = crypto.randomUUID ? crypto.randomUUID() : "cid_" + Math.random().toString(16).slice(2);
     localStorage.setItem("gh_clientId", id);
   }
   return id;
@@ -69,13 +62,25 @@ function loadProfile() {
   return { name: localStorage.getItem("gh_name") || "" };
 }
 
-function loadScript(src) {
+function loadScriptWithTimeout(src, ms = 6000) {
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
+    const timer = setTimeout(() => {
+      s.remove();
+      reject(new Error("timeout"));
+    }, ms);
+
     s.src = src;
     s.async = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error("Failed to load: " + src));
+    s.onload = () => {
+      clearTimeout(timer);
+      resolve(true);
+    };
+    s.onerror = () => {
+      clearTimeout(timer);
+      reject(new Error("load_error"));
+    };
+
     document.head.appendChild(s);
   });
 }
@@ -83,36 +88,62 @@ function loadScript(src) {
 async function ensureSocketIoLoaded() {
   if (window.io) return true;
 
+  // جرّب الأساسي
   setStatus("Connecting...", "warn");
   try {
     SERVER_URL = PRIMARY_SERVER_URL;
-    await loadScript(`${SERVER_URL}/socket.io/socket.io.js`);
+    await loadScriptWithTimeout(`${SERVER_URL}/socket.io/socket.io.js`, 6000);
     return true;
-  } catch (e) {
-    // fallback (يمنع التعليق)
+  } catch (_) {
+    // جرّب الاحتياطي (صامت)
     try {
-      SERVER_URL = FALLBACK_SERVER_URL;
-      await loadScript(`${SERVER_URL}/socket.io/socket.io.js`);
-      showToast("Fallback server ✅");
+      SERVER_URL = BACKUP_SERVER_URL;
+      await loadScriptWithTimeout(`${SERVER_URL}/socket.io/socket.io.js`, 6000);
       return true;
-    } catch (e2) {
+    } catch (_) {
       setStatus("Offline", "bad");
-      throw e2;
+      throw new Error("socketio_failed");
     }
   }
 }
 
+function connectSocketWithTimeout(ms = 6000) {
+  return new Promise((resolve, reject) => {
+    let done = false;
+
+    const socket = io(SERVER_URL, {
+      transports: ["websocket", "polling"],
+      auth: { clientId },
+    });
+
+    const timer = setTimeout(() => {
+      if (done) return;
+      done = true;
+      try { socket.close(); } catch {}
+      reject(new Error("connect_timeout"));
+    }, ms);
+
+    socket.once("connect", () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve(socket);
+    });
+
+    socket.once("connect_error", () => {
+      // نخلي التايمر يتصرف (عشان ما يعلق)
+    });
+  });
+}
+
 async function createSocket() {
   await ensureSocketIoLoaded();
-  const socket = io(SERVER_URL, {
-    transports: ["websocket", "polling"],
-    auth: { clientId },
-  });
-  return socket;
+  return await connectSocketWithTimeout(6000);
 }
 
 function bindStatusLight(socket) {
   setStatus("Disconnected", "bad");
+
   socket.on("connect", () => setStatus("Connected", "ok"));
   socket.on("disconnect", () => setStatus("Disconnected", "bad"));
   socket.on("connect_error", () => setStatus("Connecting...", "warn"));
