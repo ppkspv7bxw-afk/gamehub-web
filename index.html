@@ -4,203 +4,112 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Gamehub4u</title>
-
   <style>
-    :root{
-      --bg0: #0a0415;
-      --bg1: #1a0820;
-      --card: rgba(255,255,255,.08);
-      --stroke: rgba(255,255,255,.16);
-      --text: rgba(255,255,255,.94);
-      --muted: rgba(255,255,255,.65);
-      --primary: #ff1b3a;
-      --secondary: #ff3d6b;
-      --ok: #22c55e;
-      --warn: #fbbf24;
-      --bad: #ff2d55;
-      --radius: 20px;
-      --radius-sm: 14px;
-    }
-
-    *{ box-sizing: border-box; margin: 0; padding: 0; }
-
+    *{box-sizing:border-box;margin:0;padding:0}
     body{
-      min-height: 100vh;
-      color: var(--text);
-      font-family: system-ui, -apple-system, sans-serif;
-      background: linear-gradient(165deg, var(--bg0), var(--bg1));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      min-height:100vh;
+      color:#fff;
+      font-family:system-ui,sans-serif;
+      background:linear-gradient(165deg,#0a0415,#1a0820);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px
     }
-
     .wrap{
-      width: min(500px, 100%);
-      background: var(--card);
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      padding: 30px;
-      backdrop-filter: blur(16px);
+      width:min(500px,100%);
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:20px;
+      padding:30px;
+      backdrop-filter:blur(16px)
     }
-
-    .logo{
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .logo img{
-      width: min(300px, 80vw);
-      height: auto;
-    }
-
-    h1{
-      font-size: 24px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .form-group{
-      margin-bottom: 20px;
-    }
-
+    .logo{text-align:center;margin-bottom:30px}
+    .logo img{width:min(300px,80vw);height:auto}
+    h1{font-size:24px;margin-bottom:20px;text-align:center}
+    .form-group{margin-bottom:20px}
     label{
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 8px;
+      display:block;
+      font-size:14px;
+      font-weight:600;
+      color:rgba(255,255,255,.65);
+      margin-bottom:8px
     }
-
     .code-boxes{
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      margin-bottom:20px
     }
-
     .code-box{
-      width: 50px;
-      height: 60px;
-      border: 2px solid var(--stroke);
-      background: rgba(0,0,0,.3);
-      color: var(--text);
-      font-size: 24px;
-      font-weight: 800;
-      text-align: center;
-      border-radius: 12px;
-      outline: none;
-      text-transform: uppercase;
+      width:50px;
+      height:60px;
+      border:2px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.3);
+      color:#fff;
+      font-size:24px;
+      font-weight:800;
+      text-align:center;
+      border-radius:12px;
+      outline:none;
+      text-transform:uppercase
     }
-
     .code-box:focus{
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(255,61,107,.2);
+      border-color:#ff3d6b;
+      box-shadow:0 0 0 3px rgba(255,61,107,.2)
     }
-
     input[type="text"]{
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid var(--stroke);
-      background: rgba(0,0,0,.3);
-      color: var(--text);
-      font-size: 16px;
-      border-radius: 12px;
-      outline: none;
+      width:100%;
+      padding:12px 16px;
+      border:2px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.3);
+      color:#fff;
+      font-size:16px;
+      border-radius:12px;
+      outline:none
     }
-
     input[type="text"]:focus{
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(255,61,107,.2);
+      border-color:#ff3d6b;
+      box-shadow:0 0 0 3px rgba(255,61,107,.2)
     }
-
     .btn{
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      color: white;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      cursor: pointer;
-      transition: transform 0.2s;
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:700;
+      color:#fff;
+      background:linear-gradient(135deg,#ff1b3a,#ff3d6b);
+      cursor:pointer;
+      transition:transform .2s
     }
-
-    .btn:hover{
-      transform: translateY(-2px);
-    }
-
-    .btn:disabled{
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
+    .btn:hover{transform:translateY(-2px)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
     .btn.secondary{
-      background: rgba(255,255,255,.1);
-      margin-top: 10px;
+      background:rgba(255,255,255,.1);
+      margin-top:10px
     }
-
     .error{
-      background: rgba(255,45,85,.1);
-      border: 1px solid rgba(255,45,85,.3);
-      color: #ffaab8;
-      padding: 12px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      font-size: 14px;
-      display: none;
+      background:rgba(255,45,85,.1);
+      border:1px solid rgba(255,45,85,.3);
+      color:#ffaab8;
+      padding:12px;
+      border-radius:12px;
+      margin-bottom:15px;
+      font-size:14px;
+      display:none
     }
-
-    .error.show{
-      display: block;
-    }
-
-    .status{
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--bad);
-    }
-
-    .status.ok{ background: var(--ok); }
-    .status.warn{ background: var(--warn); }
-
-    .spinner{
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin{
-      to{ transform: rotate(360deg); }
-    }
-
-    .loading .spinner{
-      margin-left: 10px;
-    }
+    .error.show{display:block}
   </style>
 </head>
-
 <body>
-  <div class="status" id="status"></div>
-
   <div class="wrap">
     <div class="logo">
       <img src="/logo.png" alt="Gamehub4u">
     </div>
-
     <h1>انضم للعبة</h1>
-
     <div class="error" id="error"></div>
-
     <div class="form-group">
       <label>كود الغرفة</label>
       <div class="code-boxes">
@@ -210,109 +119,54 @@
         <input type="text" class="code-box" maxlength="1" id="c3">
       </div>
     </div>
-
     <div class="form-group">
       <label for="name">اسمك</label>
       <input type="text" id="name" placeholder="مثال: محمد" maxlength="20">
     </div>
-
     <button class="btn" id="joinBtn">انضم الآن</button>
     <button class="btn secondary" id="hostBtn">استضف غرفة</button>
   </div>
-
   <script>
-    const SERVER = "https://api.gamehub4u.com";
-    const boxes = [0,1,2,3].map(i => document.getElementById('c'+i));
-    const nameInput = document.getElementById('name');
-    const joinBtn = document.getElementById('joinBtn');
-    const hostBtn = document.getElementById('hostBtn');
-    const error = document.getElementById('error');
-    const status = document.getElementById('status');
-
-    function showError(msg){
-      error.textContent = msg;
-      error.classList.add('show');
-    }
-
-    function hideError(){
-      error.classList.remove('show');
-    }
-
-    function getCode(){
-      return boxes.map(b => b.value.toUpperCase()).join('');
-    }
-
-    boxes.forEach((box, i) => {
-      box.addEventListener('input', (e) => {
-        box.value = box.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        if(box.value && i < 3) boxes[i+1].focus();
+    const boxes=[0,1,2,3].map(i=>document.getElementById('c'+i));
+    const nameInput=document.getElementById('name');
+    const joinBtn=document.getElementById('joinBtn');
+    const error=document.getElementById('error');
+    function showError(msg){error.textContent=msg;error.classList.add('show')}
+    function hideError(){error.classList.remove('show')}
+    function getCode(){return boxes.map(b=>b.value.toUpperCase()).join('')}
+    boxes.forEach((box,i)=>{
+      box.addEventListener('input',()=>{
+        box.value=box.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+        if(box.value&&i<3)boxes[i+1].focus()
       });
-
-      box.addEventListener('keydown', (e) => {
-        if(e.key === 'Backspace' && !box.value && i > 0) boxes[i-1].focus();
-        if(e.key === 'Enter') join();
-      });
+      box.addEventListener('keydown',e=>{
+        if(e.key==='Backspace'&&!box.value&&i>0)boxes[i-1].focus();
+        if(e.key==='Enter')join()
+      })
     });
-
-    nameInput.addEventListener('keydown', (e) => {
-      if(e.key === 'Enter') join();
-    });
-
-    hostBtn.onclick = () => {
-      window.location.href = '/host.html';
-    };
-
-    joinBtn.onclick = join;
-
+    nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')join()});
+    document.getElementById('hostBtn').onclick=()=>location.href='/host.html';
+    joinBtn.onclick=join;
     function join(){
       hideError();
-      
-      const code = getCode();
-      const name = nameInput.value.trim();
-
-      if(code.length !== 4){
-        showError('الرجاء إدخال كود مكون من 4 أحرف');
-        return;
-      }
-
-      if(name.length < 2){
-        showError('الرجاء إدخال اسم صحيح');
-        return;
-      }
-
-      joinBtn.disabled = true;
-      joinBtn.innerHTML = 'جاري الانضمام... <span class="spinner"></span>';
-
-      // حفظ البيانات
-      localStorage.setItem('gh_name', name);
-      localStorage.setItem('gh_lastRoom', code);
-
-      // الانتقال للوبي مباشرة بعد ثانية
-      setTimeout(() => {
-        window.location.href = `/lobby.html?room=${code}`;
-      }, 1000);
+      const code=getCode();
+      const name=nameInput.value.trim();
+      if(code.length!==4)return showError('الرجاء إدخال كود مكون من 4 أحرف');
+      if(name.length<2)return showError('الرجاء إدخال اسم صحيح');
+      joinBtn.disabled=true;
+      joinBtn.textContent='جاري الانضمام...';
+      localStorage.setItem('gh_name',name);
+      localStorage.setItem('gh_lastRoom',code);
+      setTimeout(()=>location.href=`/lobby.html?room=${code}`,1000)
     }
-
-    // تحميل آخر اسم
-    const savedName = localStorage.getItem('gh_name');
-    if(savedName) nameInput.value = savedName;
-
-    // تحميل كود من URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomFromUrl = urlParams.get('room');
+    const savedName=localStorage.getItem('gh_name');
+    if(savedName)nameInput.value=savedName;
+    const urlParams=new URLSearchParams(location.search);
+    const roomFromUrl=urlParams.get('room');
     if(roomFromUrl){
-      const chars = roomFromUrl.toUpperCase().split('');
-      chars.forEach((c, i) => {
-        if(boxes[i]) boxes[i].value = c;
-      });
+      const chars=roomFromUrl.toUpperCase().split('');
+      chars.forEach((c,i)=>{if(boxes[i])boxes[i].value=c})
     }
-
-    // محاولة الاتصال بالسيرفر (اختياري)
-    status.classList.add('warn');
-    
-    fetch(SERVER + '/socket.io/socket.io.js')
-      .then(() => status.classList.add('ok'))
-      .catch(() => status.classList.add('bad'));
   </script>
 </body>
 </html>
