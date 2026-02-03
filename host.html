@@ -3,295 +3,444 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Host • Gamehub4u</title>
-  <link rel="stylesheet" href="/common.css"/>
+  <title>Host</title>
+
+  <style>
+    :root{
+      --bg0:#07030a;
+      --bg1:#14040e;
+
+      --card: rgba(255,255,255,.07);
+      --stroke: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.62);
+
+      --red1:#ff1b3a;
+      --red2:#ff3d6b;
+
+      --ok:#22c55e;
+      --warn:#fbbf24;
+      --bad:#ff2d55;
+
+      --shadow: 0 26px 80px rgba(0,0,0,.62);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Kufi Arabic", "Noto Sans Arabic", sans-serif;
+      background:
+        radial-gradient(1200px 720px at 18% 10%, rgba(255,27,58,.22), transparent 60%),
+        radial-gradient(1000px 720px at 86% 18%, rgba(255,61,107,.16), transparent 58%),
+        radial-gradient(900px 620px at 52% 92%, rgba(255,77,77,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:28px 14px 34px;
+    }
+
+    .blob{
+      position:fixed;
+      width:620px;height:620px;
+      border-radius:999px;
+      filter: blur(48px);
+      opacity:.22;
+      z-index:-1;
+      animation: float 14s ease-in-out infinite;
+      pointer-events:none;
+    }
+    .blob.a{ left:-240px; top:-220px; background: rgba(255,27,58,.95); }
+    .blob.b{ right:-280px; top:40px; background: rgba(255,61,107,.78); animation-duration: 18s; }
+    .blob.c{ left:18%; bottom:-320px; background: rgba(255,77,77,.46); animation-duration: 22s; }
+    @keyframes float{
+      0%,100%{ transform: translate(0,0) scale(1); }
+      50%{ transform: translate(28px, -22px) scale(1.06); }
+    }
+
+    .wrap{
+      width:min(980px, 100%);
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      align-items:stretch;
+    }
+
+    .logoTop{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:10px 0 4px;
+    }
+    .logoImg{
+      width:min(520px, 92vw);
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 16px 36px rgba(0,0,0,.62));
+      user-select:none;
+      -webkit-user-drag:none;
+      transform: translateZ(0);
+    }
+
+    .panel{
+      background: var(--card);
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow:hidden;
+      position:relative;
+    }
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(700px 320px at 15% 0%, rgba(255,27,58,.18), transparent 60%),
+        radial-gradient(700px 320px at 85% 18%, rgba(255,61,107,.12), transparent 60%);
+      pointer-events:none;
+    }
+    .panel > *{ position:relative; }
+
+    .card{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .topRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .lamp{
+      width:10px;height:10px;border-radius:50%;
+      background: var(--bad);
+      box-shadow: 0 0 0 4px rgba(255,45,85,.14);
+    }
+    .lamp.ok{ background: var(--ok); box-shadow: 0 0 0 4px rgba(34,197,94,.14); }
+    .lamp.warn{ background: var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.14); }
+    .lamp.bad{ background: var(--bad); box-shadow: 0 0 0 4px rgba(255,45,85,.14); }
+
+    .roomBox{
+      margin-top:6px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      border-radius: 18px;
+      padding:16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .roomCode{
+      direction:ltr;
+      font-weight:900;
+      letter-spacing: 6px;
+      font-size: 34px;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+    .muted{
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .btnRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .btn{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      padding:12px 14px;
+      cursor:pointer;
+      font-weight:800;
+      color:white;
+      background: linear-gradient(135deg, rgba(255,27,58,.95), rgba(255,61,107,.65));
+      transition: transform .08s ease, filter .2s ease, opacity .2s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+      min-width: 160px;
+    }
+    .btn:hover{ filter: brightness(1.06); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.secondary{
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+    }
+    .btn.small{ min-width: 140px; padding:10px 12px; }
+
+    .btn[disabled]{ opacity:.55; cursor:not-allowed; }
+
+    .spinner{
+      width:16px;height:16px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.35);
+      border-top-color: rgba(255,255,255,.95);
+      animation: spin 1s linear infinite;
+      display:none;
+    }
+    .btn.loading .spinner{ display:inline-block; }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+
+    .errorBox{
+      display:none;
+      border:1px solid rgba(255,45,85,.25);
+      background: rgba(255,45,85,.10);
+      color: rgba(255,220,226,.95);
+      padding:10px 12px;
+      border-radius: 14px;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .errorBox.show{ display:block; }
+
+    .toast{
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.78);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      font-size:13px;
+      backdrop-filter: blur(10px);
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+  </style>
 </head>
+
 <body>
+  <div class="blob a"></div>
+  <div class="blob b"></div>
+  <div class="blob c"></div>
+
   <div class="wrap">
-    <div class="card">
-      <div class="header">
-        <div class="brand">
-          <div class="title">
-            <div>Host Panel</div>
-            <small id="roomLabel">Room: ...</small>
-          </div>
+
+    <div class="logoTop">
+      <img class="logoImg" src="/logo.png" alt="Logo">
+    </div>
+
+    <section class="panel card">
+      <div class="topRow">
+        <div class="muted">Host</div>
+        <span id="lamp" class="lamp bad"></span>
+      </div>
+
+      <div id="err" class="errorBox"></div>
+
+      <div class="roomBox">
+        <div>
+          <div class="muted">Room Code</div>
+          <div id="roomCode" class="roomCode">----</div>
         </div>
 
-        <div class="status">
-          <span id="light" class="statusLight"></span>
-          <span id="statusText">...</span>
+        <div class="btnRow">
+          <button id="createBtn" class="btn" type="button">
+            <span class="spinner"></span>
+            <span>إنشاء روم</span>
+          </button>
+          <button id="copyCodeBtn" class="btn secondary small" type="button">نسخ الكود</button>
+          <button id="copyLinkBtn" class="btn secondary small" type="button">نسخ رابط</button>
         </div>
       </div>
 
-      <div class="content">
-        <div class="grid">
-          <div class="panel">
-            <div class="kv">
-              <div class="k">Room Code</div>
-              <div class="v"><span id="roomCode">...</span></div>
-            </div>
-            <div class="hint" style="margin-top:6px">
-              رابط الدعوة: <a id="inviteLink" href="#" target="_blank" rel="noopener">...</a>
-            </div>
-
-            <div class="hr"></div>
-
-            <div class="label">اسم الـ Host (اختياري تدخل كلاعب)</div>
-            <input id="hostName" class="input" placeholder="اسمك" maxlength="20" autocomplete="off"/>
-
-            <div class="row" style="margin-top:12px;">
-              <button id="joinAsPlayerBtn" class="btn secondary" type="button">Join as Player</button>
-              <button id="goLobbyBtn" class="btn ghost" type="button">Open Lobby</button>
-            </div>
-
-            <div class="hr"></div>
-
-            <div class="row">
-              <button id="toggleDevBtn" class="btn" type="button">Dev Mode: OFF</button>
-              <button id="startMafiaBtn" class="btn danger" type="button">Start Mafia</button>
-              <button id="nextBtn" class="btn secondary" type="button">Next Phase</button>
-            </div>
-
-            <div class="hint">
-              Dev Mode يخلّي المافيا تبدأ من لاعبين للتجربة.
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="label">Players</div>
-            <ul id="players" class="list"></ul>
-
-            <div class="hr"></div>
-
-            <div class="label">Mafia State</div>
-            <div class="kv"><div class="k">Phase</div><div class="v" id="phase">-</div></div>
-            <div class="kv"><div class="k">Round</div><div class="v" id="round">-</div></div>
-            <div class="kv"><div class="k">Winner</div><div class="v" id="winner">-</div></div>
-            <div class="hint" id="lastResult" style="margin-top:10px"></div>
-
-            <div class="hr"></div>
-
-            <div id="devBox" style="display:none">
-              <div class="label">Dev Tools</div>
-              <div class="row">
-                <button id="revealBtn" class="btn secondary" type="button">Reveal All Roles</button>
-              </div>
-              <div class="hint" id="revealOut" style="white-space:pre-wrap"></div>
-
-              <div class="hr"></div>
-
-              <div class="label">Set Role</div>
-              <select id="targetSel" class="select"></select>
-              <select id="roleSel" class="select" style="margin-top:8px">
-                <option value="mafia">mafia</option>
-                <option value="detective">detective</option>
-                <option value="doctor">doctor</option>
-                <option value="villager">villager</option>
-              </select>
-              <div class="row" style="margin-top:10px">
-                <button id="setRoleBtn" class="btn" type="button">Apply Role</button>
-                <button id="toggleAliveBtn" class="btn danger" type="button">Toggle Alive</button>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
+      <div class="btnRow">
+        <button id="startMafiaBtn" class="btn secondary" type="button">بدء المافيا</button>
+        <button id="backBtn" class="btn secondary" type="button">رجوع</button>
       </div>
-    </div>
-  </div>
-
-  <div id="overlay" class="overlay">
-    <div class="box">
-      <h3>انقطع الاتصال</h3>
-      <p>بنحاول نرجع الاتصال تلقائيًا…</p>
-    </div>
+    </section>
   </div>
 
   <div id="toast" class="toast">OK</div>
 
-  <script src="https://gamehub-server-okv5.onrender.com/socket.io/socket.io.js"></script>
-  <script src="/common.js"></script>
   <script>
-    const socket = createSocket();
-    bindStatusLight(socket, document.getElementById("light"));
-    setupReconnectOverlay(socket);
+    const SERVER_URL = "https://api.gamehub4u.com";
+    const WEB_ORIGIN = location.origin;
 
-    const roomEl = document.getElementById("roomCode");
-    const roomLabel = document.getElementById("roomLabel");
-    const inviteLink = document.getElementById("inviteLink");
-    const playersEl = document.getElementById("players");
-
-    const hostName = document.getElementById("hostName");
-    const joinAsPlayerBtn = document.getElementById("joinAsPlayerBtn");
-    const goLobbyBtn = document.getElementById("goLobbyBtn");
-
-    const toggleDevBtn = document.getElementById("toggleDevBtn");
-    const startMafiaBtn = document.getElementById("startMafiaBtn");
-    const nextBtn = document.getElementById("nextBtn");
-
-    const phaseEl = document.getElementById("phase");
-    const roundEl = document.getElementById("round");
-    const winnerEl = document.getElementById("winner");
-    const lastResultEl = document.getElementById("lastResult");
-
-    const devBox = document.getElementById("devBox");
-    const revealBtn = document.getElementById("revealBtn");
-    const revealOut = document.getElementById("revealOut");
-    const targetSel = document.getElementById("targetSel");
-    const roleSel = document.getElementById("roleSel");
-    const setRoleBtn = document.getElementById("setRoleBtn");
-    const toggleAliveBtn = document.getElementById("toggleAliveBtn");
-
-    const profile = loadProfile();
-    if(profile.name) hostName.value = profile.name;
-
-    let roomCode = (getParam("room") || "").trim().toUpperCase();
-    let devMode = false;
-
-    function setRoomUI(code){
-      roomCode = code;
-      roomEl.textContent = code;
-      roomLabel.textContent = "Room: " + code;
-      const link = WEB_ORIGIN + "/?room=" + encodeURIComponent(code);
-      inviteLink.textContent = link;
-      inviteLink.href = link;
-      setParam("room", code);
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      if (!t) return;
+      t.textContent = String(msg || "OK");
+      t.classList.add("show");
+      clearTimeout(showToast._tm);
+      showToast._tm = setTimeout(() => t.classList.remove("show"), 1600);
     }
 
-    function renderPlayers(state){
-      playersEl.innerHTML = "";
-      targetSel.innerHTML = "";
+    function showError(msg){
+      const err = document.getElementById("err");
+      if (!err) return;
+      if (!msg) { err.classList.remove("show"); err.textContent=""; return; }
+      err.textContent = String(msg);
+      err.classList.add("show");
+    }
 
-      const players = (state.players || []);
-      if(players.length === 0){
-        playersEl.innerHTML = `<li class="item"><div class="left"><span class="pill warn">Empty</span><div>لا يوجد لاعبين</div></div></li>`;
+    function setLamp(cls){
+      const lamp = document.getElementById("lamp");
+      if (!lamp) return;
+      lamp.classList.remove("ok","warn","bad");
+      lamp.classList.add(cls);
+    }
+
+    function loadScriptWithTimeout(src, ms=7000) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        const timer = setTimeout(() => { s.remove(); reject(new Error("timeout")); }, ms);
+        s.src = src;
+        s.async = true;
+        s.onload = () => { clearTimeout(timer); resolve(true); };
+        s.onerror = () => { clearTimeout(timer); reject(new Error("load_error")); };
+        document.head.appendChild(s);
+      });
+    }
+
+    function getOrCreateClientId() {
+      let id = localStorage.getItem("gh_clientId");
+      if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : ("cid_" + Math.random().toString(16).slice(2)));
+        localStorage.setItem("gh_clientId", id);
+      }
+      return id;
+    }
+    const clientId = getOrCreateClientId();
+
+    function setRoomCode(code){
+      const el = document.getElementById("roomCode");
+      const v = String(code || "").trim().toUpperCase();
+      el.textContent = v || "----";
+      if (v) localStorage.setItem("gh_lastRoom", v);
+    }
+
+    function getRoomCode(){
+      const v = document.getElementById("roomCode").textContent.trim();
+      return v === "----" ? "" : v;
+    }
+
+    function setLoading(btn, on){
+      if (!btn) return;
+      btn.classList.toggle("loading", !!on);
+      btn.disabled = !!on;
+    }
+
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(String(text||""));
+        showToast("تم");
+      }catch(_){
+        showToast("ما قدرنا");
+      }
+    }
+
+    async function start(){
+      setLamp("warn");
+      showError("");
+
+      try{
+        await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
+      }catch(_){
+        setLamp("bad");
+        showError("offline");
         return;
       }
 
-      for(const p of players){
-        const li = document.createElement("li");
-        li.className = "item";
-        li.innerHTML = `
-          <div class="left">
-            <span class="pill ${p.ready ? "ok":"warn"}">${p.ready ? "Ready":"Not Ready"}</span>
-            <div style="font-weight:900; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${p.name}</div>
-          </div>
-          <div class="pill">${p.clientId === state.hostClientId ? "HOST" : "PLAYER"}</div>
-        `;
-        playersEl.appendChild(li);
+      const socket = io(SERVER_URL, {
+        transports: ["websocket","polling"],
+        auth: { clientId }
+      });
 
-        const opt = document.createElement("option");
-        opt.value = p.clientId;
-        opt.textContent = p.name + " (" + p.clientId.slice(0,6) + ")";
-        targetSel.appendChild(opt);
-      }
-    }
+      socket.on("connect", ()=> setLamp("ok"));
+      socket.on("disconnect", ()=> setLamp("bad"));
+      socket.on("connect_error", ()=> setLamp("warn"));
 
-    function renderMafia(ms){
-      phaseEl.textContent = ms.started ? ms.phase : "not started";
-      roundEl.textContent = ms.started ? String(ms.round) : "-";
-      winnerEl.textContent = ms.winnerTeam || "-";
+      const createBtn = document.getElementById("createBtn");
+      const copyCodeBtn = document.getElementById("copyCodeBtn");
+      const copyLinkBtn = document.getElementById("copyLinkBtn");
+      const startMafiaBtn = document.getElementById("startMafiaBtn");
 
-      if(ms.lastResult){
-        lastResultEl.textContent = "Last: " + JSON.stringify(ms.lastResult);
-      }else{
-        lastResultEl.textContent = "";
-      }
-
-      devMode = !!ms.devMode;
-      toggleDevBtn.textContent = "Dev Mode: " + (devMode ? "ON" : "OFF");
-      devBox.style.display = devMode ? "block" : "none";
-    }
-
-    // Create room if no room param
-    socket.on("connect", () => {
-      if(!roomCode){
+      // ✅ Create Room
+      createBtn.onclick = () => {
+        showError("");
+        setLoading(createBtn, true);
         socket.emit("host:createRoom");
-      }else{
-        socket.emit("host:attach", { roomCode });
-      }
-    });
+      };
 
-    socket.on("room:created", ({ roomCode: rc } = {}) => {
-      const code = String(rc||"").trim().toUpperCase();
-      if(!code) return;
-      setRoomUI(code);
-      showToast("Room created ✅");
-    });
+      // Expected response: { roomCode }
+      socket.on("host:roomCreated", ({ roomCode } = {}) => {
+        setLoading(createBtn, false);
+        if (!roomCode) return showError("فشل إنشاء الروم");
+        setRoomCode(roomCode);
+        showToast("تم");
+      });
 
-    socket.on("host:attached", ({ roomCode: rc } = {}) => {
-      if(rc) setRoomUI(String(rc).trim().toUpperCase());
-    });
+      // If your server emits a different error event, this still won't break.
+      socket.on("host:error", ({ message } = {}) => {
+        setLoading(createBtn, false);
+        showError(message || "خطأ");
+      });
 
-    socket.on("host:attach:error", ({ message }={}) => showToast(message || "HOST_ATTACH_ERROR"));
+      copyCodeBtn.onclick = async () => {
+        const code = getRoomCode();
+        if (!code) return showToast("—");
+        await copyText(code);
+      };
 
-    socket.on("room:state", (state) => {
-      if(!state) return;
-      if(state.roomCode && !roomCode) setRoomUI(state.roomCode);
-      renderPlayers(state);
-    });
+      copyLinkBtn.onclick = async () => {
+        const code = getRoomCode();
+        if (!code) return showToast("—");
+        const link = WEB_ORIGIN + "/?room=" + encodeURIComponent(code);
+        await copyText(link);
+      };
 
-    socket.on("mafia:state", (ms) => renderMafia(ms));
-    socket.on("start:error", ({ message, minPlayers } = {}) => {
-      if(message === "NEED_MIN_PLAYERS") return showToast("Need players: " + minPlayers);
-      showToast(message || "Start error");
-    });
+      // ✅ Start Mafia (optional)
+      startMafiaBtn.onclick = () => {
+        const code = getRoomCode();
+        if (!code) return showToast("—");
+        socket.emit("mafia:start", { roomCode: code });
+        showToast("تم");
+      };
 
-    joinAsPlayerBtn.onclick = () => {
-      if(!roomCode) return showToast("No room");
-      const nm = validateName(hostName.value);
-      if(!nm.ok) return showToast(nm.msg);
-      saveProfile(nm.value);
-      socket.emit("host:joinAsPlayer", { roomCode, name: nm.value });
-      showToast("Joined as player ✅");
-    };
+      // Show server start errors (if exists)
+      socket.on("start:error", ({ message, minPlayers } = {}) => {
+        const msg = message === "NEED_MIN_PLAYERS"
+          ? ("عدد اللاعبين غير كافي: " + (minPlayers || 0))
+          : (message || "خطأ");
+        showError(msg);
+      });
 
-    goLobbyBtn.onclick = () => {
-      if(!roomCode) return showToast("No room");
-      location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(roomCode);
-    };
+      // Auto-load last room code if exists
+      const last = (localStorage.getItem("gh_lastRoom") || "").trim();
+      if (last) setRoomCode(last);
 
-    toggleDevBtn.onclick = () => {
-      if(!roomCode) return;
-      const next = !devMode;
-      socket.emit("host:setDevMode", { roomCode, enabled: next });
-    };
+      // Back
+      document.getElementById("backBtn").onclick = () => location.href = WEB_ORIGIN + "/";
 
-    startMafiaBtn.onclick = () => {
-      if(!roomCode) return;
-      socket.emit("mafia:start", { roomCode });
-    };
+      // Safety: if host page opened with ?room=XXXX use it
+      const fromUrl = (new URL(location.href).searchParams.get("room") || "").trim();
+      if (fromUrl) setRoomCode(fromUrl);
+    }
 
-    nextBtn.onclick = () => {
-      if(!roomCode) return;
-      socket.emit("mafia:next", { roomCode });
-    };
-
-    revealBtn.onclick = () => {
-      if(!roomCode) return;
-      socket.emit("mafia:revealAll", { roomCode });
-    };
-
-    socket.on("mafia:reveal", ({ list } = {}) => {
-      if(!Array.isArray(list)) return;
-      revealOut.textContent = list.map(x => `${x.name} • ${x.role} • ${x.alive ? "alive":"dead"}`).join("\n");
-    });
-
-    setRoleBtn.onclick = () => {
-      if(!roomCode) return;
-      const targetId = targetSel.value;
-      const role = roleSel.value;
-      socket.emit("mafia:setRole", { roomCode, targetId, role });
-      showToast("Role updated ✅");
-    };
-
-    toggleAliveBtn.onclick = () => {
-      if(!roomCode) return;
-      const targetId = targetSel.value;
-      socket.emit("mafia:toggleAlive", { roomCode, targetId });
-      showToast("Toggled ✅");
-    };
+    start();
   </script>
 </body>
 </html>
