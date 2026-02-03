@@ -16,9 +16,7 @@
 
         <div class="status">
           <span id="light" class="statusLight bad"></span>
-
-          <!-- ✅ موجود عشان JS ما ينكسر، لكنه مخفي -->
-          <span id="statusText" style="display:none;">Loading...</span>
+          <span id="statusText">Loading...</span>
         </div>
       </div>
 
@@ -126,6 +124,7 @@
     async function start() {
       setStatus("Connecting...", "warn");
 
+      // 1) حمل socket.io client من السيرفر
       try {
         await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
       } catch (e) {
@@ -134,6 +133,7 @@
         return;
       }
 
+      // 2) اتصل
       let socket;
       try {
         socket = io(SERVER_URL, {
@@ -154,6 +154,7 @@
       socket.on("disconnect", () => { setStatus("Disconnected", "bad"); showOv(); });
       socket.on("connect_error", () => { setStatus("Connecting...", "warn"); });
 
+      // UI
       const roomInput = document.getElementById("room");
       const nameInput = document.getElementById("name");
       const joinBtn   = document.getElementById("joinBtn");
@@ -188,7 +189,7 @@
         setTimeout(() => {
           location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
         }, 200);
-      };
+      });
     }
 
     start();
