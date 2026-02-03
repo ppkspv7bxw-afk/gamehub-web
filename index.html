@@ -457,3 +457,248 @@
       const t = document.getElementById("toast");
       if (!t) return;
       t.textContent = String(msg || "OK");
+      t.classList.add("show");
+      clearTimeout(showToast._tm);
+      showToast._tm = setTimeout(() => t.classList.remove("show"), 1600);
+    }
+
+    function showError(msg){
+      const err = document.getElementById("err");
+      if (!err) return;
+      if (!msg) { err.classList.remove("show"); err.textContent=""; return; }
+      err.textContent = String(msg);
+      err.classList.add("show");
+      err.classList.remove("shake");
+      void err.offsetWidth;
+      err.classList.add("shake");
+    }
+
+    function loadScriptWithTimeout(src, ms=7000) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        const timer = setTimeout(() => { s.remove(); reject(new Error("timeout")); }, ms);
+        s.src = src;
+        s.async = true;
+        s.onload = () => { clearTimeout(timer); resolve(true); };
+        s.onerror = () => { clearTimeout(timer); reject(new Error("load_error")); };
+        document.head.appendChild(s);
+      });
+    }
+
+    // ===== Code Boxes Helpers =====
+    const boxes = Array.from({length:6}, (_,i)=>document.getElementById("c"+i));
+
+    function getCode(){
+      return boxes.map(b => (b.value||"").toUpperCase()).join("").replace(/[^A-Z0-9]/g,"");
+    }
+
+    function setCode(code){
+      const clean = String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,6);
+      boxes.forEach((b,i)=> b.value = clean[i] || "");
+      if (clean.length < 6) boxes[clean.length]?.focus();
+    }
+
+    function markCodeInvalid(on){
+      boxes.forEach(b => b.classList.toggle("invalid", !!on));
+      if (on) {
+        boxes[0].classList.remove("shake");
+      }
+    }
+
+    function normalizeRoom(s) {
+      return String(s || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0,6);
+    }
+    function validateRoomCode(code) {
+      const v = normalizeRoom(code);
+      if (v.length < 3) return { ok:false, msg:"اكتب Room Code صحيح" };
+      return { ok:true, value:v };
+    }
+    function validateName(s) {
+      const v = String(s || "").trim().replace(/\s+/g," ").slice(0,20);
+      if (v.length < 2) return { ok:false, msg:"اكتب اسم (حرفين على الأقل)" };
+      return { ok:true, value:v };
+    }
+
+    // ===== Identity =====
+    function getOrCreateClientId() {
+      let id = localStorage.getItem("gh_clientId");
+      if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : ("cid_" + Math.random().toString(16).slice(2)));
+        localStorage.setItem("gh_clientId", id);
+      }
+      return id;
+    }
+    const clientId = getOrCreateClientId();
+
+    function saveProfile(name) { localStorage.setItem("gh_name", String(name||"")); }
+    function loadProfile() { return { name: localStorage.getItem("gh_name") || "" }; }
+
+    function saveLastRoom(code){ localStorage.setItem("gh_lastRoom", String(code||"")); }
+    function loadLastRoom(){ return localStorage.getItem("gh_lastRoom") || ""; }
+
+    function setLoading(on){
+      const btn = document.getElementById("joinBtn");
+      if (!btn) return;
+      btn.classList.toggle("loading", !!on);
+      btn.disabled = !!on;
+    }
+
+    // ===== Start App =====
+    async function start() {
+      setStatus("Connecting...", "warn");
+      document.getElementById("serverHint").textContent = "Server: " + SERVER_URL;
+
+      // Load socket.io client
+      try {
+        await loadScriptWithTimeout(SERVER_URL + "/socket.io/socket.io.js", 7000);
+      } catch (e) {
+        setStatus("Offline", "bad");
+        showError("ما قدرنا نحمل socket.io من api");
+        return;
+      }
+
+      // Connect
+      let socket;
+      try {
+        socket = io(SERVER_URL, {
+          transports: ["websocket","polling"],
+          auth: { clientId }
+        });
+      } catch (e) {
+        setStatus("Offline", "bad");
+        showError("تعذر تشغيل socket");
+        return;
+      }
+
+      // Connection UI
+      const ov = document.getElementById("overlay");
+      const showOv = () => ov && ov.classList.add("show");
+      const hideOv = () => ov && ov.classList.remove("show");
+
+      socket.on("connect", () => { setStatus("Connected", "ok"); hideOv(); });
+      socket.on("disconnect", () => { setStatus("Disconnected", "bad"); showOv(); });
+      socket.on("connect_error", () => { setStatus("Connecting...", "warn"); });
+
+      // Inputs
+      const nameInput = document.getElementById("name");
+      const joinBtn   = document.getElementById("joinBtn");
+      const hostBtn   = document.getElementById("hostBtn");
+
+      // Prefill
+      const roomFromUrl = (new URL(location.href).searchParams.get("room") || "").trim().toUpperCase();
+      const profile = loadProfile();
+      if (profile.name) nameInput.value = profile.name;
+      if (roomFromUrl) setCode(roomFromUrl);
+      else {
+        const last = loadLastRoom();
+        if (last) setCode(last);
+      }
+
+      // Boxes behavior (type, backspace, paste)
+      boxes.forEach((b, idx) => {
+        b.addEventListener("input", () => {
+          b.value = b.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,1);
+          showError("");
+          markCodeInvalid(false);
+          if (b.value && idx < boxes.length - 1) boxes[idx+1].focus();
+        });
+
+        b.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !b.value && idx > 0) {
+            boxes[idx-1].focus();
+          }
+          if (e.key === "Enter") doJoin();
+        });
+
+        b.addEventListener("paste", (e) => {
+          const text = (e.clipboardData || window.clipboardData).getData("text");
+          if (text) {
+            e.preventDefault();
+            setCode(text);
+          }
+        });
+      });
+
+      nameInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter") doJoin(); });
+      nameInput.addEventListener("input", ()=>{ showError(""); nameInput.classList.remove("invalid"); });
+
+      hostBtn.onclick = () => location.href = WEB_ORIGIN + "/host.html";
+
+      document.getElementById("clearBtn").onclick = () => {
+        setCode("");
+        nameInput.value = "";
+        showError("");
+        markCodeInvalid(false);
+        nameInput.classList.remove("invalid");
+        boxes[0].focus();
+      };
+
+      document.getElementById("lastRoomBtn").onclick = () => {
+        const last = loadLastRoom();
+        if (!last) return showToast("ما فيه آخر روم");
+        setCode(last);
+        showToast("تم");
+      };
+
+      document.getElementById("copyInviteBtn").onclick = async () => {
+        const code = getCode();
+        const rc = validateRoomCode(code);
+        if (!rc.ok) return showToast("اكتب كود صحيح أول");
+        const link = WEB_ORIGIN + "/?room=" + encodeURIComponent(rc.value);
+        try {
+          await navigator.clipboard.writeText(link);
+          showToast("تم نسخ الرابط ✅");
+        } catch {
+          showToast("ما قدرنا ننسخ");
+        }
+      };
+
+      joinBtn.onclick = () => doJoin();
+
+      function doJoin(){
+        showError("");
+        setLoading(false);
+
+        const code = getCode();
+        const rc = validateRoomCode(code);
+        if (!rc.ok) {
+          markCodeInvalid(true);
+          showError(rc.msg);
+          boxes[0].focus();
+          return;
+        }
+
+        const nm = validateName(nameInput.value);
+        if (!nm.ok) {
+          nameInput.classList.add("invalid");
+          showError(nm.msg);
+          nameInput.focus();
+          return;
+        }
+
+        saveProfile(nm.value);
+        saveLastRoom(rc.value);
+
+        setLoading(true);
+        socket.emit("player:join", { roomCode: rc.value, name: nm.value, clientId });
+      }
+
+      socket.on("join:error", ({ message } = {}) => {
+        setLoading(false);
+        showError(message || "Join error");
+      });
+
+      socket.on("player:joined", ({ roomCode: rc } = {}) => {
+        setLoading(false);
+        const code = String(rc || "").trim().toUpperCase();
+        showToast("Joined ✅");
+        setTimeout(() => {
+          location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
+        }, 200);
+      });
+    }
+
+    start();
+  </script>
+</body>
+</html>
