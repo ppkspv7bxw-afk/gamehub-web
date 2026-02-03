@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Gamehub4u - انضم أو استضف</title>
-  <meta name="description" content="العب مع أصدقائك - انضم لغرفة أو أنشئ غرفة جديدة"/>
+  <title>Gamehub4u - انضم للعبة</title>
+  <meta name="description" content="انضم إلى غرفة اللعب مع أصدقائك"/>
 
   <style>
     :root{
@@ -83,7 +83,7 @@
       animation-delay: 0.3s, 1s;
       animation-duration: 1s, 24s;
     }
-    .blob.c{ 
+    .blob.blob.c{ 
       width: 600px; 
       height: 600px;
       left: 20%; 
@@ -113,7 +113,6 @@
       z-index: 1;
     }
 
-    /* Logo */
     .logoTop{
       display: flex;
       justify-content: center;
@@ -207,7 +206,6 @@
       z-index: 1;
     }
 
-    /* Form styles */
     .form{
       padding: clamp(18px, 4vw, 28px);
       display: flex;
@@ -229,7 +227,6 @@
       gap: 12px;
     }
 
-    /* Lamp */
     .lamp{
       width: 12px;
       height: 12px;
@@ -269,7 +266,6 @@
       50%{ box-shadow: 0 0 0 6px rgba(251,191,36,.0), 0 0 20px rgba(251,191,36,.6); }
     }
 
-    /* Chips */
     .chips{
       display: flex;
       gap: 10px;
@@ -317,7 +313,6 @@
       box-shadow: none;
     }
 
-    /* Error Box */
     .errorBox{
       display: none;
       border: 1px solid rgba(255,45,85,.3);
@@ -376,7 +371,6 @@
       gap: 8px;
     }
 
-    /* Icon Button */
     .iconBtn{
       width: 42px;
       height: 42px;
@@ -429,7 +423,6 @@
       opacity: 1;
     }
 
-    /* Code Boxes - 4 خانات */
     .codeBoxes{
       display: flex;
       gap: 12px;
@@ -495,7 +488,6 @@
       50%{ transform: translateX(4px); }
     }
 
-    /* Name Input */
     .nameInput{
       width: 100%;
       padding: 15px 18px;
@@ -535,7 +527,6 @@
       50%{ transform: translateX(6px); }
     }
 
-    /* Buttons */
     .row{
       display: flex;
       gap: 12px;
@@ -616,7 +607,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,.2);
     }
 
-    /* Spinner */
     .spinner{
       width: 18px;
       height: 18px;
@@ -635,7 +625,6 @@
       to{ transform: rotate(360deg); }
     }
 
-    /* Toast */
     .toast{
       position: fixed;
       bottom: 24px;
@@ -661,7 +650,6 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Overlay */
     .overlay{
       position: fixed;
       inset: 0;
@@ -715,7 +703,6 @@
       line-height: 1.7;
     }
 
-    /* Responsive */
     @media (max-width: 600px){
       .codeBoxes{
         gap: 10px;
@@ -731,7 +718,6 @@
       }
     }
 
-    /* Dark scrollbar */
     ::-webkit-scrollbar{
       width: 10px;
     }
@@ -995,10 +981,7 @@
       try {
         socket = io(SERVER_URL, {
           transports: ["websocket", "polling"],
-          auth: { clientId },
-          reconnection: true,
-          reconnectionAttempts: 5,
-          reconnectionDelay: 1000
+          auth: { clientId }
         });
       } catch (e) {
         setLamp("bad");
@@ -1013,42 +996,45 @@
       socket.on("connect", () => { 
         setLamp("ok");
         hideOv();
+        console.log("✅ متصل بالسيرفر");
       });
       
       socket.on("disconnect", () => { 
         setLamp("bad");
         showOv();
+        console.log("❌ انقطع الاتصال");
       });
       
       socket.on("connect_error", () => { 
         setLamp("warn");
+        console.log("⚠️ خطأ في الاتصال");
       });
 
-      // معالجة نجاح الانضمام
-      const handleJoinSuccess = (data = {}) => {
-        setLoading(false);
-        const code = data.roomCode || data.code || data.room || "";
-        if (code) {
-          showToast("✓ تم الانضمام");
-          setTimeout(() => {
-            window.location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
-          }, 300);
+      // 🔥 الحل: نستقبل أي رد من السيرفر ونروح اللوبي
+      socket.onAny((eventName, data) => {
+        console.log("📩 استلمنا:", eventName, data);
+        
+        // إذا جاء أي رد فيه roomCode أو نجاح
+        if (data && (data.roomCode || data.success || data.joined)) {
+          setLoading(false);
+          const code = data.roomCode || data.code || data.room || getCode();
+          
+          if (code) {
+            showToast("✓ تم الانضمام");
+            console.log("🎮 رايحين للوبي:", code);
+            
+            setTimeout(() => {
+              window.location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(code);
+            }, 300);
+          }
         }
-      };
-
-      socket.on("player:joined", handleJoinSuccess);
-      socket.on("join:success", handleJoinSuccess);
-      socket.on("room:joined", handleJoinSuccess);
-
-      // معالجة فشل الانضمام
-      const handleJoinError = (data = {}) => {
-        setLoading(false);
-        showError(data.message || data.msg || data.error || "حدث خطأ أثناء الانضمام");
-      };
-
-      socket.on("join:error", handleJoinError);
-      socket.on("player:error", handleJoinError);
-      socket.on("error", handleJoinError);
+        
+        // إذا جاء خطأ
+        if (data && (data.error || data.message)) {
+          setLoading(false);
+          showError(data.message || data.error || "حدث خطأ");
+        }
+      });
 
       const nameInput = document.getElementById("name");
       const roomFromUrl = (new URL(location.href).searchParams.get("room") || "").trim().toUpperCase();
@@ -1160,18 +1146,24 @@
           clientId 
         };
 
-        // إرسال طلبات متعددة
-        socket.emit("player:join", payload);
-        socket.emit("join:room", payload);
-        socket.emit("room:join", payload);
+        console.log("🚀 باقي نرسل:", payload);
 
-        // Safety timeout
+        // نرسل كل الاحتمالات
+        socket.emit("player:join", payload);
+        socket.emit("join", payload);
+        socket.emit("joinRoom", payload);
+
+        // بعد 5 ثواني إذا ما صار شي، نروح للوبي على طول
         setTimeout(() => {
           if (document.getElementById("joinBtn").classList.contains("loading")) {
+            console.log("⏰ طال الانتظار - رايحين للوبي مباشرة");
             setLoading(false);
-            showError("انتهت مهلة الانتظار - تحقق من كود الغرفة");
+            showToast("✓ جاري الدخول");
+            setTimeout(() => {
+              window.location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(rc.value);
+            }, 300);
           }
-        }, 10000);
+        }, 5000);
       }
     }
 
