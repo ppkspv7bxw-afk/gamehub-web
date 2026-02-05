@@ -304,19 +304,25 @@
 
   <div id="toast" class="toast">Copied ✅</div>
 
-  <!-- ✅ IMPORTANT: load socket.io from Render server (NOT from gamehub4u) -->
-  <script src="https://jackbox-server-pwtr.onrender.com/socket.io/socket.io.js"></script>
+  <!-- ✅ Load socket.io from YOUR server -->
+  <script src="https://api.gamehub4u.com/socket.io/socket.io.js"></script>
 
   <script>
-    // ✅ IMPORTANT: connect to Render server
-    const SERVER_URL = "https://jackbox-server-pwtr.onrender.com";
-    const SITE_ORIGIN = "https://www.gamehub4u.com";
+    // ✅ YOUR endpoints
+    const SERVER_URL = "https://api.gamehub4u.com";
+    const SITE_ORIGIN = window.location.origin; // gamehub4u.com or www.gamehub4u.com
 
     function uuidFallback(){
       return "id-" + Date.now().toString(16) + "-" + Math.random().toString(16).slice(2);
     }
-    const clientId = localStorage.getItem("clientId") || (crypto && crypto.randomUUID ? crypto.randomUUID() : uuidFallback());
-    localStorage.setItem("clientId", clientId);
+
+    // ✅ clientId migration: prefer gh_clientId, fallback to clientId
+    let cid = localStorage.getItem("gh_clientId") || localStorage.getItem("clientId");
+    if (!cid) cid = (crypto && crypto.randomUUID ? crypto.randomUUID() : uuidFallback());
+    localStorage.setItem("gh_clientId", cid);
+    localStorage.setItem("clientId", cid); // keep compatibility
+
+    const clientId = cid;
 
     const light = document.getElementById("light");
     const countEl = document.getElementById("count");
@@ -375,9 +381,9 @@
       document.body.removeChild(ta);
     }
 
-    // ✅ QR from server as PNG
+    // ✅ QR (no server dependency)
     function renderQR(link){
-      qrImg.src = `${SERVER_URL}/qr?data=${encodeURIComponent(link)}&t=${Date.now()}`;
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(link)}&margin=8&t=${Date.now()}`;
     }
 
     function setMode(mode){
@@ -405,6 +411,11 @@
     modeDisplayBtn.onclick = () => setMode("display");
     modePlayerBtn.onclick = () => setMode("player");
 
+    function isReadyFlag(p){
+      // server uses isReady, some UIs use ready
+      return !!(p && (p.isReady || p.ready));
+    }
+
     function renderPlayers(players){
       playersEl.innerHTML = "";
       const list = players || [];
@@ -412,7 +423,7 @@
 
       list.forEach(p => {
         const div = document.createElement("div");
-        const ready = !!p.ready;
+        const ready = isReadyFlag(p);
         const isMe = myName && (p.name||"") === myName;
         div.className = "player";
         div.innerHTML = `
@@ -422,13 +433,14 @@
         playersEl.appendChild(div);
       });
 
-      const allReady = list.length > 0 && list.every(x => !!x.ready);
+      const allReady = list.length > 0 && list.every(x => isReadyFlag(x));
       startBtn.disabled = !roomCode || !allReady;
     }
 
     socket.on("connect", () => {
       light.classList.add("ok");
-      socket.emit("host:createRoom");
+      // Our server supports optional name/clientId in createRoom; safe to omit
+      socket.emit("host:createRoom", { clientId });
     });
 
     socket.on("disconnect", () => {
@@ -440,7 +452,8 @@
       copyBtn.disabled = true;
     });
 
-    socket.on("room:created", ({ roomCode: rc }) => {
+    // Our server emits host:roomCreated and room:created (keep both)
+    socket.on("host:roomCreated", ({ roomCode: rc } = {}) => {
       roomCode = normalizeRoom(rc);
       codeEl.textContent = roomCode;
 
@@ -451,9 +464,21 @@
       copyBtn.disabled = false;
     });
 
-    socket.on("room:state", ({ roomCode: rc, players }) => {
+    socket.on("room:created", ({ roomCode: rc } = {}) => {
+      if (!roomCode && rc) {
+        roomCode = normalizeRoom(rc);
+        codeEl.textContent = roomCode;
+        renderQR(roomLink(roomCode));
+        if (hostMode === "player") joinAsPlayerBtn.disabled = false;
+        copyBtn.disabled = false;
+      }
+    });
+
+    // Server broadcasts room:update / players:update
+    socket.on("room:update", (payload = {}) => {
+      const rc = payload.code || payload.roomCode;
       if (rc) roomCode = normalizeRoom(rc);
-      renderPlayers(players || []);
+      renderPlayers(payload.players || []);
       if (hostMode === "player") joinAsPlayerBtn.disabled = !roomCode || joinedAsPlayer;
 
       if (roomCode && codeEl.textContent.trim().startsWith("—")) {
@@ -462,17 +487,26 @@
       }
     });
 
+    socket.on("players:update", (payload = {}) => {
+      const rc = payload.code || payload.roomCode;
+      if (rc) roomCode = normalizeRoom(rc);
+      renderPlayers(payload.players || []);
+      if (hostMode === "player") joinAsPlayerBtn.disabled = !roomCode || joinedAsPlayer;
+    });
+
     socket.on("room:closed", () => {
       showToast("Room closed");
       setTimeout(() => window.location.href = "/", 600);
     });
 
     socket.on("join:error", ({ message } = {}) => showToast(message || "Join error"));
-    socket.on("start:error", ({ message } = {}) => showToast(message || "Cannot start"));
+    socket.on("game:error", ({ message } = {}) => showToast(message || "Cannot start"));
+    socket.on("room:error", ({ message } = {}) => showToast(message || "Room error"));
 
+    // ✅ Start (our server uses game:start, not host:startGame)
     startBtn.onclick = () => {
       if (!roomCode) return;
-      socket.emit("host:startGame", { roomCode });
+      socket.emit("game:start", { roomCode });
     };
 
     socket.on("game:started", ({ roomCode: rc } = {}) => {
@@ -486,35 +520,36 @@
       copyToClipboard(roomLink(roomCode));
     };
 
+    // Note: our server already adds host as player on createRoom.
+    // This button can be used to "attach" host identity after reload (and enable ready).
     joinAsPlayerBtn.onclick = () => {
       if (!roomCode) return;
       const nm = (myNameEl.value || "").trim();
       if (!nm) { showToast("Enter name"); return; }
       myName = nm;
-      socket.emit("player:join", { roomCode, name: nm, clientId });
-    };
 
-    socket.on("player:joined", ({ roomCode: rc, name } = {}) => {
-      const code = normalizeRoom(rc || "");
-      if (!code || code !== roomCode) return;
-      if (hostMode === "player" && name && name === myName){
-        joinedAsPlayer = true;
-        joinAsPlayerBtn.disabled = true;
-        readyMeBtn.disabled = false;
-        leaveMeBtn.disabled = false;
-      }
-    });
+      // Attach to existing host player via clientId (no duplicate join)
+      socket.emit("player:attach", { roomCode, clientId });
+
+      joinedAsPlayer = true;
+      joinAsPlayerBtn.disabled = true;
+      readyMeBtn.disabled = false;
+      leaveMeBtn.disabled = false;
+    };
 
     readyMeBtn.onclick = () => {
       if (!roomCode || !joinedAsPlayer) return;
       myReady = !myReady;
       readyMeBtn.textContent = myReady ? "Unready" : "Ready";
-      socket.emit("player:ready", { roomCode, ready: myReady, clientId });
+
+      // our server expects { isReady }, not { ready }
+      socket.emit("player:ready", { roomCode, isReady: myReady });
     };
 
     leaveMeBtn.onclick = () => {
       if (!roomCode || !joinedAsPlayer) return;
-      socket.emit("player:leave", { roomCode, clientId });
+      socket.emit("player:leave", { roomCode });
+
       joinedAsPlayer = false;
       myReady = false;
       myName = "";
