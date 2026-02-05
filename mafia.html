@@ -4,7 +4,46 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Mafia • Gamehub4u</title>
-  <link rel="stylesheet" href="/common.css"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;background:radial-gradient(1200px 600px at 70% -10%,rgba(255,61,107,.18),transparent 60%),linear-gradient(165deg,#08020f,#1a0820);color:#fff;font-family:system-ui,sans-serif;padding:28px 18px}
+    .wrap{max-width:980px;margin:0 auto}
+    .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:22px;backdrop-filter:blur(18px);overflow:hidden}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .title{font-weight:900;font-size:18px}
+    .title small{display:block;opacity:.7;font-weight:700;margin-top:6px;font-family:monospace}
+    .status{display:flex;align-items:center;gap:10px;font-size:12px;opacity:.85}
+    .statusLight{width:12px;height:12px;border-radius:50%;background:#fbbf24;box-shadow:0 0 10px #fbbf24}
+    .statusLight.ok{background:#22c55e;box-shadow:0 0 10px #22c55e}
+    .statusLight.bad{background:#ff2d55;box-shadow:0 0 10px #ff2d55}
+    .content{padding:18px}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:14px}
+    @media(max-width:920px){.grid{grid-template-columns:1fr}}
+    .panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px}
+    .kv{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+    .kv:last-child{border-bottom:0}
+    .k{font-size:12px;opacity:.7}
+    .v{font-weight:900}
+    .hr{height:1px;background:rgba(255,255,255,.08);margin:14px 0}
+    .label{font-size:13px;opacity:.75;font-weight:800;margin-bottom:8px}
+    .hint{font-size:12px;opacity:.75;line-height:1.7}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{padding:12px 14px;border:none;border-radius:12px;font-weight:900;color:#fff;background:linear-gradient(135deg,#ff1b3a,#ff3d6b);cursor:pointer}
+    .btn.secondary{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.14)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .select{padding:12px 12px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);color:#fff}
+    .list{list-style:none;display:flex;flex-direction:column;gap:10px}
+    .item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);padding:12px;border-radius:14px}
+    .pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.14)}
+    .pill.ok{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.12)}
+    .pill.bad{border-color:rgba(255,45,85,.35);background:rgba(255,45,85,.12)}
+    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:999}
+    .overlay.show{display:flex}
+    .overlay .box{width:min(420px,92vw);background:rgba(20,10,30,.92);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:18px}
+    .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(0,0,0,.92);color:#fff;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:800;opacity:0;transition:all .3s;z-index:1000}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
 </head>
 <body>
   <div class="wrap">
@@ -72,12 +111,80 @@
 
   <div id="toast" class="toast">OK</div>
 
-  <script src="https://gamehub-server-okv5.onrender.com/socket.io/socket.io.js"></script>
-  <script src="/common.js"></script>
   <script>
-    const socket = createSocket();
-    bindStatusLight(socket, document.getElementById("light"));
-    setupReconnectOverlay(socket);
+    const SERVER = "https://api.gamehub4u.com";
+    const WEB_ORIGIN = location.origin;
+
+    function getParam(k){
+      return new URLSearchParams(location.search).get(k);
+    }
+    function setParam(k,v){
+      const u=new URL(location.href);
+      u.searchParams.set(k,v);
+      history.replaceState({},'',u.toString());
+    }
+    function normalizeRoom(x){
+      return String(x||'').trim().toUpperCase();
+    }
+    function showToast(msg){
+      const t=document.getElementById('toast');
+      t.textContent=msg;
+      t.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t=setTimeout(()=>t.classList.remove('show'),1600);
+    }
+
+    // Stable client id
+    let clientId = localStorage.getItem('gh_clientId');
+    if(!clientId){
+      clientId = (crypto?.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now());
+      localStorage.setItem('gh_clientId', clientId);
+    }
+
+    let socket=null;
+    const overlay=document.getElementById('overlay');
+    const light=document.getElementById('light');
+    const statusText=document.getElementById('statusText');
+
+    function setLight(ok){
+      light.classList.remove('ok','bad');
+      if(ok===true) light.classList.add('ok');
+      else if(ok===false) light.classList.add('bad');
+      statusText.textContent = ok===true ? 'Connected' : (ok===false ? 'Disconnected' : 'Connecting...');
+    }
+
+    function connectSocket(){
+      setLight(null);
+      const s=document.createElement('script');
+      s.src=SERVER + '/socket.io/socket.io.js';
+      s.onload=()=>{
+        socket=io(SERVER,{ transports:['websocket','polling'], auth:{ clientId } });
+
+        socket.on('connect', ()=>{
+          setLight(true);
+          overlay.classList.remove('show');
+          onConnected();
+        });
+        socket.on('disconnect', ()=>{
+          setLight(false);
+          overlay.classList.add('show');
+        });
+        socket.io.on('reconnect_attempt', ()=>setLight(null));
+
+        // Mafia events
+        socket.on('mafia:state', (ms)=>render(ms));
+        socket.on('mafia:role', ({ role }={})=>{
+          // PRIVATE: only you receive your role
+          if(role) roleEl.textContent = role;
+        });
+      };
+      s.onerror=()=>{
+        setLight(false);
+        overlay.classList.add('show');
+        showToast('فشل تحميل Socket.IO');
+      };
+      document.head.appendChild(s);
+    }
 
     const roomLabel = document.getElementById("roomLabel");
     const phaseEl = document.getElementById("phase");
@@ -201,18 +308,12 @@
       lastResultEl.textContent = ms.lastResult ? ("Last Result:\n" + JSON.stringify(ms.lastResult, null, 2)) : "";
     }
 
-    socket.on("connect", () => {
-      if(!roomCode) return showToast("No room in URL");
+    function onConnected(){
+      if(!roomCode) return showToast('No room in URL');
       setRoomUI(roomCode);
-
-      socket.emit("player:attach", { roomCode, clientId });
-      socket.emit("mafia:getState", { roomCode, clientId });
-    });
-
-    socket.on("mafia:state", (ms) => render(ms));
-    socket.on("mafia:role", ({ role } = {}) => {
-      if(role) roleEl.textContent = role;
-    });
+      socket.emit('player:attach', { roomCode, clientId });
+      socket.emit('mafia:getState', { roomCode, clientId });
+    }
 
     doActionBtn.onclick = () => {
       if(!mafiaState) return;
@@ -235,6 +336,9 @@
     };
 
     lobbyBtn.onclick = () => location.href = WEB_ORIGIN + "/lobby.html?room=" + encodeURIComponent(roomCode);
+
+    // start
+    connectSocket();
   </script>
 </body>
 </html>
