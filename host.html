@@ -218,12 +218,7 @@
     function uuidFallback(){
       return "id-" + Date.now().toString(16) + "-" + Math.random().toString(16).slice(2);
     }
-    // ✅ Persistent identity (supports legacy "clientId" + new "gh_clientId")
-let __cid = localStorage.getItem('gh_clientId') || localStorage.getItem('clientId');
-if (!__cid) __cid = (crypto.randomUUID?.() || ('cid_' + Math.random().toString(36).slice(2)));
-localStorage.setItem('gh_clientId', __cid);
-localStorage.setItem('clientId', __cid); // legacy compatibility
-const clientId = __cid;
+    const clientId = localStorage.getItem("clientId") || (crypto && crypto.randomUUID ? crypto.randomUUID() : uuidFallback());
     localStorage.setItem("clientId", clientId);
 
     const light = document.getElementById("light");
