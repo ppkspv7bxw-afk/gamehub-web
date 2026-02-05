@@ -17,327 +17,64 @@
       padding:20px
     }
     .wrap{
-      width:min(500px,100%);
+      width:min(560px,100%);
       background:rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.16);
-      border-radius:20px;
-      padding:30px;
-      backdrop-filter:blur(16px)
+      border-radius:22px;
+      padding:34px 28px;
+      backdrop-filter:blur(16px);
+      text-align:center
     }
-    .logo{text-align:center;margin-bottom:30px}
-    .logo img{width:min(300px,80vw);height:auto}
-    h1{font-size:24px;margin-bottom:20px;text-align:center}
-    .form-group{margin-bottom:20px}
-    label{
-      display:block;
-      font-size:14px;
-      font-weight:600;
-      color:rgba(255,255,255,.65);
-      margin-bottom:8px
-    }
-    .code-boxes{
-      display:flex;
-      gap:10px;
-      justify-content:center;
-      margin-bottom:20px;
-      direction:ltr;
-      flex-direction:row-reverse
-    }
-    .code-box{
-      width:50px;
-      height:60px;
-      border:2px solid rgba(255,255,255,.16);
-      background:rgba(0,0,0,.3);
-      color:#fff;
-      font-size:24px;
-      font-weight:800;
-      text-align:center;
-      border-radius:12px;
-      outline:none;
-      text-transform:uppercase;
-      transition:all .2s
-    }
-    .code-box:focus{
-      border-color:#ff3d6b;
-      box-shadow:0 0 0 3px rgba(255,61,107,.2);
-      transform:translateY(-2px)
-    }
-    .code-box.invalid{
-      border-color:#ff2d55;
-      background:rgba(255,45,85,.08);
-      animation:shake .4s
-    }
-    @keyframes shake{
-      0%,100%{transform:translateX(0)}
-      25%,75%{transform:translateX(-4px)}
-      50%{transform:translateX(4px)}
-    }
-    input[type="text"]{
-      width:100%;
-      padding:12px 16px;
-      border:2px solid rgba(255,255,255,.16);
-      background:rgba(0,0,0,.3);
-      color:#fff;
-      font-size:16px;
-      border-radius:12px;
-      outline:none;
-      transition:all .2s
-    }
-    input[type="text"]:focus{
-      border-color:#ff3d6b;
-      box-shadow:0 0 0 3px rgba(255,61,107,.2)
-    }
-    input[type="text"].invalid{
-      border-color:#ff2d55;
-      background:rgba(255,45,85,.08)
-    }
+    .logo{margin-bottom:18px}
+    .logo img{width:min(340px,80vw);height:auto}
+    h1{font-size:22px;margin-bottom:8px}
+    p{font-size:13px;color:rgba(255,255,255,.65);line-height:1.7;margin-bottom:18px}
     .btn{
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:12px;
-      font-size:16px;
-      font-weight:700;
-      color:#fff;
+      width:100%;padding:14px;border:none;border-radius:12px;
+      font-size:16px;font-weight:800;color:#fff;
       background:linear-gradient(135deg,#ff1b3a,#ff3d6b);
-      cursor:pointer;
-      transition:transform .2s;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px
+      cursor:pointer;transition:transform .2s
     }
     .btn:hover{transform:translateY(-2px)}
-    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    .btn.secondary{
-      background:rgba(255,255,255,.1);
-      margin-top:10px
-    }
-    .error{
-      background:rgba(255,45,85,.1);
-      border:1px solid rgba(255,45,85,.3);
-      color:#ffaab8;
-      padding:12px;
-      border-radius:12px;
-      margin-bottom:15px;
-      font-size:14px;
-      display:none;
-      animation:slideIn .3s
-    }
-    .error.show{display:block}
-    @keyframes slideIn{
-      from{opacity:0;transform:translateY(-10px)}
-    }
-    .spinner{
-      width:16px;
-      height:16px;
-      border:2px solid rgba(255,255,255,.3);
-      border-top-color:#fff;
-      border-radius:50%;
-      animation:spin .8s linear infinite
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .status-dot{
-      position:fixed;
-      top:20px;
-      left:20px;
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      background:#ff2d55;
-      box-shadow:0 0 12px #ff2d55;
-      animation:pulse 2s infinite
-    }
-    .status-dot.ok{background:#22c55e;box-shadow:0 0 12px #22c55e}
-    .status-dot.warn{background:#fbbf24;box-shadow:0 0 12px #fbbf24}
-    @keyframes pulse{
-      0%,100%{opacity:1}
-      50%{opacity:.5}
-    }
+    .btn.secondary{margin-top:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18)}
+    .small{margin-top:14px;font-size:12px;color:rgba(255,255,255,.55)}
   </style>
 </head>
 <body>
-  <div class="status-dot" id="status"></div>
   <div class="wrap">
-    <div class="logo">
-      <img src="/logo.png" alt="Gamehub4u">
-    </div>
-    <h1>انضم للعبة</h1>
-    <div class="error" id="error"></div>
-    <div class="form-group">
-      <label>كود الغرفة</label>
-      <div class="code-boxes">
-        <input type="text" class="code-box" maxlength="1" id="c3" dir="ltr">
-        <input type="text" class="code-box" maxlength="1" id="c2" dir="ltr">
-        <input type="text" class="code-box" maxlength="1" id="c1" dir="ltr">
-        <input type="text" class="code-box" maxlength="1" id="c0" dir="ltr">
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="name">اسمك</label>
-      <input type="text" id="name" placeholder="مثال: محمد" maxlength="20">
-    </div>
-    <button class="btn" id="joinBtn">
-      <span id="btnText">انضم الآن</span>
-    </button>
-    <button class="btn secondary" id="hostBtn">استضف غرفة</button>
+    <div class="logo"><img src="/logo.png" alt="Gamehub4u"></div>
+    <h1>Gamehub4u</h1>
+    <p>اختر الدخول كضيف أو كمستضيف في الخطوة التالية.</p>
+    <button class="btn" id="go">دخول</button>
+    <button class="btn secondary" id="goLast" style="display:none">آخر غرفة</button>
+    <div class="small">إذا عندك رابط دعوة: افتحه مباشرة وسيتم تعبئة الكود تلقائياً.</div>
   </div>
+
   <script>
-    const SERVER='https://api.gamehub4u.com';
-    const boxes=[
-      document.getElementById('c0'),
-      document.getElementById('c1'),
-      document.getElementById('c2'),
-      document.getElementById('c3')
-    ];
-    const nameInput=document.getElementById('name');
-    const joinBtn=document.getElementById('joinBtn');
-    const btnText=document.getElementById('btnText');
-    const error=document.getElementById('error');
-    const status=document.getElementById('status');
-    let socket=null;
-    let isConnected=false;
+    const params=new URLSearchParams(location.search);
+    const room=params.get('room');
+    const last=localStorage.getItem('gh_lastRoom');
 
-    function showError(msg){
-      error.textContent=msg;
-      error.classList.add('show');
-      boxes.forEach(b=>b.classList.add('invalid'));
-      nameInput.classList.add('invalid')
-    }
-    function hideError(){
-      error.classList.remove('show');
-      boxes.forEach(b=>b.classList.remove('invalid'));
-      nameInput.classList.remove('invalid')
-    }
-    function getCode(){
-      return boxes.map(b=>b.value.toUpperCase()).join('')
-    }
-    function setLoading(on){
-      joinBtn.disabled=on;
-      if(on){
-        btnText.innerHTML='<span class="spinner"></span> جاري التحقق...'
-      }else{
-        btnText.textContent='انضم الآن'
-      }
+    const go=document.getElementById('go');
+    const goLast=document.getElementById('goLast');
+
+    function toHost(withRoom){
+      if(withRoom) location.href='/host.html?room='+encodeURIComponent(withRoom);
+      else location.href='/host.html';
     }
 
-    boxes.forEach((box,i)=>{
-      box.addEventListener('input',()=>{
-        box.value=box.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
-        hideError();
-        if(box.value&&i<3)boxes[i+1].focus()
-      });
-      box.addEventListener('keydown',e=>{
-        if(e.key==='Backspace'&&!box.value&&i>0)boxes[i-1].focus();
-        if(e.key==='Enter')join()
-      })
-    });
-
-    nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')join()});
-    document.getElementById('hostBtn').onclick=()=>location.href='/host.html';
-    joinBtn.onclick=join;
-
-    function join(){
-      hideError();
-      const code=getCode();
-      const name=nameInput.value.trim();
-
-      if(code.length!==4){
-        showError('الرجاء إدخال كود مكون من 4 أحرف');
-        boxes[0].focus();
-        return
-      }
-      if(name.length<2){
-        showError('الرجاء إدخال اسم صحيح (حرفين على الأقل)');
-        nameInput.focus();
-        return
-      }
-
-      setLoading(true);
-      localStorage.setItem('gh_name',name);
-      localStorage.setItem('gh_lastRoom',code);
-
-      if(isConnected&&socket){
-        socket.emit('room:check',{roomCode:code},(response)=>{
-          if(response&&response.exists){
-            socket.emit('player:join',{
-              roomCode:code,
-              name:name,
-              clientId:localStorage.getItem('gh_clientId')||makeId()
-            })
-          }else{
-            setLoading(false);
-            showError('الغرفة غير موجودة - تحقق من الكود')
-          }
-        })
-      }else{
-        setTimeout(()=>{
-          setLoading(false);
-          showError('غير متصل بالسيرفر - تحقق من الاتصال')
-        },2000)
-      }
+    // if opened from invite link (?room=XXXX) -> go directly to the choice page with prefilled code
+    if(room){
+      toHost(room);
     }
 
-    function makeId(){
-      const id='cid_'+Math.random().toString(36).slice(2);
-      localStorage.setItem('gh_clientId',id);
-      return id
+    if(last){
+      goLast.style.display='block';
+      goLast.textContent='آخر غرفة: '+last;
+      goLast.onclick=()=>toHost(last);
     }
 
-    const savedName=localStorage.getItem('gh_name');
-    if(savedName)nameInput.value=savedName;
-
-    const urlParams=new URLSearchParams(location.search);
-    const roomFromUrl=urlParams.get('room');
-    if(roomFromUrl){
-      const chars=roomFromUrl.toUpperCase().split('');
-      chars.forEach((c,i)=>{if(boxes[i])boxes[i].value=c})
-    }
-
-    status.classList.add('warn');
-    fetch(SERVER+'/socket.io/socket.io.js')
-      .then(()=>loadSocketIO())
-      .catch(()=>{
-        status.classList.remove('warn');
-        status.classList.add('bad')
-      });
-
-    function loadSocketIO(){
-      const script=document.createElement('script');
-      script.src=SERVER+'/socket.io/socket.io.js';
-      script.onload=()=>{
-        try{
-          socket=io(SERVER,{
-            transports:['websocket','polling'],
-            auth:{clientId:localStorage.getItem('gh_clientId')||makeId()}
-          });
-          socket.on('connect',()=>{
-            isConnected=true;
-            status.classList.remove('warn','bad');
-            status.classList.add('ok')
-          });
-          socket.on('disconnect',()=>{
-            isConnected=false;
-            status.classList.remove('ok');
-            status.classList.add('bad')
-          });
-          socket.on('player:joined',(data)=>{
-            setLoading(false);
-            if(data&&data.roomCode){
-              location.href=`/lobby.html?room=${data.roomCode}`
-            }
-          });
-          socket.on('join:error',(data)=>{
-            setLoading(false);
-            showError(data?.message||'حدث خطأ - تحقق من الكود')
-          })
-        }catch(e){
-          status.classList.add('bad')
-        }
-      };
-      script.onerror=()=>status.classList.add('bad');
-      document.head.appendChild(script)
-    }
+    go.onclick=()=>toHost('');
   </script>
 </body>
 </html>
