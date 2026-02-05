@@ -11,218 +11,348 @@
       color:#fff;
       font-family:system-ui,sans-serif;
       background:linear-gradient(165deg,#0a0415,#1a0820);
-      padding:40px 20px
+      padding:38px 18px
     }
-    .wrap{
-      max-width:800px;
-      margin:0 auto;
-      display:flex;
-      flex-direction:column;
-      gap:20px
-    }
-    .logo{text-align:center;margin-bottom:20px}
-    .logo img{width:min(400px,80vw);height:auto}
-    .panel{
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:20px;
-      padding:30px;
-      backdrop-filter:blur(16px)
-    }
-    .header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:30px;
-      flex-wrap:wrap;
-      gap:15px
-    }
-    h1{font-size:24px;margin-bottom:8px}
-    .room-code{
-      display:inline-block;
-      background:rgba(255,61,107,.15);
-      border:1px solid rgba(255,61,107,.3);
-      padding:8px 16px;
-      border-radius:12px;
-      font-size:20px;
-      font-weight:800;
-      letter-spacing:4px;
-      color:#ff3d6b;
-      font-family:monospace
-    }
-    .share-section{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.16);
-      padding:20px;
-      border-radius:12px;
-      margin-bottom:20px
-    }
-    .share-label{
-      font-size:14px;
-      color:rgba(255,255,255,.65);
-      margin-bottom:10px
-    }
-    .share-box{display:flex;gap:10px}
-    .share-input{
-      flex:1;
-      padding:10px 14px;
-      background:rgba(0,0,0,.3);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:10px;
-      color:#fff;
-      font-size:14px;
-      font-family:monospace;
-      direction:ltr;
-      text-align:left
-    }
-    .copy-btn{
-      padding:10px 20px;
-      background:rgba(255,255,255,.1);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:10px;
-      color:#fff;
-      font-size:14px;
-      font-weight:600;
-      cursor:pointer
-    }
-    .section h2{
-      font-size:18px;
-      margin-bottom:15px;
-      color:rgba(255,255,255,.65)
-    }
-    .players{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-      gap:12px;
-      margin-bottom:20px
-    }
-    .player{
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.16);
-      padding:15px;
-      border-radius:12px;
-      display:flex;
-      align-items:center;
-      gap:12px
-    }
-    .player-avatar{
-      width:40px;
-      height:40px;
-      border-radius:50%;
-      background:linear-gradient(135deg,#ff1b3a,#ff3d6b);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:18px;
-      font-weight:700
-    }
-    .player-name{font-size:15px;font-weight:600}
-    .player.host .player-name::after{content:' 👑';font-size:14px}
-    .actions{display:flex;gap:12px;flex-wrap:wrap}
-    .btn{
-      flex:1;
-      min-width:150px;
-      padding:14px 20px;
-      border:none;
-      border-radius:12px;
-      font-size:15px;
-      font-weight:700;
-      color:#fff;
-      background:linear-gradient(135deg,#ff1b3a,#ff3d6b);
-      cursor:pointer
-    }
-    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .status-dot{position:fixed;top:18px;left:18px;width:12px;height:12px;border-radius:50%;background:#ff2d55;box-shadow:0 0 12px #ff2d55;animation:pulse 2s infinite}
+    .status-dot.ok{background:#22c55e;box-shadow:0 0 12px #22c55e}
+    .status-dot.warn{background:#fbbf24;box-shadow:0 0 12px #fbbf24}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+    .logo{text-align:center;margin-bottom:6px}
+    .logo img{width:min(420px,80vw);height:auto}
+    .panel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:22px;padding:24px;backdrop-filter:blur(16px)}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    h1{font-size:20px}
+    .room-code{display:inline-block;background:rgba(255,61,107,.15);border:1px solid rgba(255,61,107,.3);padding:8px 14px;border-radius:12px;font-size:18px;font-weight:900;letter-spacing:4px;color:#ff3d6b;font-family:monospace}
+    .share{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.16);padding:16px;border-radius:14px;margin:14px 0}
+    .share-label{font-size:13px;color:rgba(255,255,255,.65);margin-bottom:10px}
+    .share-box{display:flex;gap:10px;flex-wrap:wrap}
+    .share-input{flex:1;min-width:240px;padding:10px 12px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.16);border-radius:10px;color:#fff;font-size:13px;font-family:monospace;direction:ltr;text-align:left}
+    .copy-btn{padding:10px 16px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:14px}
+    @media(max-width:860px){.grid{grid-template-columns:1fr}}
+    .section h2{font-size:16px;margin-bottom:12px;color:rgba(255,255,255,.65)}
+    .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+    .player{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);padding:12px 12px;border-radius:14px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+    .left{display:flex;align-items:center;gap:10px;min-width:0}
+    .avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ff1b3a,#ff3d6b);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex:0 0 auto}
+    .name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tag{font-size:11px;opacity:.8;margin-right:6px}
+    .pill{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.22)}
+    .pill.ready{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.12)}
+    .pill.notready{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.12)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{flex:1;min-width:160px;padding:13px 14px;border:none;border-radius:12px;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff1b3a,#ff3d6b);cursor:pointer}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
     .btn.secondary{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
     .btn.danger{background:linear-gradient(135deg,#dc2626,#b91c1c)}
-    .toast{
-      position:fixed;
-      bottom:30px;
-      left:50%;
-      transform:translateX(-50%) translateY(100px);
-      background:rgba(0,0,0,.9);
-      color:#fff;
-      padding:12px 24px;
-      border-radius:12px;
-      font-size:14px;
-      font-weight:600;
-      opacity:0;
-      transition:all .3s;
-      z-index:1000
-    }
+    .sideCard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:16px}
+    .kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+    .kv:last-child{border-bottom:0}
+    .k{font-size:12px;color:rgba(255,255,255,.65)}
+    .v{font-size:12px;font-weight:800}
+    .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(0,0,0,.92);color:#fff;padding:12px 22px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;transition:all .3s;z-index:1000;backdrop-filter:blur(10px)}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  </style>
+    .games{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:10px 0 18px}
+    .gameCard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:14px;cursor:pointer;transition:transform .15s,background .15s,border-color .15s}
+    .gameCard:hover{transform:translateY(-2px);background:rgba(255,255,255,.07)}
+    .gameCard.disabled{opacity:.55;cursor:not-allowed}
+    .gameCard.selected{border-color:rgba(168,85,247,.9);box-shadow:0 0 0 3px rgba(168,85,247,.25)}
+    .gameTop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+    .gameIcon{width:42px;height:42px;border-radius:12px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.35);display:flex;align-items:center;justify-content:center;font-size:22px}
+    .gameTitle{font-weight:900}
+    .gameDesc{font-size:12px;opacity:.75;line-height:1.6}
+    .badge{font-size:10px;font-weight:900;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.22)}
+    .badge.on{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.12)}
+    .badge.soon{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.12)}
+
+</style>
 </head>
 <body>
+  <div class="status-dot" id="status"></div>
   <div class="wrap">
-    <div class="logo">
-      <img src="/logo.png" alt="Gamehub4u">
-    </div>
+    <div class="logo"><img src="/logo.png" alt="Gamehub4u"></div>
+
     <div class="panel">
       <div class="header">
         <div>
-          <h1>غرفة اللعب</h1>
-          <span class="room-code" id="roomCode">----</span>
+          <h1>لوبي الغرفة</h1>
+          <div style="margin-top:8px"><span class="room-code" id="roomCode">----</span></div>
         </div>
+        <div style="font-size:12px;opacity:.7">Server: <span dir="ltr" style="font-family:monospace">https://api.gamehub4u.com</span></div>
       </div>
-      <div class="share-section">
+
+      <div class="share">
         <div class="share-label">شارك هذا الرابط مع أصدقائك:</div>
         <div class="share-box">
           <input type="text" class="share-input" id="shareLink" readonly>
           <button class="copy-btn" id="copyBtn">نسخ</button>
         </div>
       </div>
-      <div class="section">
-        <h2>اللاعبين (<span id="playerCount">1</span>)</h2>
-        <div class="players" id="playersList"></div>
-      </div>
-      <div class="actions">
-        <button class="btn" id="startBtn">ابدأ اللعبة</button>
-        <button class="btn secondary" id="settingsBtn">الإعدادات</button>
-        <button class="btn danger" id="leaveBtn">مغادرة</button>
+
+      <div class="grid">
+        <div class="section">
+          <h2>اختيار اللعبة</h2>
+          <div class="games" id="gamesGrid">
+            <div class="gameCard" data-game="mafia">
+              <div class="gameTop">
+                <div class="gameIcon">🕵️‍♂️</div>
+                <div class="badge on">متاحة</div>
+              </div>
+              <div class="gameTitle">مافيا</div>
+              <div class="gameDesc">لعبة الأدوار والخداع (النسخة الأولى).</div>
+            </div>
+            <div class="gameCard disabled" data-game="werewolf">
+              <div class="gameTop">
+                <div class="gameIcon">🐺</div>
+                <div class="badge soon">قريباً</div>
+              </div>
+              <div class="gameTitle">Werewolf</div>
+              <div class="gameDesc">قريباً مع نفس نظام الربط.</div>
+            </div>
+            <div class="gameCard disabled" data-game="secrethitler">
+              <div class="gameTop">
+                <div class="gameIcon">🗳️</div>
+                <div class="badge soon">قريباً</div>
+              </div>
+              <div class="gameTitle">Secret Hitler</div>
+              <div class="gameDesc">قريباً.</div>
+            </div>
+          </div>
+          <div style="font-size:12px;opacity:.65;line-height:1.6">* المستضيف فقط يقدر يغيّر اختيار اللعبة.
+          </div>
+
+          <h2 style="margin-top:16px">اللاعبين (<span id="playerCount">0</span>)</h2>
+          <div class="players" id="playersList"></div>
+
+          <div class="actions">
+            <button class="btn secondary" id="readyBtn">جاهز</button>
+            <button class="btn" id="startBtn" disabled>ابدأ اللعبة</button>
+            <button class="btn danger" id="leaveBtn">مغادرة</button>
+          </div>
+        </div>
+
+        <div class="sideCard">
+          <div class="kv"><div class="k">حالتي</div><div class="v" id="meState">-</div></div>
+          <div class="kv"><div class="k">أنا الهوست</div><div class="v" id="meHost">-</div></div>
+          <div class="kv"><div class="k">جاهزين</div><div class="v" id="readyCount">0</div></div>
+          <div class="kv"><div class="k">الكل جاهز</div><div class="v" id="allReady">-</div></div>
+          <div style="margin-top:10px;font-size:12px;opacity:.65;line-height:1.7">
+            كل لاعب يضغط "جاهز". زر "ابدأ" يشتغل للمستضيف فقط لما الكل يكون جاهز.
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
   <div class="toast" id="toast"></div>
+
   <script>
-    const urlParams=new URLSearchParams(location.search);
-    const roomCode=urlParams.get('room')||'----';
-    document.getElementById('roomCode').textContent=roomCode;
+    const SERVER='https://api.gamehub4u.com';
+    const params=new URLSearchParams(location.search);
+    const roomCode=(params.get('room')||'').toUpperCase();
+    if(!roomCode){ location.href='/host.html'; }
+
+    const status=document.getElementById('status');
+    const roomCodeEl=document.getElementById('roomCode');
+    const shareLinkEl=document.getElementById('shareLink');
+    const playersList=document.getElementById('playersList');
+    const playerCountEl=document.getElementById('playerCount');
+    const readyBtn=document.getElementById('readyBtn');
+    const startBtn=document.getElementById('startBtn');
+    const leaveBtn=document.getElementById('leaveBtn');
+    const meState=document.getElementById('meState');
+    const meHost=document.getElementById('meHost');
+    const readyCount=document.getElementById('readyCount');
+    const allReadyEl=document.getElementById('allReady');
+
+
+    const gamesGrid=document.getElementById("gamesGrid");
+    let selectedGame="mafia";
+
+
+    roomCodeEl.textContent=roomCode;
     const shareLink=location.origin+'/?room='+roomCode;
-    document.getElementById('shareLink').value=shareLink;
-    const players=[{name:localStorage.getItem('gh_name')||'أنت',isHost:true}];
-    function renderPlayers(){
-      const list=document.getElementById('playersList');
-      document.getElementById('playerCount').textContent=players.length;
-      list.innerHTML=players.map(p=>`
-        <div class="player ${p.isHost?'host':''}">
-          <div class="player-avatar">${p.name.charAt(0).toUpperCase()}</div>
-          <div class="player-name">${p.name}</div>
-        </div>
-      `).join('')
+    shareLinkEl.value=shareLink;
+
+    let socket=null;
+    let isConnected=false;
+    let roomInfo=null;
+    let myId=null;
+    let myReady=false;
+
+    function showToast(msg){
+      const t=document.getElementById('toast');
+      t.textContent=msg;
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'),2000);
     }
-    renderPlayers();
-    document.getElementById('copyBtn').onclick=async()=>{
-      const input=document.getElementById('shareLink');
-      try{
-        await navigator.clipboard.writeText(input.value);
-        showToast('تم نسخ الرابط ✓')
-      }catch(e){
-        input.select();
-        document.execCommand('copy');
-        showToast('تم نسخ الرابط ✓')
+    async function copyText(text){
+      try{ await navigator.clipboard.writeText(text); showToast('تم النسخ ✓'); }
+      catch(e){
+        const inp=shareLinkEl; inp.select(); document.execCommand('copy'); showToast('تم النسخ ✓');
+      }
+    }
+    document.getElementById('copyBtn').onclick=()=>copyText(shareLink);
+
+    function makeId(){
+      const id='cid_'+Math.random().toString(36).slice(2);
+      localStorage.setItem('gh_clientId',id);
+      return id;
+    }
+
+
+    function renderGames(isHost){
+      if(!gamesGrid) return;
+      const cards=[...gamesGrid.querySelectorAll(".gameCard")];
+      cards.forEach(card=>{
+        const id=card.dataset.game;
+        const disabled=card.classList.contains("disabled");
+        card.classList.toggle("selected", id===selectedGame);
+        card.onclick=()=>{
+          if(disabled) return showToast("قريباً");
+          if(!isHost) return showToast("فقط المستضيف يختار اللعبة");
+          if(!socket) return;
+          if(id===selectedGame) return;
+          selectedGame=id;
+          socket.emit("room:setGame", { roomCode, gameId:id });
+        };
+      });
+    }
+
+    function render(){
+      if(!roomInfo){ return; }
+      const players=roomInfo.players||[];
+      playerCountEl.textContent=players.length;
+      const readyN=players.filter(p=>p.isReady).length;
+      readyCount.textContent=readyN+' / '+players.length;
+      const allReady = players.length>0 && readyN===players.length;
+      allReadyEl.textContent = allReady ? 'نعم' : 'لا';
+
+      if(roomInfo.selectedGame) selectedGame=roomInfo.selectedGame;
+
+
+      const me=players.find(p=>p.id===myId);
+
+
+      const isHost = me ? me.isHost : false;
+
+      renderGames(isHost);
+
+      myReady = !!(me && me.isReady);
+
+      meHost.textContent = isHost ? 'نعم' : 'لا';
+      meState.textContent = myReady ? 'جاهز' : 'غير جاهز';
+
+      readyBtn.textContent = myReady ? 'إلغاء الجاهزية' : 'جاهز';
+      readyBtn.className = 'btn secondary';
+
+      startBtn.disabled = !(isHost && allReady && !!selectedGame);
+
+
+
+      playersList.innerHTML = players.map(p=>{
+        const first=(p.name||'?').trim().charAt(0).toUpperCase();
+        return `
+          <div class="player">
+            <div class="left">
+              <div class="avatar">${first||'?'}</div>
+              <div class="name">${escapeHtml(p.name||'لاعب')}${p.isHost?'<span class="tag">👑</span>':''}</div>
+            </div>
+            <div class="pill ${p.isReady?'ready':'notready'}">${p.isReady?'جاهز':'ينتظر'}</div>
+          </div>`;
+      }).join('');
+
+      if(isHost && allReady){
+        showToast('الكل جاهز ✓');
+      }
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
+    }
+
+    // ====== socket boot ======
+    status.classList.add('warn');
+    fetch(SERVER+'/socket.io/socket.io.js')
+      .then(()=>loadSocketIO())
+      .catch(()=>{ status.classList.remove('warn'); status.classList.add('bad'); showToast('غير قادر على الوصول للسيرفر'); });
+
+    function loadSocketIO(){
+      const script=document.createElement('script');
+      script.src=SERVER+'/socket.io/socket.io.js';
+      script.onload=()=>{
+        try{
+          const clientId=localStorage.getItem('gh_clientId')||makeId();
+          socket=io(SERVER,{ transports:['websocket','polling'], auth:{clientId} });
+
+          socket.on('connect',()=>{
+            isConnected=true;
+            myId=socket.id;
+            status.classList.remove('warn','bad');
+            status.classList.add('ok');
+
+            // attach/join defensively (if user refreshed lobby)
+            const name=localStorage.getItem('gh_name')||'لاعب';
+            socket.emit('player:join',{ roomCode, name, clientId });
+          });
+
+          socket.on('disconnect',()=>{
+            isConnected=false;
+            status.classList.remove('ok');
+            status.classList.add('bad');
+          });
+
+          socket.on('players:update',(info)=>{ roomInfo=info; render(); });
+          socket.on('room:update',(info)=>{ roomInfo=info; render(); });
+
+          socket.on('game:started',(p)=>{
+            const gid=(p&&p.gameId)||'mafia';
+            if(gid==='mafia'){
+              location.href=`/mafia.html?room=${roomCode}`;
+            }else{
+              alert("قريباً: "+gid);
+            }
+          });
+
+
+          socket.on('game:error',(d)=>showToast(d?.message||'خطأ'));
+          socket.on('join:error',(d)=>showToast(d?.message||'خطأ'));
+        }catch(e){
+          status.classList.add('bad');
+          showToast('خطأ في الاتصال');
+        }
+      };
+      script.onerror=()=>{ status.classList.add('bad'); showToast('فشل تحميل Socket.IO'); };
+      document.head.appendChild(script);
+    }
+
+    // ====== actions ======
+    readyBtn.onclick=()=>{
+      if(!isConnected||!socket) return showToast('غير متصل');
+      const next=!myReady;
+      socket.emit('player:ready',{ roomCode, isReady: next });
+      // optimistic
+      myReady=next;
+      render();
+    };
+
+    startBtn.onclick=()=>{
+      if(!isConnected||!socket) return showToast('غير متصل');
+      socket.emit('game:start',{ roomCode });
+    };
+
+    leaveBtn.onclick=()=>{
+      if(confirm('هل تريد مغادرة الغرفة؟')){
+        try{ socket?.emit('player:leave',{ roomCode }); }catch(e){}
+        location.href='/';
       }
     };
-    document.getElementById('startBtn').onclick=()=>showToast('جاري بدء اللعبة...');
-    document.getElementById('settingsBtn').onclick=()=>showToast('قريباً...');
-    document.getElementById('leaveBtn').onclick=()=>{
-      if(confirm('هل تريد مغادرة الغرفة؟'))location.href='/'
-    };
-    function showToast(msg){
-      const toast=document.getElementById('toast');
-      toast.textContent=msg;
-      toast.classList.add('show');
-      setTimeout(()=>toast.classList.remove('show'),2000)
-    }
   </script>
 </body>
 </html>
