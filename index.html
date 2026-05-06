@@ -21,7 +21,7 @@
     socket.on('connect',()=>light.classList.add('ok')); socket.on('disconnect',()=>light.classList.remove('ok'));
     function show(t){toast.textContent=t;toast.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>toast.style.display='none',1400)}
     function clean(x){return String(x||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8)}
-    function join(){const rc=clean(room.value);const nm=String(name.value||'').trim().slice(0,24);if(!rc)return show('Enter room code');if(!nm)return show('Enter name');socket.emit('player:join',{roomCode:rc,name:nm,clientId:cid});}
+    function join(){const rc=clean(room.value);const nm=String(name.value||'').trim().slice(0,24);if(!rc)return show('Enter room code');if(!nm)return show('Enter name');localStorage.setItem('gh_playerName',nm);localStorage.setItem('playerName',nm);socket.emit('player:join',{roomCode:rc,name:nm,clientId:cid});}
     document.getElementById('join').onclick=join; [room,name].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')join()}));
     socket.on('join:error',({message}={})=>show(message||'Join error'));
     socket.on('player:joined',({roomCode}={})=>{location.href='/lobby.html?room='+encodeURIComponent(clean(roomCode||room.value));});
