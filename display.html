@@ -133,7 +133,7 @@
         div.className = "player";
         div.innerHTML = `
           <div style="font-weight:950; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(p.name||"Player")}</div>
-          <div class="badge ${p.ready ? "ready" : ""}">${p.ready ? "READY" : "WAIT"}</div>
+          <div class="badge ${(p.isReady || p.ready) ? "ready" : ""}">${(p.isReady || p.ready) ? "READY" : "WAIT"}</div>
         `;
         playersEl.appendChild(div);
       });
