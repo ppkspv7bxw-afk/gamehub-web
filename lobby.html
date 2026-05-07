@@ -5,7 +5,7 @@
 <script src="https://api.gamehub4u.com/socket.io/socket.io.js"></script>
 <script>
 const SERVER_URL='https://api.gamehub4u.com';let cid=localStorage.getItem('gh_clientId')||localStorage.getItem('clientId');if(!cid){cid=crypto?.randomUUID?.()||('cid_'+Math.random().toString(36).slice(2));localStorage.setItem('gh_clientId',cid);localStorage.setItem('clientId',cid)}
-const qs=new URLSearchParams(location.search);const roomCode=(qs.get('room')||qs.get('code')||'').toUpperCase();const name=localStorage.getItem('gh_name')||localStorage.getItem('playerName')||'Player';const $=id=>document.getElementById(id);let myReady=false,dev=false,state=null;
+const qs=new URLSearchParams(location.search);const roomCode=(qs.get('room')||qs.get('code')||'').toUpperCase();const name=localStorage.getItem('gh_playerName')||localStorage.getItem('playerName')||'Player';const $=id=>document.getElementById(id);let myReady=false,dev=false,state=null;
 const games=[{id:'mafia',name:'Mafia',desc:'المافيا الجديدة مع أدوار وبوتات وتجربة كاملة.',path:'/mafia.html'},{id:'out-of-loop',name:'Out of the Loop',desc:'واحد برا السالفة والباقي يعرفون الكلمة.',path:'/out-of-loop.html'},{id:'conqueror',name:'Conqueror',desc:'خريطة مناطق، موارد، جيوش، وسيطرة.',path:'/conqueror.html'}];
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function show(t){const x=$('toast');x.textContent=t;x.style.display='block';clearTimeout(x._t);x._t=setTimeout(()=>x.style.display='none',1600)}
 const socket=io(SERVER_URL,{transports:['websocket','polling'],auth:{clientId:cid,gh_clientId:cid}});

@@ -167,16 +167,18 @@
       phaseEl.textContent = labelPhase(s.phase);
       roundEl.textContent = s.round || "—";
 
-      if (s.lastResult){
-        if (s.lastResult.type === "night"){
-          const died = s.lastResult.died ? s.lastResult.died.name : "No one";
+      if (s.lastResult) {
+        const allPlayers = s.alive || [];
+        function findName(clientId) {
+          const p = allPlayers.find(x => x.clientId === clientId);
+          return p ? p.name : "Unknown";
+        }
+        if (s.lastResult.phase === "nightEnd") {
+          const died = s.lastResult.killed ? findName(s.lastResult.killed) : "No one";
           resultEl.textContent = `Night: ${died} died.`;
-        } else if (s.lastResult.type === "day"){
-          if (s.lastResult.tie) resultEl.textContent = "Day: Tie — no one eliminated.";
-          else {
-            const el = s.lastResult.eliminated ? s.lastResult.eliminated.name : "No one";
-            resultEl.textContent = `Day: ${el} eliminated.`;
-          }
+        } else if (s.lastResult.phase === "dayEnd") {
+          const el = s.lastResult.executed ? findName(s.lastResult.executed) : null;
+          resultEl.textContent = el ? `Day: ${el} eliminated.` : "Day: Tie — no one eliminated.";
         }
       } else {
         resultEl.textContent = "—";
